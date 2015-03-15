@@ -53,7 +53,7 @@ public class CommonRpcRegister {
 	}
 	
 	private String[] getServers(String serverIp){
-		String[]serverIps=serverIp.split(";");
+		String[]serverIps=serverIp.split(",");
 		return serverIps;
 	}
 }
