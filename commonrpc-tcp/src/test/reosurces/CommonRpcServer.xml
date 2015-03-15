@@ -6,7 +6,7 @@
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
     http://www.commonrpc.com/commonrpc http://www.commonrpc.com/commonrpc/commonrpc.xsd">
     <!--redis 注册中心地址  -->
-    <commonrpc:application id="rpcRegistryApplication" address="127.0.0.1:6379"></commonrpc:application>
+    <commonrpc:application id="rpcRegistryApplication" address="127.0.0.1:6379,127.0.0.1:6379"></commonrpc:application>
      
     <commonrpc:registry id="rpcRegistry" port="10009" timeout="500" token="1122" procotolType="1" codecType="4" group="demo"></commonrpc:registry>
     

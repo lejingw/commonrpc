@@ -1,0 +1,100 @@
+commonrpc Logger: INFO{AbstractApplicationContext.java:411}-Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@792e67fa: display name [org.springframework.context.support.ClassPathXmlApplicationContext@792e67fa]; startup date [Sun Mar 15 21:33:21 CST 2015]; root of context hierarchy
+ commonrpc Logger: INFO{XmlBeanDefinitionReader.java:323}-Loading XML bean definitions from class path resource [commonRpcServer.xml]
+ commonrpc Logger: INFO{AbstractApplicationContext.java:426}-Bean factory for application context [org.springframework.context.support.ClassPathXmlApplicationContext@792e67fa]: org.springframework.beans.factory.support.DefaultListableBeanFactory@7eaf8890
+ commonrpc Logger: INFO{DefaultListableBeanFactory.java:414}-Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@7eaf8890: defining beans [rpcRegistryApplication,rpcRegistry,test.cross.plateform.rocketrpc.demo.service.IDemoService,demoService,demoRpcFilter]; root of factory hierarchy
+ commonrpc Logger: INFO{CommonRpcTcpServer.java:112}------------------开始启动--------------------------
+ commonrpc Logger: INFO{CommonRpcTcpServer.java:114}-端口号：10009的服务端已经启动,作者:liubing
+ commonrpc Logger: INFO{CommonRpcTcpServer.java:115}------------------启动结束--------------------------
+ commonrpc Logger: INFO{AbstractApplicationContext.java:411}-Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@792e67fa: display name [org.springframework.context.support.ClassPathXmlApplicationContext@792e67fa]; startup date [Sun Mar 15 21:33:48 CST 2015]; root of context hierarchy
+ commonrpc Logger: INFO{XmlBeanDefinitionReader.java:323}-Loading XML bean definitions from class path resource [commonRpcServer.xml]
+ commonrpc Logger: INFO{AbstractApplicationContext.java:426}-Bean factory for application context [org.springframework.context.support.ClassPathXmlApplicationContext@792e67fa]: org.springframework.beans.factory.support.DefaultListableBeanFactory@3959199
+ commonrpc Logger: INFO{DefaultListableBeanFactory.java:414}-Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@3959199: defining beans [rpcRegistryApplication,rpcRegistry,test.cross.plateform.rocketrpc.demo.service.IDemoService,demoService,demoRpcFilter]; root of factory hierarchy
+ commonrpc Logger: INFO{CommonRpcTcpServer.java:112}------------------开始启动--------------------------
+ commonrpc Logger: INFO{CommonRpcTcpServer.java:114}-端口号：10009的服务端已经启动,作者:liubing
+ commonrpc Logger: INFO{CommonRpcTcpServer.java:115}------------------启动结束--------------------------
+ commonrpc Logger: INFO{AbstractApplicationContext.java:411}-Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@3cdb8522: display name [org.springframework.context.support.ClassPathXmlApplicationContext@3cdb8522]; startup date [Sun Mar 15 21:33:54 CST 2015]; root of context hierarchy
+ commonrpc Logger: INFO{XmlBeanDefinitionReader.java:323}-Loading XML bean definitions from class path resource [CommonRpcClient.xml]
+ commonrpc Logger: INFO{AbstractApplicationContext.java:426}-Bean factory for application context [org.springframework.context.support.ClassPathXmlApplicationContext@3cdb8522]: org.springframework.beans.factory.support.DefaultListableBeanFactory@1d3e4f82
+ commonrpc Logger: INFO{DefaultListableBeanFactory.java:414}-Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@1d3e4f82: defining beans [rpcRegistryApplicationClient,demoServiceClient]; root of factory hierarchy
+ commonrpc Logger: INFO{CommonRpcTcpClientFactory.java:50}-----------------客户端开始启动-------------------------------
+ commonrpc Logger: INFO{CommonRpcTcpClientFactory.java:68}-----------------客户端启动结束-------------------------------
+ commonrpc Logger:ERROR{CommonRpcTcpServerHandler.java:76}-catch some exception not IOException
+ java.io.IOException: 远程主机强迫关闭了一个现有的连接。
+	at sun.nio.ch.SocketDispatcher.read0(Native Method)
+	at sun.nio.ch.SocketDispatcher.read(SocketDispatcher.java:43)
+	at sun.nio.ch.IOUtil.readIntoNativeBuffer(IOUtil.java:225)
+	at sun.nio.ch.IOUtil.read(IOUtil.java:193)
+	at sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:375)
+	at io.netty.buffer.UnpooledUnsafeDirectByteBuf.setBytes(UnpooledUnsafeDirectByteBuf.java:447)
+	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:881)
+	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:241)
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:119)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:511)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:468)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:382)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:354)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$2.run(SingleThreadEventExecutor.java:111)
+	at java.lang.Thread.run(Thread.java:724)
+commonrpc Logger: INFO{AbstractApplicationContext.java:411}-Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@55ac8c3d: display name [org.springframework.context.support.ClassPathXmlApplicationContext@55ac8c3d]; startup date [Sun Mar 15 21:34:13 CST 2015]; root of context hierarchy
+ commonrpc Logger: INFO{XmlBeanDefinitionReader.java:323}-Loading XML bean definitions from class path resource [commonRpcServer.xml]
+ commonrpc Logger: INFO{AbstractApplicationContext.java:426}-Bean factory for application context [org.springframework.context.support.ClassPathXmlApplicationContext@55ac8c3d]: org.springframework.beans.factory.support.DefaultListableBeanFactory@6b611e0
+ commonrpc Logger: INFO{DefaultListableBeanFactory.java:414}-Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@6b611e0: defining beans [rpcRegistryApplication,rpcRegistry,test.cross.plateform.rocketrpc.demo.service.IDemoService,demoService,demoRpcFilter]; root of factory hierarchy
+ commonrpc Logger: INFO{CommonRpcTcpServer.java:112}------------------开始启动--------------------------
+ commonrpc Logger: INFO{CommonRpcTcpServer.java:114}-端口号：10009的服务端已经启动,作者:liubing
+ commonrpc Logger: INFO{CommonRpcTcpServer.java:115}------------------启动结束--------------------------
+ commonrpc Logger: INFO{AbstractApplicationContext.java:411}-Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@301bb7be: display name [org.springframework.context.support.ClassPathXmlApplicationContext@301bb7be]; startup date [Sun Mar 15 21:34:37 CST 2015]; root of context hierarchy
+ commonrpc Logger: INFO{XmlBeanDefinitionReader.java:323}-Loading XML bean definitions from class path resource [CommonRpcClient.xml]
+ commonrpc Logger: INFO{AbstractApplicationContext.java:426}-Bean factory for application context [org.springframework.context.support.ClassPathXmlApplicationContext@301bb7be]: org.springframework.beans.factory.support.DefaultListableBeanFactory@1a28785c
+ commonrpc Logger: INFO{DefaultListableBeanFactory.java:414}-Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@1a28785c: defining beans [rpcRegistryApplicationClient,demoServiceClient]; root of factory hierarchy
+ commonrpc Logger: INFO{CommonRpcTcpClientFactory.java:50}-----------------客户端开始启动-------------------------------
+ commonrpc Logger: INFO{CommonRpcTcpClientFactory.java:68}-----------------客户端启动结束-------------------------------
+ commonrpc Logger:ERROR{CommonRpcTcpClientHandler.java:64}-catch some exception not IOException
+ java.io.IOException: 远程主机强迫关闭了一个现有的连接。
+	at sun.nio.ch.SocketDispatcher.read0(Native Method)
+	at sun.nio.ch.SocketDispatcher.read(SocketDispatcher.java:43)
+	at sun.nio.ch.IOUtil.readIntoNativeBuffer(IOUtil.java:225)
+	at sun.nio.ch.IOUtil.read(IOUtil.java:193)
+	at sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:375)
+	at io.netty.buffer.UnpooledUnsafeDirectByteBuf.setBytes(UnpooledUnsafeDirectByteBuf.java:447)
+	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:881)
+	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:241)
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:119)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:511)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:468)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:382)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:354)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$2.run(SingleThreadEventExecutor.java:111)
+	at java.lang.Thread.run(Thread.java:724)
+commonrpc Logger:ERROR{CommonRpcTcpClientHandler.java:75}-connection closed: /192.168.1.10:10009
+ commonrpc Logger: INFO{AbstractApplicationContext.java:411}-Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@792e67fa: display name [org.springframework.context.support.ClassPathXmlApplicationContext@792e67fa]; startup date [Sun Mar 15 21:35:43 CST 2015]; root of context hierarchy
+ commonrpc Logger: INFO{XmlBeanDefinitionReader.java:323}-Loading XML bean definitions from class path resource [commonRpcServer.xml]
+ commonrpc Logger: INFO{AbstractApplicationContext.java:426}-Bean factory for application context [org.springframework.context.support.ClassPathXmlApplicationContext@792e67fa]: org.springframework.beans.factory.support.DefaultListableBeanFactory@362ee6ea
+ commonrpc Logger: INFO{DefaultListableBeanFactory.java:414}-Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@362ee6ea: defining beans [rpcRegistryApplication,rpcRegistry,test.cross.plateform.rocketrpc.demo.service.IDemoService,demoService,demoRpcFilter]; root of factory hierarchy
+ commonrpc Logger: INFO{CommonRpcTcpServer.java:112}------------------开始启动--------------------------
+ commonrpc Logger: INFO{CommonRpcTcpServer.java:114}-端口号：10009的服务端已经启动,作者:liubing
+ commonrpc Logger: INFO{CommonRpcTcpServer.java:115}------------------启动结束--------------------------
+ commonrpc Logger: INFO{AbstractApplicationContext.java:411}-Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@301bb7be: display name [org.springframework.context.support.ClassPathXmlApplicationContext@301bb7be]; startup date [Sun Mar 15 21:35:47 CST 2015]; root of context hierarchy
+ commonrpc Logger: INFO{XmlBeanDefinitionReader.java:323}-Loading XML bean definitions from class path resource [CommonRpcClient.xml]
+ commonrpc Logger: INFO{AbstractApplicationContext.java:426}-Bean factory for application context [org.springframework.context.support.ClassPathXmlApplicationContext@301bb7be]: org.springframework.beans.factory.support.DefaultListableBeanFactory@57b3af58
+ commonrpc Logger: INFO{DefaultListableBeanFactory.java:414}-Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@57b3af58: defining beans [rpcRegistryApplicationClient,demoServiceClient]; root of factory hierarchy
+ commonrpc Logger: INFO{CommonRpcTcpClientFactory.java:50}-----------------客户端开始启动-------------------------------
+ commonrpc Logger: INFO{CommonRpcTcpClientFactory.java:68}-----------------客户端启动结束-------------------------------
+ commonrpc Logger:ERROR{CommonRpcTcpClientHandler.java:64}-catch some exception not IOException
+ java.io.IOException: 远程主机强迫关闭了一个现有的连接。
+	at sun.nio.ch.SocketDispatcher.read0(Native Method)
+	at sun.nio.ch.SocketDispatcher.read(SocketDispatcher.java:43)
+	at sun.nio.ch.IOUtil.readIntoNativeBuffer(IOUtil.java:225)
+	at sun.nio.ch.IOUtil.read(IOUtil.java:193)
+	at sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:375)
+	at io.netty.buffer.UnpooledUnsafeDirectByteBuf.setBytes(UnpooledUnsafeDirectByteBuf.java:447)
+	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:881)
+	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:241)
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:119)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:511)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:468)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:382)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:354)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$2.run(SingleThreadEventExecutor.java:111)
+	at java.lang.Thread.run(Thread.java:724)
+commonrpc Logger:ERROR{CommonRpcTcpClientHandler.java:75}-connection closed: /192.168.1.10:10009
+ 

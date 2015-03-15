@@ -48,7 +48,7 @@ public class CommonRpcClientService {
 		if(servers.containsKey(group)){
 			Set<InetSocketAddress> addresses=servers.get(group);
 			for(InetSocketAddress address:addresses){
-				String server1=address.getHostName()+":"+address.getPort();
+				String server1=address.getHostString()+":"+address.getPort();
 				if(server1.equals(server)){
 					servers.remove(address);
 					break;
