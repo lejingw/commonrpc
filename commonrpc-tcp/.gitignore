@@ -9,4 +9,5 @@ target
 .idea
 /out
 *.log
+*.log.*
 /*.iws
