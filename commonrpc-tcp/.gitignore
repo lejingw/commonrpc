@@ -8,5 +8,5 @@ target
 *.iml
 .idea
 /out
-
+*.log
 /*.iws
