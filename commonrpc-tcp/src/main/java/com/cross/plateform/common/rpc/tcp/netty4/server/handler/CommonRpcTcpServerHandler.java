@@ -8,8 +8,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.thread.CommonRpcTaskExecutors;
@@ -19,10 +21,12 @@ import com.cross.plateform.common.rpc.tcp.netty4.server.thread.RocketRPCServerTa
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
+
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.ReferenceCountUtil;
 /**
  * @author liubing1
  *
@@ -110,7 +114,9 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	    } catch (RejectedExecutionException exception) {
 	        
 	        sendErrorResponse(ctx, (CommonRpcRequest) message,"server threadpool full,maybe because server is slow or too many requests"+",server Ip:"+getLocalhost());
-	    }
+	    }finally{
+			ReferenceCountUtil.release(message);
+		}
 	}
 	
 	private void sendErrorResponse(final ChannelHandlerContext ctx, final CommonRpcRequest request,String errorMessage) {

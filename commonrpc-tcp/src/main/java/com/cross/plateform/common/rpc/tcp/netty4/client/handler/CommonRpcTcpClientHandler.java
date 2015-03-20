@@ -4,14 +4,17 @@
 package com.cross.plateform.common.rpc.tcp.netty4.client.handler;
 
 import java.io.IOException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.redis.register.client.service.CommonRpcClientService;
 import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.ReferenceCountUtil;
 
 /**
  * @author liubing1
@@ -33,21 +36,26 @@ public class CommonRpcTcpClientHandler extends ChannelInboundHandlerAdapter {
 
 	public void channelRead(ChannelHandlerContext ctx, Object msg)
 			throws Exception {
-		if (msg instanceof CommonRpcResponse) {
-			CommonRpcResponse response = (CommonRpcResponse) msg;
-			if (isDebugEnabled) {
-				// for performance trace
-				LOGGER.debug("receive response list from server: "
-						+ ctx.channel().remoteAddress() + ",request is:"
-						+ response.getRequestId());
+		try{
+			if (msg instanceof CommonRpcResponse) {
+				CommonRpcResponse response = (CommonRpcResponse) msg;
+				if (isDebugEnabled) {
+					// for performance trace
+					LOGGER.debug("receive response list from server: "
+							+ ctx.channel().remoteAddress() + ",request is:"
+							+ response.getRequestId());
+				}
+				
+				CommonRpcTcpClientFactory.getInstance().receiveResponse(response);
+			} else {
+				LOGGER.error("receive message error,only support List || ResponseWrapper");
+				throw new Exception(
+						"receive message error,only support List || ResponseWrapper");
 			}
-			
-			CommonRpcTcpClientFactory.getInstance().receiveResponse(response);
-		} else {
-			LOGGER.error("receive message error,only support List || ResponseWrapper");
-			throw new Exception(
-					"receive message error,only support List || ResponseWrapper");
+		}finally{
+			ReferenceCountUtil.release(msg);
 		}
+		
 	}
 	
 	@Override
