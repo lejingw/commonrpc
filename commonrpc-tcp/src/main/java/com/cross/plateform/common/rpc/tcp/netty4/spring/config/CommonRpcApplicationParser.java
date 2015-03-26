@@ -23,11 +23,16 @@ public class CommonRpcApplicationParser implements BeanDefinitionParser {
 		// TODO Auto-generated method stub
 		String id = element.getAttribute("id");
 		String address=element.getAttribute("address");
+		String flag=element.getAttribute("flag");
+		String timeout=element.getAttribute("timeout");
 		
 		RootBeanDefinition beanDefinition = new RootBeanDefinition();
 		beanDefinition.setBeanClass(CommonRpcApplication.class);
 		beanDefinition.setLazyInit(false);
         beanDefinition.getPropertyValues().addPropertyValue("address", address);
+        beanDefinition.getPropertyValues().addPropertyValue("flag", Integer.parseInt(flag));
+        beanDefinition.getPropertyValues().addPropertyValue("timeout", Integer.parseInt(timeout));
+        
         parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
 		return beanDefinition;
 	}

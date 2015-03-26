@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
-import com.cross.plateform.common.rpc.redis.register.server.service.CommonRpcServerService;
+import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
 import com.cross.plateform.common.rpc.tcp.netty4.server.CommonRpcTcpServer;
 /**
  * @author liubing1
@@ -31,7 +31,7 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 	@Override
 	public void destroy() throws Exception {
 		// TODO Auto-generated method stub
-		CommonRpcServerService.getInstance().deleteRpcServiceServer(group, getLocalhost());
+		CommonRpcServerService.getInstance().close();
 		CommonRpcTcpServer.getInstance().stop();//停止
 	}
 	
@@ -41,13 +41,11 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 		if(port==0){
 			throw new Exception("parameter  timeout port can not be null");
 		}
-		
-			CommonRpcServerService.getInstance().registerService(group, getLocalhost());
-			CommonRpcTcpServer.getInstance().setToken(token);
-			CommonRpcTcpServer.getInstance().setCodecType(codecType);
-			CommonRpcTcpServer.getInstance().setProcotolType(procotolType);
-			CommonRpcTcpServer.getInstance().setGroup(group);
-			CommonRpcTcpServer.getInstance().start(port,timeout);
+		CommonRpcServerService.getInstance().registerService(group, getLocalhost());
+		CommonRpcTcpServer.getInstance().setToken(token);
+		CommonRpcTcpServer.getInstance().setCodecType(codecType);
+		CommonRpcTcpServer.getInstance().setProcotolType(procotolType);
+		CommonRpcTcpServer.getInstance().start(port,timeout);
 	}
 	/**
 	 * @return the port

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-import com.cross.plateform.common.rpc.redis.register.client.service.CommonRpcClientService;
+import com.cross.plateform.common.rpc.service.client.service.CommonRpcClientService;
 import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
 import com.cross.plateform.common.rpc.tcp.netty4.client.proxy.CommonRpcTcpClientProxy;
 /**
@@ -52,7 +52,7 @@ public class CommonRpcReference implements FactoryBean, InitializingBean,
 	@Override
 	public void destroy() throws Exception {
 		// TODO Auto-generated method stub
-		CommonRpcClientService.getInstance().removeAll();
+		CommonRpcClientService.getInstance().close();
 		CommonRpcTcpClientFactory.getInstance().stopClient();
 	}
 
@@ -62,7 +62,7 @@ public class CommonRpcReference implements FactoryBean, InitializingBean,
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// TODO Auto-generated method stub
-		CommonRpcTcpClientFactory.getInstance().startClient(timeout,group);
+		CommonRpcTcpClientFactory.getInstance().startClient(timeout);
 	}
 
 	/* (non-Javadoc)

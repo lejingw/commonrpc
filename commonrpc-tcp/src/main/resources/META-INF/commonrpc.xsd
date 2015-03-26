@@ -12,7 +12,10 @@
 					
 					<xsd:attribute name="address" type="xsd:string"
 						use="required" />
-						
+					<xsd:attribute name="timeout" type="xsd:int"
+						use="required" />
+					<xsd:attribute name="flag" type="xsd:int"
+						use="required" />	
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>

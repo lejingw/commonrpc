@@ -14,7 +14,7 @@ import com.cross.plateform.common.rpc.core.client.factory.RpcClientFactory;
 import com.cross.plateform.common.rpc.core.route.CommonRpcRoute;
 import com.cross.plateform.common.rpc.core.route.bean.RpcRouteServer;
 import com.cross.plateform.common.rpc.core.util.SocketAddressUtil;
-import com.cross.plateform.common.rpc.redis.register.client.service.CommonRpcClientService;
+import com.cross.plateform.common.rpc.service.client.service.CommonRpcClientService;
 /**
  * @author liubing1
  *

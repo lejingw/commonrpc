@@ -9,9 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
-import com.cross.plateform.common.rpc.redis.register.client.service.CommonRpcClientService;
 import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
-
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
@@ -27,11 +25,11 @@ public class CommonRpcTcpClientHandler extends ChannelInboundHandlerAdapter {
 
 	private static final boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	
-	private String group;
 	
-	public CommonRpcTcpClientHandler(String group) {
+	
+	public CommonRpcTcpClientHandler() {
 		super();
-		this.group = group;
+		
 	}
 
 	public void channelRead(ChannelHandlerContext ctx, Object msg)
@@ -84,7 +82,7 @@ public class CommonRpcTcpClientHandler extends ChannelInboundHandlerAdapter {
 		CommonRpcTcpClientFactory.getInstance().removeRpcClient(ctx.channel().remoteAddress().toString());
 		String server=ctx.channel().remoteAddress().toString();
 		server=server.substring(1, server.length());
-		CommonRpcClientService.getInstance().removeCommonRpcServer(group, server);
+		
 		if(ctx.channel().isOpen()){
 			ctx.channel().close();
 		}

@@ -29,12 +29,6 @@
 			
 		</dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.2</version>
-			
-		</dependency>
   </dependencies>
   <modules>
     <module>commonrpc-core</module>
@@ -42,6 +36,6 @@
     <module>commonrpc-proxy</module>
     <module>commonrpc-tcp</module>
     <module>commonrpc-http</module>
-    <module>commonrpc-register</module>
+    <module>commonrpc-service</module>
   </modules>
 </project>

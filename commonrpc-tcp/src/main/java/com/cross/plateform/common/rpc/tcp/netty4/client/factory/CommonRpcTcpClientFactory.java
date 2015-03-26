@@ -12,10 +12,14 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
+
 import java.net.InetSocketAddress;
 import java.util.concurrent.ThreadFactory;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import com.cross.plateform.common.rpc.core.client.RpcClient;
 import com.cross.plateform.common.rpc.core.client.factory.AbstractRpcClientFactory;
 import com.cross.plateform.common.rpc.core.thread.NamedThreadFactory;
@@ -45,7 +49,7 @@ public class CommonRpcTcpClientFactory extends AbstractRpcClientFactory {
 	 * @see com.cross.plateform.common.rpc.core.client.factory.RpcClientFactory#startClient()
 	 */
 	@Override
-	public void startClient(int connectTimeout,final String group) {
+	public void startClient(int connectTimeout) {
 		// TODO Auto-generated method stub
 		LOGGER.info("----------------客户端开始启动-------------------------------");
 		 bootstrap.group(workerGroup)
@@ -61,7 +65,8 @@ public class CommonRpcTcpClientFactory extends AbstractRpcClientFactory {
 	    			ChannelPipeline pipeline = channel.pipeline();
 	    			pipeline.addLast("decoder", new CommonRpcDecoderHandler());
 	    			pipeline.addLast("encoder", new CommonRpcEncoderHandler());
-	    			pipeline.addLast("handler", new CommonRpcTcpClientHandler(group));
+	    			pipeline.addLast("timeout",new IdleStateHandler(0, 0, 120));
+	    			pipeline.addLast("handler", new CommonRpcTcpClientHandler());
 	    		}
 
 	    	});

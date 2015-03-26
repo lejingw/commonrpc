@@ -53,6 +53,7 @@ public class CommonRpcHttpServerHander extends ChannelInboundHandlerAdapter {
 				this.writeResponse(ctx, result);
 			}
 		}catch(Exception e){
+			e.printStackTrace();
 			DefaultHttpResponse httpResponse=new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR);
 			httpResponse.headers().add(HttpHeaders.Names.TRANSFER_ENCODING,
 					HttpHeaders.Values.CHUNKED);

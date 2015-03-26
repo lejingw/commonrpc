@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.thread.CommonRpcTaskExecutors;
-import com.cross.plateform.common.rpc.redis.register.client.service.CommonRpcClientService;
+import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
 import com.cross.plateform.common.rpc.tcp.netty4.server.thread.CommonRpcServerFuture;
 import com.cross.plateform.common.rpc.tcp.netty4.server.thread.RocketRPCServerTask;
 import com.google.common.util.concurrent.Futures;
@@ -46,29 +46,26 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	
 	private int codecType;//编码类型
 	
-	private String group;//组名
 	
 	public CommonRpcTcpServerHandler(int timeout, int port, String token,
-			int procotolType, int codecType, String group) {
+			int procotolType, int codecType) {
 		super();
 		this.timeout = timeout;
 		this.port = port;
 		this.token = token;
 		this.procotolType = procotolType;
 		this.codecType = codecType;
-		this.group = group;
 	}
 	
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
-		CommonRpcClientService.getInstance().registerClient(group, ctx.channel().remoteAddress().toString());
+		CommonRpcServerService.getInstance().registerClient(getLocalhost(), ctx.channel().remoteAddress().toString());
 	}
 	
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
-		CommonRpcClientService.getInstance().deleteRpcClient(group, ctx.channel().remoteAddress().toString());
 		ctx.channel().close();
 	}
 	

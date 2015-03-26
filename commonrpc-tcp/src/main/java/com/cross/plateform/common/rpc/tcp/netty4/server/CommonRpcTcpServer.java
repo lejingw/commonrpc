@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -16,6 +17,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
+
 import com.cross.plateform.common.rpc.core.server.RpcServer;
 import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
 import com.cross.plateform.common.rpc.core.thread.NamedThreadFactory;
@@ -42,8 +45,6 @@ public class CommonRpcTcpServer implements RpcServer {
 	private int procotolType;//协议名称
 	
 	private int codecType;//编码类型
-	
-	private String group;
 	
 	public CommonRpcTcpServer() {
 
@@ -104,7 +105,8 @@ public class CommonRpcTcpServer implements RpcServer {
 	          ChannelPipeline pipeline = channel.pipeline();
 	          pipeline.addLast("decoder", new CommonRpcDecoderHandler());
 	          pipeline.addLast("encoder", new CommonRpcEncoderHandler());
-	          pipeline.addLast("handler", new CommonRpcTcpServerHandler(timeout,port,token,procotolType,codecType,group));
+	          pipeline.addLast("timeout",new IdleStateHandler(0, 0, 120));
+	          pipeline.addLast("handler", new CommonRpcTcpServerHandler(timeout,port,token,procotolType,codecType));
 	          
 	        }
 
@@ -133,12 +135,7 @@ public class CommonRpcTcpServer implements RpcServer {
 	public void setCodecType(int codecType) {
 		this.codecType = codecType;
 	}
-	/**
-	 * @param group the group to set
-	 */
-	public void setGroup(String group) {
-		this.group = group;
-	}
+	
 	
 	
 }

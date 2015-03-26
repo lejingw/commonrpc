@@ -19,7 +19,7 @@ public interface RpcClientFactory {
 	 * 创建客户端
 	 * @param connectiontimeout  连接超时时间
 	 */
-	public void startClient(int connectiontimeout,String group);
+	public void startClient(int connectiontimeout);
 	
 	
 	/**

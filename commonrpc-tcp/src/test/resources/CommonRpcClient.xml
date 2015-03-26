@@ -7,7 +7,7 @@
     http://www.commonrpc.com/commonrpc http://www.commonrpc.com/commonrpc/commonrpc.xsd">
     
     <!--redis 注册中心地址  -->
-    <commonrpc:application id="rpcRegistryApplicationClient" address="127.0.0.1:6379,127.0.0.1:6379"></commonrpc:application>
+    <commonrpc:application id="rpcRegistryApplicationClient" address="127.0.0.1:2181" flag="2" timeout="5000"></commonrpc:application>
     
     <commonrpc:reference id="demoServiceClient"  interfacename="test.cross.plateform.rocketrpc.demo.service.IDemoService"  procotolType="1" codecType="4" timeout="50000" token="1122" group="demo"/>
     

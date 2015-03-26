@@ -5,6 +5,7 @@ package com.cross.plateform.common.rpc.http.netty4.server;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ThreadFactory;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -15,8 +16,11 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.timeout.IdleStateHandler;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import com.cross.plateform.common.rpc.core.server.RpcServer;
 import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
 import com.cross.plateform.common.rpc.core.thread.NamedThreadFactory;
@@ -98,6 +102,7 @@ public class CommonRpcHttpServer implements RpcServer {
 	          ChannelPipeline pipeline = channel.pipeline();
 	          pipeline.addLast("codec", new HttpServerCodec());
 	          pipeline.addLast("aggegator", new HttpObjectAggregator(512 * 1024));
+	          pipeline.addLast("timeout",new IdleStateHandler(0, 0, 120));
 	          pipeline.addLast("biz", new CommonRpcHttpServerHander(timeout));
 	        }
 
