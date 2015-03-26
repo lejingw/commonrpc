@@ -17,8 +17,55 @@ import com.cross.plateform.common.rpc.core.protocol.RpcProtocol;
 import com.cross.plateform.common.rpc.core.protocol.all.CommonRpcProtocol;
 
 /**
- * @author liubing1
+ * Common RPC Protocol
  * 
+ * Protocol Header
+ * 	VERSION(1B): Protocol Version
+ *  TYPE(1B):    Protocol Type,so u can custom your protocol
+ *  Request Protocol
+ * 	VERSION(1B):   
+ *  TYPE(1B):      request/response 
+ *  CODECTYPE(1B):  serialize/deserialize type
+ *  KEEPED(1B):    
+ *  KEEPED(1B):    
+ *  KEEPED(1B):    
+ *  ID(4B):        request id
+ *  TIMEOUT(4B):   request timeout
+ *  TARGETINSTANCELEN(4B):  target service name length
+ *  METHODNAMELEN(4B):      method name length
+ *  ARGSCOUNT(4B):          method args count
+ *  ARG1TYPELEN(4B):        method arg1 type len
+ *  ARG2TYPELEN(4B):        method arg2 type len
+ *  ...
+ *  ARG1LEN(4B):            method arg1 len
+ *  ARG2LEN(4B):            method arg2 len
+ *  ...
+ *  TARGETINSTANCENAME
+ *  METHODNAME
+ *  ARG1TYPENAME
+ *  ARG2TYPENAME
+ *  ...
+ *  ARG1
+ *  ARG2
+ *  ...
+ * 
+ *  Protocol Header
+ * 	VERSION(1B): Protocol Version
+ *  TYPE(1B):    Protocol Type,so u can custom your protocol
+ *  Response Protocol
+ *  VERSION(1B):   
+ *  TYPE(1B):      request/response 
+ *  DATATYPE(1B):  serialize/deserialize type
+ *  KEEPED(1B):    
+ *  KEEPED(1B):    
+ *  KEEPED(1B):    
+ *  ID(4B):        request id
+ *  BodyClassNameLen(4B): body className Len
+ *  LENGTH(4B):    body length
+ *  BodyClassName
+ *  BODY if need than set
+ *  
+ * @author liubing1 
  */
 public class DefualtRpcProtocolImpl implements RpcProtocol {
 
@@ -85,19 +132,22 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 						.get(capacity);
 				byteBuffer.writeByte(CommonRpcProtocol.CURRENT_VERSION);
 				byteBuffer.writeByte((byte) TYPE);
-				byteBuffer.writeByte(VERSION);
-				byteBuffer.writeByte(type);
-				byteBuffer.writeByte((byte) wrapper.getCodecType());
-				byteBuffer.writeByte((byte) 0);
-				byteBuffer.writeByte((byte) 0);
-				byteBuffer.writeByte((byte) 0);
-				byteBuffer.writeInt(id);
-				byteBuffer.writeInt(timeout);
-				byteBuffer.writeInt(targetInstanceNameByte.length);
+				//--------------HEADER_LEN----------------
+				byteBuffer.writeByte(VERSION);//1B
+				byteBuffer.writeByte(type);//1B
+				byteBuffer.writeByte((byte) wrapper.getCodecType());//1B
+				byteBuffer.writeByte((byte) 0);//1B
+				byteBuffer.writeByte((byte) 0);//1B
+				byteBuffer.writeByte((byte) 0);//1B
+				byteBuffer.writeInt(id);//4B
+				byteBuffer.writeInt(timeout);//4B
+				byteBuffer.writeInt(targetInstanceNameByte.length);//4B
 				byteBuffer.writeInt(tokenByte.length);
-				byteBuffer.writeInt(methodNameByte.length);
+				byteBuffer.writeInt(methodNameByte.length);//4B
 				
-				byteBuffer.writeInt(requestArgs.size());
+				byteBuffer.writeInt(requestArgs.size());//4B
+				//---------------REQUEST_HEADER_LEN----------
+				
 				for (byte[] requestArgType : requestArgTypes) {
 					byteBuffer.writeInt(requestArgType.length);
 				}
