@@ -14,7 +14,7 @@ import com.cross.plateform.common.rpc.service.server.impl.CommonServiceServerImp
  */
 public class CommonRpcServiceFactory {
 	
-private static ICommonServiceServer[] serverHandlers = new ICommonServiceServer[1];
+	private static ICommonServiceServer[] serverHandlers = new ICommonServiceServer[1];
 	
 	private static ICommonServiceClient[] clientHandlers = new ICommonServiceClient[1];
 

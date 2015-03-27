@@ -91,14 +91,20 @@ public abstract class AbstractRpcClient implements RpcClient {
 					+ rocketRPCRequest.getTimeout() + " ms),server is: "
 					+ getServerIP() + ":" + getServerPort()
 					+ " request id is:" + rocketRPCRequest.getId();
-			throw new Exception(errorMsg);
+			LOGGER.error(errorMsg);
+			//throw new Exception(errorMsg);
+			commonRPCResponse=new CommonRpcResponse(rocketRPCRequest.getId(), rocketRPCRequest.getCodecType(), rocketRPCRequest.getProtocolType());
+			commonRPCResponse.setException( new Exception(errorMsg));
+			//return commonRPCResponse;
 		}
 		
 		if(result instanceof CommonRpcResponse){
 			commonRPCResponse = (CommonRpcResponse) result;
 			
 		}else{
-			throw new Exception("only receive ResponseWrapper or List as response");
+			commonRPCResponse=new CommonRpcResponse(rocketRPCRequest.getId(), rocketRPCRequest.getCodecType(), rocketRPCRequest.getProtocolType());
+			commonRPCResponse.setException( new Exception("only receive ResponseWrapper or List as response"));
+			//return commonRPCResponse;
 		}
 		
 		try{
@@ -127,12 +133,13 @@ public abstract class AbstractRpcClient implements RpcClient {
 		
 		if (!StringUtils.isNullOrEmpty(commonRPCResponse.getException())) {
 			Throwable t = commonRPCResponse.getException();
-			t.fillInStackTrace();
+			//t.fillInStackTrace();
 			String errorMsg = "server error,server is: " + getServerIP()
 					+ ":" + getServerPort() + " request id is:"
 					+ rocketRPCRequest.getId();
 			LOGGER.error(errorMsg, t);
-			throw new Exception(errorMsg, t);
+			//throw new Exception(errorMsg, t);
+			return null;
 		}
 		
 		return commonRPCResponse.getResponse();

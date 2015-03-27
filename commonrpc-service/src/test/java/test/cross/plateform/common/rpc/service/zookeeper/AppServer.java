@@ -41,7 +41,7 @@ public class AppServer {
 	 * 此处不做任何处理, 只让server sleep
 	 */
 	public void handle() throws InterruptedException {
-		//Thread.sleep(Long.MAX_VALUE);
+		Thread.sleep(Long.MAX_VALUE);
 	}
 	
 	public static void main(String[] args) throws Exception {
