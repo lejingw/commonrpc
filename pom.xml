@@ -37,5 +37,6 @@
     <module>commonrpc-tcp</module>
     <module>commonrpc-http</module>
     <module>commonrpc-service</module>
+    <module>commonrpc-manager</module>
   </modules>
 </project>

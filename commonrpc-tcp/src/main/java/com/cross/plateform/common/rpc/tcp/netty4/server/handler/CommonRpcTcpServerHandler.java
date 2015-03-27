@@ -103,7 +103,7 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 				long endtime=System.currentTimeMillis();
 				sendErrorResponse(ctx, (CommonRpcRequest) message,"the server operate CommonRpcRequest timeout,timeout is:"+timeout+",but really cost time is:"+(endtime-begintime)+",client Ip is:"+ctx.channel().remoteAddress().toString()+",server Ip:"+getLocalhost());
 			}
