@@ -304,6 +304,10 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 					wrapper.readBytes(argByte);
 					args[i] = argByte;
 				}
+				if(wrapper.readableBytes()>0){//防止占包
+					wrapper.setReaderIndex(originPos);
+					return errorObject;
+				}
 				CommonRpcRequest rocketRPCRequest = new CommonRpcRequest(
 						targetInstanceByte, methodNameByte, argTypes, args,
 						timeout, requestId, codecType, TYPE,tokenByte);
@@ -337,6 +341,12 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				}
 				byte[] bodyBytes = new byte[bodyLen];
 				wrapper.readBytes(bodyBytes);
+				
+				if(wrapper.readableBytes()>0){//防止占包
+					wrapper.setReaderIndex(originPos);
+					return errorObject;
+				}
+				
 				CommonRpcResponse responseWrapper = new CommonRpcResponse(
 						requestId, codecType, TYPE);
 				responseWrapper.setResponse(bodyBytes);

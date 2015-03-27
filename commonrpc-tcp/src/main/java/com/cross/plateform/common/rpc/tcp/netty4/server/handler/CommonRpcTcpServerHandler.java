@@ -21,7 +21,6 @@ import com.cross.plateform.common.rpc.tcp.netty4.server.thread.RocketRPCServerTa
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
-
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -50,6 +49,7 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	public CommonRpcTcpServerHandler(int timeout, int port, String token,
 			int procotolType, int codecType) {
 		super();
+		
 		this.timeout = timeout;
 		this.port = port;
 		this.token = token;
