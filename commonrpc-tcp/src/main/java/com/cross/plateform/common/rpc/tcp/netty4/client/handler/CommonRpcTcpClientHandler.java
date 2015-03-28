@@ -9,7 +9,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
+import com.cross.plateform.common.rpc.service.client.service.CommonRpcClientService;
 import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
@@ -80,8 +82,7 @@ public class CommonRpcTcpClientHandler extends ChannelInboundHandlerAdapter {
 	public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
 		LOGGER.error("connection closed: " + ctx.channel().remoteAddress());
 		CommonRpcTcpClientFactory.getInstance().removeRpcClient(ctx.channel().remoteAddress().toString());
-		String server=ctx.channel().remoteAddress().toString();
-		server=server.substring(1, server.length());
+		CommonRpcClientService.getInstance().removeServer(ctx.channel().remoteAddress().toString());
 		
 		if(ctx.channel().isOpen()){
 			ctx.channel().close();

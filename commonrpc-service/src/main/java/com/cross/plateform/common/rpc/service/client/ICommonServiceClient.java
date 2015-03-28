@@ -34,5 +34,9 @@ public interface ICommonServiceClient {
 	 */
 	public void connectZookeeper(String server,int timeout) throws Exception;
 	
-	
+	/**
+	 * 客户端宕机，删除对应本地化
+	 * @param address
+	 */
+	public void removeServer(String address) throws Exception ;
 }

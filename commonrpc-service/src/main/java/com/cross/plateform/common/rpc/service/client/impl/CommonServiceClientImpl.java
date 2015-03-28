@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
@@ -107,9 +108,8 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 					addresses.add(socketAddress);
 				}
 				newservers.put(group, addresses);
-				this.deleteServerNode(servers.get(group), addresses);
 			}else{
-				this.deleteServerNode(servers.get(group), addresses);
+				
 				servers.remove(group);
 			}
 			
@@ -117,16 +117,26 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 		servers.putAll(newservers);
 	}
 	
-	private void deleteServerNode(Set<InetSocketAddress> allSets,Set<InetSocketAddress> sets) throws Exception{
-		Set<InetSocketAddress> result = new HashSet<InetSocketAddress>();
-		result.clear();
-		result.addAll(allSets);
-		result.removeAll(sets);
-		for(InetSocketAddress address:result){
-			String host=address.getHostString();
-			int port=address.getPort();
-			String path="/"+host+":"+port;
-			zk.delete(path, -1);
+
+	@Override
+	public void removeServer(String address) throws Exception {
+		// TODO Auto-generated method stub
+		address=address.substring(1, address.length());
+		List<String> subList = zk.getChildren("/" + address, true);
+		if(!subList.isEmpty()){
+			for (String subNode : subList) {
+				zk.delete("/" + address+ "/" + subNode, -1);
+			}
+		}
+		zk.delete("/"+address, -1);
+		String[] host=address.split(":");
+		
+		InetSocketAddress socketAddress=new InetSocketAddress(host[0], Integer.parseInt(host[1]));
+		for(Set<InetSocketAddress> inetSocketAddress:servers.values()){
+			if(inetSocketAddress.contains(socketAddress)){
+				inetSocketAddress.remove(socketAddress);
+				break;
+			}
 		}
 	}
 	
