@@ -8,7 +8,7 @@
     
     <commonrpc:registry id="rpcRegistry" port="10009" timeout="500"></commonrpc:registry>
     
-    <commonrpc:service id="IDemoService"  projectname="Demo" ref="demoService" httpType="GET" returnType="html"/>
+    <commonrpc:service id="IDemoService"  projectname="Demo" ref="demoService" httpType="POST" returnType="html"/>
     
     <bean id="demoService" class="test.cross.plateform.service.impl.DemoServiceImpl"></bean>
     

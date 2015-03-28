@@ -5,11 +5,11 @@
   <parent>
     <groupId>com.rpc</groupId>
     <artifactId>common-rpc</artifactId>
-    <version>1.1</version>
+    <version>1.0-stable</version>
   </parent>
   <groupId>com.rpc</groupId>
   <artifactId>commonrpc-proxy</artifactId>
-  <version>1.1</version>
+  <version>1.0-stable</version>
   <name>commonrpc-proxy</name>
   <url>http://maven.apache.org</url>
   <description>代理类</description>
