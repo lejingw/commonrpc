@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import com.cross.plateform.common.rpc.core.client.RpcClient;
@@ -55,7 +56,13 @@ public abstract class AbstractRpcClientInvocationHandler implements
 		// TODO Auto-generated method stub
 		RpcClient client = null;
 		
-		Set<InetSocketAddress>addresses =CommonRpcClientService.getInstance().getServersByGroup(group);
+		String [] groups=group.split(",");
+		
+		Random r=new Random(); 
+		
+		int i=r.nextInt(groups.length);
+		
+		Set<InetSocketAddress>addresses =CommonRpcClientService.getInstance().getServersByGroup(groups[i]);
 		
 		List<RpcRouteServer> servers=SocketAddressUtil.getInetSocketAddress(addresses);
 				
