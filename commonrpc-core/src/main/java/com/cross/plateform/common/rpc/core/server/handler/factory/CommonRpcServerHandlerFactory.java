@@ -17,6 +17,7 @@ public class CommonRpcServerHandlerFactory {
 	private static AbstractRpcTcpServerHandler[] serverHandlers = new AbstractRpcTcpServerHandler[1];
 	
 	private static AbstractRpcHttpServerHandler[] httpserverHandlers = new AbstractRpcHttpServerHandler[2];
+	
 	static{
 		registerProtocol(RpcTcpServerHandlerImpl.TYPE, new RpcTcpServerHandlerImpl(),RpcHttpServerHandlerImpl.TYPE,new RpcHttpServerHandlerImpl());
 	}
@@ -30,11 +31,12 @@ public class CommonRpcServerHandlerFactory {
 		serverHandlers[type] = customServerHandler;
 		
 		if(httptype > httpserverHandlers.length){
-			AbstractRpcHttpServerHandler[] newServerHandlers = new AbstractRpcHttpServerHandler[type + 1];
+			AbstractRpcHttpServerHandler[] newServerHandlers = new AbstractRpcHttpServerHandler[httptype + 1];
 			System.arraycopy(serverHandlers, 0, newServerHandlers, 0, serverHandlers.length);
 			httpserverHandlers = newServerHandlers;
 		}
-		httpserverHandlers[type] = httpServerHandler;
+		
+		httpserverHandlers[httptype] = httpServerHandler;
 	}
 	
 	public static AbstractRpcTcpServerHandler getServerHandler(){
