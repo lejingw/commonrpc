@@ -19,9 +19,10 @@ public class DemoServiceImpl implements IDemoService {
 	 * @see test.cross.plateform.service.IDemoService#sayDemo(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void sayDemo(String name, String age) {
+	public String sayDemo(String name, String age) {
 		// TODO Auto-generated method stub
 		System.out.println(name+"--------"+age);
+		return name+"--------"+age;
 	}
 
 	/* (non-Javadoc)

@@ -13,7 +13,7 @@ import java.util.Map;
 public interface IDemoService {
 	
 	
-	public void sayDemo(String name,String age);
+	public String sayDemo(String name,String age);
 	
 	public void sayDemoByParamsMap(Map<String, Object> params);
 	

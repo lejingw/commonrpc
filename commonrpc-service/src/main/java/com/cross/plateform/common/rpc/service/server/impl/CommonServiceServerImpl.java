@@ -65,6 +65,7 @@ public class CommonServiceServerImpl implements ICommonServiceServer {
 	public void registerClient(String server, String client) throws Exception {
 		// TODO Auto-generated method stub
 		if(zk.exists("/"+server, true) == null){
+			
 			zk.create("/" + server, server.getBytes("utf-8"), 
 					Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
 		}

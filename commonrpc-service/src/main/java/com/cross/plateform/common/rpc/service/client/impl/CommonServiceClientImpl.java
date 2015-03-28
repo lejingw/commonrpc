@@ -72,6 +72,7 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 	public void connectZookeeper(String server, int timeout) throws Exception {
 		// TODO Auto-generated method stub
 		zk = new ZooKeeper(server, timeout, new Watcher() {
+			
 			public void process(WatchedEvent event) {
 				// 如果发生了"/sgroup"节点下的子节点变化事件, 更新server列表, 并重新注册监听
 				if (event.getType() == EventType.NodeChildrenChanged ) {
@@ -92,15 +93,19 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 		for(String group:servers.keySet()){
 			Set<InetSocketAddress> addresses=new HashSet<InetSocketAddress>();
 			List<String> subList = zk.getChildren("/" + group, true);
-			for (String subNode : subList) {
-				// 获取每个子节点下关联的server地址
-				byte[] data = zk.getData("/" + group + "/" + subNode, false, stat);
-				String server=new String(data, "utf-8");
-				String[] host=server.split(":");
-				InetSocketAddress socketAddress=new InetSocketAddress(host[0], Integer.parseInt(host[1]));
-				addresses.add(socketAddress);
+			if(subList!=null){
+				for (String subNode : subList) {
+					// 获取每个子节点下关联的server地址
+					byte[] data = zk.getData("/" + group + "/" + subNode, false, stat);
+					String server=new String(data, "utf-8");
+					String[] host=server.split(":");
+					InetSocketAddress socketAddress=new InetSocketAddress(host[0], Integer.parseInt(host[1]));
+					addresses.add(socketAddress);
+				}
+				newservers.put(group, addresses);
+				
 			}
-			newservers.put(group, addresses);
+			
 		}
 		servers.putAll(newservers);
 	}
