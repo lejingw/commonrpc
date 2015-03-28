@@ -43,16 +43,19 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 		Set<InetSocketAddress> addresses=new HashSet<InetSocketAddress>();
 		List<String> subList = zk.getChildren("/" + group, true);
 		Stat stat = new Stat();
-		for (String subNode : subList) {
-			// 获取每个子节点下关联的server地址
-			byte[] data = zk.getData("/" + group + "/" + subNode, false, stat);
-			String server=new String(data, "utf-8");
-			
-			String[] host=server.split(":");
-			InetSocketAddress socketAddress=new InetSocketAddress(host[0], Integer.parseInt(host[1]));
-			addresses.add(socketAddress);
+		if(subList!=null){
+			for (String subNode : subList) {
+				// 获取每个子节点下关联的server地址
+				byte[] data = zk.getData("/" + group + "/" + subNode, false, stat);
+				String server=new String(data, "utf-8");
+				
+				String[] host=server.split(":");
+				InetSocketAddress socketAddress=new InetSocketAddress(host[0], Integer.parseInt(host[1]));
+				addresses.add(socketAddress);
+			}
+			servers.put(group, addresses);
 		}
-		servers.put(group, addresses);
+		
 		return addresses;
 	}
 
@@ -94,7 +97,7 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 		for(String group:servers.keySet()){
 			Set<InetSocketAddress> addresses=new HashSet<InetSocketAddress>();
 			List<String> subList = zk.getChildren("/" + group, true);
-			if(subList!=null){
+			if(subList!=null&&!subList.isEmpty()){
 				for (String subNode : subList) {
 					// 获取每个子节点下关联的server地址
 					byte[] data = zk.getData("/" + group + "/" + subNode, false, stat);
@@ -105,6 +108,9 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 				}
 				newservers.put(group, addresses);
 				this.deleteServerNode(servers.get(group), addresses);
+			}else{
+				this.deleteServerNode(servers.get(group), addresses);
+				servers.remove(group);
 			}
 			
 		}
@@ -115,7 +121,7 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 		Set<InetSocketAddress> result = new HashSet<InetSocketAddress>();
 		result.clear();
 		result.addAll(allSets);
-		result.retainAll(sets);
+		result.removeAll(sets);
 		for(InetSocketAddress address:result){
 			String host=address.getHostString();
 			int port=address.getPort();
