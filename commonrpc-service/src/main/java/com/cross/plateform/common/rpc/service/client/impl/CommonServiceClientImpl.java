@@ -15,6 +15,7 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.data.Stat;
+
 import com.cross.plateform.common.rpc.service.client.ICommonServiceClient;
 
 /**
@@ -103,10 +104,24 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 					addresses.add(socketAddress);
 				}
 				newservers.put(group, addresses);
-				
+				this.deleteServerNode(servers.get(group), addresses);
 			}
 			
 		}
 		servers.putAll(newservers);
 	}
+	
+	private void deleteServerNode(Set<InetSocketAddress> allSets,Set<InetSocketAddress> sets) throws Exception{
+		Set<InetSocketAddress> result = new HashSet<InetSocketAddress>();
+		result.clear();
+		result.addAll(allSets);
+		result.retainAll(sets);
+		for(InetSocketAddress address:result){
+			String host=address.getHostString();
+			int port=address.getPort();
+			String path="/"+host+":"+port;
+			zk.delete(path, -1);
+		}
+	}
+	
 }
