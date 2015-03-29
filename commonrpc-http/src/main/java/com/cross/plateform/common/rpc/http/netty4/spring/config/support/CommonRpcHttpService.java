@@ -42,7 +42,7 @@ public class CommonRpcHttpService implements ApplicationContextAware, Applicatio
 	public void onApplicationEvent(ApplicationEvent event) {
 		// TODO Auto-generated method stub
 		Object object=applicationContext.getBean(ref);
-		if(filterRef!=null){
+		if(filterRef!=null&&!filterRef.equals("")){
 			RpcFilter rpcFilter=(RpcFilter) applicationContext.getBean(filterRef);
 			RpcHttpBean rpcHttpBean=new RpcHttpBean(object, httpType, returnType);
 			CommonRpcHttpServer.getInstance().registerProcessor(projectname, rpcHttpBean, rpcFilter);

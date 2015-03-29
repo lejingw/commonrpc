@@ -31,11 +31,11 @@ public class CommonRpcServiceFactory {
 		serverHandlers[type] = serverHandler;
 		
 		if(httptype > clientHandlers.length){
-			ICommonServiceClient[] newServerHandlers = new ICommonServiceClient[type + 1];
+			ICommonServiceClient[] newServerHandlers = new ICommonServiceClient[httptype + 1];
 			System.arraycopy(serverHandlers, 0, newServerHandlers, 0, serverHandlers.length);
 			clientHandlers = newServerHandlers;
 		}
-		clientHandlers[type] = clientHandler;
+		clientHandlers[httptype] = clientHandler;
 	}
 	
 	public static ICommonServiceServer getCommonServiceServer(){
