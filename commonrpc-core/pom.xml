@@ -28,7 +28,7 @@
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
 			<version>2.6.1</version>
-			
+
 		</dependency>
 
 		<dependency>
@@ -37,6 +37,12 @@
 			<version>14.0-rc2</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.lmax</groupId>
+			<artifactId>disruptor</artifactId>
+			<version>3.3.2</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>com.esotericsoftware.kryo</groupId>
 			<artifactId>kryo</artifactId>
@@ -66,11 +72,11 @@
 			<artifactId>javassist</artifactId>
 			<version>3.12.1.GA</version>
 		</dependency>
-		
+
 		<dependency>
-	   		<groupId>com.rpc</groupId>
-  	   		<artifactId>commonrpc-service</artifactId>
-  	   		<version>1.0-stable</version>
+			<groupId>com.rpc</groupId>
+			<artifactId>commonrpc-service</artifactId>
+			<version>1.0-stable</version>
 		</dependency>
 	</dependencies>
 </project>

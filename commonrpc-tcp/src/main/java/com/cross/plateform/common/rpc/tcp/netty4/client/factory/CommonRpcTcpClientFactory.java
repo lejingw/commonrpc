@@ -41,7 +41,7 @@ public class CommonRpcTcpClientFactory extends AbstractRpcClientFactory {
 	
 	private static final ThreadFactory workerThreadFactory = new NamedThreadFactory("NETTYCLIENT-WORKER-");
 
-	private static EventLoopGroup workerGroup = new NioEventLoopGroup(PROCESSORS, workerThreadFactory);
+	private static EventLoopGroup workerGroup = new NioEventLoopGroup(2*PROCESSORS, workerThreadFactory);
 	
 	private final Bootstrap bootstrap = new Bootstrap();
 	

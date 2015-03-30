@@ -4,12 +4,13 @@
 package com.cross.plateform.common.rpc.http.netty4.server.handler;
 import java.util.concurrent.TimeUnit;
 
+import com.cross.plateform.common.rpc.core.disruptor.RpcProducer;
 import com.cross.plateform.common.rpc.core.thread.CommonRpcTaskExecutors;
 import com.cross.plateform.common.rpc.http.netty4.server.bean.ServerBean;
+import com.cross.plateform.common.rpc.http.netty4.server.thread.CommonRpcHttpServerEventHandler;
 import com.cross.plateform.common.rpc.http.netty4.server.thread.CommonRpcHttpServerTask;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
-
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,21 +30,44 @@ import io.netty.util.CharsetUtil;
 public class CommonRpcHttpServerHander extends ChannelInboundHandlerAdapter {
 	
 	private int timeout;
+	/**
+	 * 处理类型
+	 * 1：java 多线程
+	 * 2：disruptor处理
+	 */
+	private int handType;
 	
-	
-	public CommonRpcHttpServerHander(int timeout) {
+	public CommonRpcHttpServerHander(int handType) {
 		super();
-		this.timeout = timeout;
+		this.handType = handType;
 	}
+
 	@Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         
         ctx.channel().close();
     }
+	
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg)
 			throws Exception {
 		// TODO Auto-generated method stub
+		if(handType==1){
+			handRequest(ctx, msg);
+		}else if(handType==2){
+			handleRequestWithDisruptor(ctx, msg);
+		}
+		
+		
+	}
+	
+	private void handleRequestWithDisruptor( ChannelHandlerContext ctx,  Object message){
+		RpcProducer.getInstance().publish(timeout, new CommonRpcHttpServerEventHandler(ctx), message);
+	}
+	/*
+	 * java 处理
+	 */
+	private void handRequest(ChannelHandlerContext ctx, Object msg){
 		ListeningExecutorService service = CommonRpcTaskExecutors.getInstance()
 				.getService();
 		ListenableFuture<ServerBean> future=service.submit(new CommonRpcHttpServerTask(msg));
@@ -72,8 +96,6 @@ public class CommonRpcHttpServerHander extends ChannelInboundHandlerAdapter {
 			DefaultLastHttpContent lastHttpContent = new DefaultLastHttpContent();
 			ctx.writeAndFlush(lastHttpContent);
 		}
-		
-		
 	}
 	
 	private void writeResponse(ChannelHandlerContext ctx,ServerBean serverBean){

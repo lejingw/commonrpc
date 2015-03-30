@@ -17,7 +17,11 @@ public class CommonRpcHttpRegistery implements InitializingBean, DisposableBean 
 	private int port;//端口号
 	
 	private int timeout;
-	
+	/**
+	 * 1:java 多线程
+	 * 2：disruptor
+	 */
+	private int handType;
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
@@ -33,6 +37,7 @@ public class CommonRpcHttpRegistery implements InitializingBean, DisposableBean 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// TODO Auto-generated method stub
+		CommonRpcHttpServer.getInstance().setHandType(handType);
 		CommonRpcHttpServer.getInstance().start(port, timeout);
 	}
 
@@ -62,6 +67,14 @@ public class CommonRpcHttpRegistery implements InitializingBean, DisposableBean 
 	 */
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
+	}
+
+	public int getHandType() {
+		return handType;
+	}
+
+	public void setHandType(int handType) {
+		this.handType = handType;
 	}
 	
 	

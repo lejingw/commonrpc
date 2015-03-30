@@ -20,7 +20,7 @@ public class CommonRpcTaskExecutors {
 	
 	private CommonRpcTaskExecutors() {
 		
-		int nThreads=Runtime.getRuntime().availableProcessors();//根据cpu核数，决定个数
+		int nThreads=Runtime.getRuntime().availableProcessors()*2;//根据cpu核数，决定个数
 		
 		threadPoolExecutor=new ThreadPoolExecutor(nThreads, nThreads,
                 0L, TimeUnit.MILLISECONDS,

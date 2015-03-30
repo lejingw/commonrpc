@@ -42,10 +42,8 @@ public class RocketRPCServerTask extends AbstractCommonRpcTask<CommonRpcResponse
 	public CommonRpcResponse call() throws Exception {
 		// TODO Auto-generated method stub
 		CommonRpcResponse rocketRPCResponse =null;
-		
-		if(message instanceof CommonRpcRequest){
-			CommonRpcRequest request = (CommonRpcRequest) message;
-			if(!StringUtils.isNullOrEmpty(request.getToken())){
+		CommonRpcRequest request = (CommonRpcRequest) message;
+		if(!StringUtils.isNullOrEmpty(request.getToken())){
 				String token=new String(request.getToken());
 				if(!this.token.equals(token)){
 					LOGGER.error("client token is wrong");
@@ -53,12 +51,10 @@ public class RocketRPCServerTask extends AbstractCommonRpcTask<CommonRpcResponse
 			          rocketRPCResponse.setException(new Exception("client token is wrong"));
 			          return rocketRPCResponse;
 				}
-			}
-			
-	        rocketRPCResponse =
-	        		CommonRpcServerHandlerFactory.getServerHandler().handleRequest(request,codecType,procotolType);
-	        
 		}
+			
+	   rocketRPCResponse =
+	        		CommonRpcServerHandlerFactory.getServerHandler().handleRequest(request,codecType,procotolType);
 		return rocketRPCResponse;
 	}
 

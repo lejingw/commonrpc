@@ -41,6 +41,13 @@ public class CommonRpcHttpServer implements RpcServer {
 	
 	private NioEventLoopGroup workerGroup;
 	
+	/**
+	 * 处理类型
+	 * 1：java 多线程
+	 * 2：disruptor处理
+	 */
+	private int handType;
+	
 	public CommonRpcHttpServer() {
 
 	}
@@ -103,7 +110,7 @@ public class CommonRpcHttpServer implements RpcServer {
 	          pipeline.addLast("codec", new HttpServerCodec());
 	          pipeline.addLast("aggegator", new HttpObjectAggregator(512 * 1024));
 	          pipeline.addLast("timeout",new IdleStateHandler(0, 0, 120));
-	          pipeline.addLast("biz", new CommonRpcHttpServerHander(timeout));
+	          pipeline.addLast("biz", new CommonRpcHttpServerHander(handType));
 	        }
 
 	      });
@@ -113,4 +120,12 @@ public class CommonRpcHttpServer implements RpcServer {
 	   LOGGER.info("-----------------启动结束--------------------------");
 	}
 
+	public int getHandType() {
+		return handType;
+	}
+
+	public void setHandType(int handType) {
+		this.handType = handType;
+	}
+	
 }

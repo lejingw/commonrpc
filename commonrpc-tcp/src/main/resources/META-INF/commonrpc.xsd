@@ -54,6 +54,9 @@
 						<xsd:attribute name="codecType" type="xsd:int"
 						use="required" />
 						
+						<xsd:attribute name="handleType" type="xsd:int"
+						use="required" />
+						
 						<xsd:attribute name="group" type="xsd:string"
 						use="required" />
 						

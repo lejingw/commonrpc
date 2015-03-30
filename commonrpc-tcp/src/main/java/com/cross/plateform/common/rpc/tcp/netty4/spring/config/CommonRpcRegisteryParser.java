@@ -28,6 +28,7 @@ public class CommonRpcRegisteryParser implements BeanDefinitionParser {
 		String token=element.getAttribute("token");
 		int procotolType=Integer.parseInt(element.getAttribute("procotolType"));
 		int codecType=Integer.parseInt(element.getAttribute("codecType"));
+		int handleType=Integer.parseInt(element.getAttribute("handleType"));
 		String group=element.getAttribute("group");
 		
 		RootBeanDefinition beanDefinition = new RootBeanDefinition();
@@ -36,6 +37,7 @@ public class CommonRpcRegisteryParser implements BeanDefinitionParser {
 		beanDefinition.getPropertyValues().addPropertyValue("timeout", timeout);
 		beanDefinition.getPropertyValues().addPropertyValue("token", token);
 		beanDefinition.getPropertyValues().addPropertyValue("group", group);
+		beanDefinition.getPropertyValues().addPropertyValue("handleType", handleType);
 		beanDefinition.getPropertyValues().addPropertyValue("procotolType", procotolType);
 	    beanDefinition.getPropertyValues().addPropertyValue("codecType", codecType);
         parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);

@@ -21,7 +21,7 @@ public class DemoServiceImpl implements IDemoService {
 	@Override
 	public String sayDemo(String name, String age) {
 		// TODO Auto-generated method stub
-		System.out.println(name+"--------"+age);
+		//System.out.println(name+"--------"+age);
 		return name+"--------"+age;
 	}
 

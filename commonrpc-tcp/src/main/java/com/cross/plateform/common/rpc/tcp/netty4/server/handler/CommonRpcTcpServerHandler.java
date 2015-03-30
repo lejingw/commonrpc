@@ -14,13 +14,16 @@ import org.apache.commons.logging.LogFactory;
 
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
+import com.cross.plateform.common.rpc.core.disruptor.RpcProducer;
 import com.cross.plateform.common.rpc.core.thread.CommonRpcTaskExecutors;
 import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
 import com.cross.plateform.common.rpc.tcp.netty4.server.thread.CommonRpcServerFuture;
+import com.cross.plateform.common.rpc.tcp.netty4.server.thread.CommonRpcTcpEventHandler;
 import com.cross.plateform.common.rpc.tcp.netty4.server.thread.RocketRPCServerTask;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
+
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -44,19 +47,23 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	private int procotolType;//协议名称
 	
 	private int codecType;//编码类型
-	
+	/**
+	 * 1:java 多线程
+	 * 2:disruptor
+	 */
+	private int handleType;//服务端处理方式
 	
 	public CommonRpcTcpServerHandler(int timeout, int port, String token,
-			int procotolType, int codecType) {
+			int procotolType, int codecType, int handleType) {
 		super();
-		
 		this.timeout = timeout;
 		this.port = port;
 		this.token = token;
 		this.procotolType = procotolType;
 		this.codecType = codecType;
+		this.handleType = handleType;
 	}
-	
+
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
@@ -88,9 +95,26 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 		      throw new Exception(
 		          "receive message error,only support RequestWrapper || List");
 		}
-		handleRequest(ctx, msg);
+		if(handleType==1||handleType==0){
+			handleRequest(ctx, msg);
+		}else if(handleType==2){
+			handleRequestWithDisruptor(ctx, msg);
+		}
+		
 	}
-	
+	/**
+	 * disruptor处理方式
+	 * @param ctx
+	 * @param message
+	 */
+	private void handleRequestWithDisruptor( ChannelHandlerContext ctx,  Object message){
+		RpcProducer.getInstance().publish(timeout, new CommonRpcTcpEventHandler(token, procotolType, codecType, port, ctx), message);
+	}
+	/**
+	 * java 多线程处理
+	 * @param ctx
+	 * @param message
+	 */
 	private void handleRequest(final ChannelHandlerContext ctx, final Object message) {
 	    try {
 	    	ListeningExecutorService service = CommonRpcTaskExecutors.getInstance()

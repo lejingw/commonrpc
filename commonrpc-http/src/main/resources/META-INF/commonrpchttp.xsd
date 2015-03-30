@@ -36,6 +36,8 @@
 						<xsd:attribute name="timeout" type="xsd:int"
 						use="required" />
 						
+						<xsd:attribute name="handType" type="xsd:int"
+						use="required" />
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
