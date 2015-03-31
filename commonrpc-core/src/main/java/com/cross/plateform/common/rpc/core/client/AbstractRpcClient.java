@@ -5,6 +5,7 @@ package com.cross.plateform.common.rpc.core.client;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.codec.all.CommonRpcCodecs;
@@ -42,12 +43,13 @@ public abstract class AbstractRpcClient implements RpcClient {
 	private Object invokeImplIntern(CommonRpcRequest rocketRPCRequest) throws Exception {
 		
 		CommonRpcResponse commonRPCResponse = null;
-
+		Object object="1";
 		try {
 			if(LOGGER.isDebugEnabled()){
 				LOGGER.debug("client ready to send message,request id: "+rocketRPCRequest.getId());
 			}
 			sendRequest(rocketRPCRequest);
+			
 			if(LOGGER.isDebugEnabled()){
 				LOGGER.debug("client write message to send buffer,wait for response,request id: "+rocketRPCRequest.getId());
 			}
@@ -56,29 +58,11 @@ public abstract class AbstractRpcClient implements RpcClient {
 			LOGGER.error("send request to os sendbuffer error", e);
 			throw new RuntimeException("send request to os sendbuffer error", e);
 		}
-		
 		Object result = null;
 		try {
-			long begintime=System.currentTimeMillis();
-			boolean flag=true;
-			while (true) {
-				result =getClientFactory().getResponse(rocketRPCRequest.getId());
-				if(result!=null){
-					break;
-				}else{
-					long endtime=System.currentTimeMillis();
-					if(endtime-begintime>rocketRPCRequest.getTimeout()){//timeout
-						LOGGER.error("request timeout");
-						flag=false;
-						break;
-					}
-				}
-			}
-			
-			if(!flag){
-				result=null;
-			}
-			
+				 
+				getClientFactory().putObject(rocketRPCRequest.getId(), object,rocketRPCRequest.getTimeout());
+				result=getClientFactory().getResponse(rocketRPCRequest.getId());
 		}catch(Exception e){
 			//responses.remove(rocketRPCRequest.getId());
 			LOGGER.error("receive response timeout ", e);

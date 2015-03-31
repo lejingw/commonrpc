@@ -32,7 +32,7 @@ public class CommonRpcServiceFactory {
 		
 		if(httptype > clientHandlers.length){
 			ICommonServiceClient[] newServerHandlers = new ICommonServiceClient[httptype + 1];
-			System.arraycopy(serverHandlers, 0, newServerHandlers, 0, serverHandlers.length);
+			System.arraycopy(clientHandlers, 0, newServerHandlers, 0, clientHandlers.length);
 			clientHandlers = newServerHandlers;
 		}
 		clientHandlers[httptype] = clientHandler;

@@ -19,10 +19,9 @@ public class DeomoClientTest {
 		long time1=System.currentTimeMillis();
 		
 		IDemoService demoService=(IDemoService) context.getBean("demoServiceClient");
-		for(int j=0;j<5;j++){
+		for(int j=0;j<3;j++){
 			for(int i=0;i<1000000;i++){
 				demoService.sayDemo("okok");
-				
 			}
 			long end1=System.currentTimeMillis();
 			System.out.println("完成时间1:"+(end1-time1));

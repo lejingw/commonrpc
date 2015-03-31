@@ -5,7 +5,6 @@ package com.cross.plateform.common.rpc.core.client.factory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.client.AbstractRpcClient;
 import com.cross.plateform.common.rpc.core.client.RpcClient;
@@ -18,8 +17,12 @@ public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 	protected static Map<Integer, CommonRpcResponse> responses = 
 			new ConcurrentHashMap<Integer, CommonRpcResponse>();
 	
+	protected static Map<Integer, Object> caches = 
+			new ConcurrentHashMap<Integer, Object>();
+	
 	protected static Map<String, AbstractRpcClient> rpcClients = 
 			new ConcurrentHashMap<String, AbstractRpcClient>();
+	
 	/* (non-Javadoc)
 	 * @see com.cross.plateform.common.rpc.core.client.factory.RpcClientFactory#getClient(java.lang.String, int, int, boolean)
 	 */
@@ -44,12 +47,38 @@ public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 	public void receiveResponse(CommonRpcResponse response) throws Exception {
 		// TODO Auto-generated method stub
 		responses.put(response.getRequestId(), response);
+		if(caches.containsKey(response.getRequestId())){
+			try{
+				synchronized (caches.get(response.getRequestId())) {
+					caches.get(response.getRequestId()).notify();
+		         }
+			}finally{
+				caches.remove(response.getRequestId());
+			}
+			
+		}
+		
 	}
 	
 	@Override
 	public CommonRpcResponse getResponse(Integer key) throws Exception {
 		// TODO Auto-generated method stub
 		return (CommonRpcResponse) responses.get(key);
+	}
+	
+	@Override
+	public void putObject(Integer key,Object object,int timeout) throws Exception{
+		// TODO Auto-generated method stub
+		
+		caches.put(key, object);
+		synchronized (object) {
+            try {
+           	 object.wait(Long.parseLong(String.valueOf(timeout)));
+            } catch (InterruptedException e) {
+            	caches.remove(key);
+           	    throw new Exception(e);
+            }
+        }
 	}
 	
 	@Override

@@ -35,6 +35,12 @@ public interface RpcClientFactory {
 	 * @throws Exception
 	 */
 	public CommonRpcResponse getResponse(Integer key) throws Exception;
+	
+	/**
+	 * 放入消息
+	 * @param response
+	 */
+	public void putObject(Integer key,Object object,int timeout) throws Exception;
 	/**
 	 * 删除消息
 	 * @param key
