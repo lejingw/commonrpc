@@ -32,7 +32,7 @@ public class HttpRequest {
             URLConnection connection = realUrl.openConnection();
             // 设置通用的请求属性
             connection.setRequestProperty("accept", "*/*");
-            connection.setRequestProperty("connection", "Keep-Alive");
+            //connection.setRequestProperty("connection", "Keep-Alive");
             connection.setRequestProperty("user-agent",
                     "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
             // 建立实际的连接
@@ -50,6 +50,7 @@ public class HttpRequest {
             while ((line = in.readLine()) != null) {
                 result += line;
             }
+            //connection.
         } catch (Exception e) {
             System.out.println("发送GET请求出现异常！" + e);
             e.printStackTrace();
@@ -59,6 +60,7 @@ public class HttpRequest {
             try {
                 if (in != null) {
                     in.close();
+                    //conn.
                 }
             } catch (Exception e2) {
                 e2.printStackTrace();
@@ -86,7 +88,7 @@ public class HttpRequest {
             URLConnection conn = realUrl.openConnection();
             // 设置通用的请求属性
             conn.setRequestProperty("accept", "*/*");
-            conn.setRequestProperty("connection", "Keep-Alive");
+            //conn.setRequestProperty("connection", "Keep-Alive");
             conn.setRequestProperty("user-agent",
                     "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
             // 发送POST请求必须设置如下两行
@@ -127,7 +129,7 @@ public class HttpRequest {
     }
     
     public static void main(String[] args) {
-    	for(int i=0;i<10;i++){
+    	for(int i=0;i<1;i++){
     		String s=HttpRequest.sendGet("http://127.0.0.1:10009/Demo/demoServiceImpl/sayDemo", "name=111&age=3333");
             System.out.println(s);
     	}

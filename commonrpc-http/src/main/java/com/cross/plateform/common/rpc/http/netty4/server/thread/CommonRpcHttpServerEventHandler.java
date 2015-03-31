@@ -44,19 +44,17 @@ public class CommonRpcHttpServerEventHandler implements EventHandler<RpcValueEve
 
 	private boolean keepAlive=true;
 	
-	private ChannelHandlerContext ctx;
-	
-	public CommonRpcHttpServerEventHandler(
-			ChannelHandlerContext ctx) {
+	public CommonRpcHttpServerEventHandler() {
 		super();
-		this.ctx = ctx;
 	}
 
 	@Override
 	public void onEvent(RpcValueEvent event, long sequence, boolean endOfBatch)
 			throws Exception {
 		// TODO Auto-generated method stub
+		ChannelHandlerContext ctx=(ChannelHandlerContext) event.getCtx();
 		try{
+			
 			ServerBean serverBean=null;
 			Map<String, Object> map=new HashMap<String, Object>();
 			String httpType=null;

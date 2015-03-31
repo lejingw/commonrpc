@@ -32,19 +32,16 @@ public class CommonRpcTcpEventHandler implements EventHandler<RpcValueEvent> {
 	
 	private int port;
 	
-	private ChannelHandlerContext ctx;//
-	
 	private static final Log LOGGER = LogFactory
 			.getLog(RocketRPCServerTask.class);
 	
 	public CommonRpcTcpEventHandler(String token, int procotolType,
-			int codecType, int port, ChannelHandlerContext ctx) {
+			int codecType, int port) {
 		super();
 		this.token = token;
 		this.procotolType = procotolType;
 		this.codecType = codecType;
 		this.port = port;
-		this.ctx = ctx;
 	}
 
 	@Override
@@ -52,6 +49,7 @@ public class CommonRpcTcpEventHandler implements EventHandler<RpcValueEvent> {
 			throws Exception {
 		// TODO Auto-generated method stub
 		CommonRpcResponse rocketRPCResponse = null;
+		final ChannelHandlerContext ctx=(ChannelHandlerContext) event.getCtx();
 		try{
 			CommonRpcRequest request = (CommonRpcRequest) event.getValue();
 			if (!StringUtils.isNullOrEmpty(request.getToken())&&!new String(request.getToken()).equals(this.token)) {

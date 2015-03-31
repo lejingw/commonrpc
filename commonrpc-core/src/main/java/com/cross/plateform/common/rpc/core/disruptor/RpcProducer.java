@@ -64,11 +64,14 @@ public class RpcProducer {
 		return ringBuffer;
 	}
 	
-	public void publish(long timeout,EventHandler<RpcValueEvent> eventHandler,Object obj){
+	public void publish(long timeout,EventHandler<RpcValueEvent> eventHandler,Object obj,Object ctx){
 		 RingBuffer<RpcValueEvent> ringBuffer=getRingBuffer(timeout, eventHandler);
 		 
 		 long index = ringBuffer.next();
-		 ringBuffer.get(index).setValue(obj);
+		 RpcValueEvent rpcValueEvent=ringBuffer.get(index);
+		 rpcValueEvent.setCtx(ctx);
+		 rpcValueEvent.setValue(obj);
+		 
 		 ringBuffer.publish(index);
 	}
 	

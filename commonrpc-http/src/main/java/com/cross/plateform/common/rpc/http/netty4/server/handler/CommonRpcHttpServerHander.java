@@ -11,6 +11,7 @@ import com.cross.plateform.common.rpc.http.netty4.server.thread.CommonRpcHttpSer
 import com.cross.plateform.common.rpc.http.netty4.server.thread.CommonRpcHttpServerTask;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
+
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -62,7 +63,8 @@ public class CommonRpcHttpServerHander extends ChannelInboundHandlerAdapter {
 	}
 	
 	private void handleRequestWithDisruptor( ChannelHandlerContext ctx,  Object message){
-		RpcProducer.getInstance().publish(timeout, new CommonRpcHttpServerEventHandler(ctx), message);
+		
+		RpcProducer.getInstance().publish(timeout, new CommonRpcHttpServerEventHandler(), message,ctx);
 	}
 	/*
 	 * java 处理

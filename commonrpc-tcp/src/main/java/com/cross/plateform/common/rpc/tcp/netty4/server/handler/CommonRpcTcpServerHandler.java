@@ -108,7 +108,7 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	 * @param message
 	 */
 	private void handleRequestWithDisruptor( ChannelHandlerContext ctx,  Object message){
-		RpcProducer.getInstance().publish(timeout, new CommonRpcTcpEventHandler(token, procotolType, codecType, port, ctx), message);
+		RpcProducer.getInstance().publish(timeout, new CommonRpcTcpEventHandler(token, procotolType, codecType, port), message,ctx);
 	}
 	/**
 	 * java 多线程处理
