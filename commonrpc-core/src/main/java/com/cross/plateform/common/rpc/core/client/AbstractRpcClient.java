@@ -80,16 +80,18 @@ public abstract class AbstractRpcClient implements RpcClient {
 			commonRPCResponse=new CommonRpcResponse(rocketRPCRequest.getId(), rocketRPCRequest.getCodecType(), rocketRPCRequest.getProtocolType());
 			commonRPCResponse.setException( new Exception(errorMsg));
 			//return commonRPCResponse;
+		}else{
+			if(result instanceof CommonRpcResponse){
+				commonRPCResponse = (CommonRpcResponse) result;
+				
+			}else{
+				commonRPCResponse=new CommonRpcResponse(rocketRPCRequest.getId(), rocketRPCRequest.getCodecType(), rocketRPCRequest.getProtocolType());
+				commonRPCResponse.setException( new Exception("only receive ResponseWrapper or List as response"));
+				//return commonRPCResponse;
+			}
 		}
 		
-		if(result instanceof CommonRpcResponse){
-			commonRPCResponse = (CommonRpcResponse) result;
-			
-		}else{
-			commonRPCResponse=new CommonRpcResponse(rocketRPCRequest.getId(), rocketRPCRequest.getCodecType(), rocketRPCRequest.getProtocolType());
-			commonRPCResponse.setException( new Exception("only receive ResponseWrapper or List as response"));
-			//return commonRPCResponse;
-		}
+		
 		
 		try{
 			if (commonRPCResponse.getResponse() instanceof byte[]) {

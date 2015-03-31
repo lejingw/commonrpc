@@ -4,8 +4,7 @@
 package com.cross.plateform.common.rpc.core.all.message;
 
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import java.util.Random;
 import com.cross.plateform.common.rpc.core.codec.all.CommonRpcCodecs;
 /**
  * @author liubing1
@@ -18,7 +17,6 @@ public class CommonRpcRequest implements Serializable{
 	 */
 	private static final long serialVersionUID = -3554311529871950375L;
 	
-	private static AtomicInteger incId = new AtomicInteger(1);
 	
 	private byte[] targetInstanceName;
 	
@@ -114,13 +112,16 @@ public class CommonRpcRequest implements Serializable{
 	}
 	
 	private static int get(){
-		int result=incId.incrementAndGet();
-		if(result>Integer.MAX_VALUE){
-			incId=new AtomicInteger(1);
-		}
-		return result; 
+		Random random=new Random();
+		
+		return random.nextInt();
 	}
-
+	
+	public static void main(String[] args) {
+		Random random=new Random();
+		int index=random.nextInt();
+		System.out.print(index);
+	}
 	/**
 	 * @return the token
 	 */
