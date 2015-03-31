@@ -27,5 +27,6 @@
   	   <artifactId>commonrpc-core</artifactId>
   	   <version>1.0-stable</version>
 	</dependency>
+	
   </dependencies>
 </project>
