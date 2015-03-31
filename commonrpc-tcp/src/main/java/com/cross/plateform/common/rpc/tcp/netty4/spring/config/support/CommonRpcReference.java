@@ -7,8 +7,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
-
 import com.cross.plateform.common.rpc.service.client.service.CommonRpcClientService;
 import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
 import com.cross.plateform.common.rpc.tcp.netty4.client.proxy.CommonRpcTcpClientProxy;
@@ -16,7 +14,7 @@ import com.cross.plateform.common.rpc.tcp.netty4.client.proxy.CommonRpcTcpClient
  * @author liubing1
  *
  */
-public class CommonRpcReference implements FactoryBean, InitializingBean,
+public class CommonRpcReference implements FactoryBean,
 		DisposableBean {
 	
 	/**
@@ -54,15 +52,6 @@ public class CommonRpcReference implements FactoryBean, InitializingBean,
 		// TODO Auto-generated method stub
 		CommonRpcClientService.getInstance().close();
 		CommonRpcTcpClientFactory.getInstance().stopClient();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		// TODO Auto-generated method stub
-		CommonRpcTcpClientFactory.getInstance().startClient(timeout);
 	}
 
 	/* (non-Javadoc)

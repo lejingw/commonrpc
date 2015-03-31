@@ -8,6 +8,7 @@ import org.springframework.beans.factory.InitializingBean;
 import com.cross.plateform.common.rpc.core.util.StringUtils;
 import com.cross.plateform.common.rpc.service.client.service.CommonRpcClientService;
 import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
+import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
 
 /**
  * @author liubing1
@@ -41,6 +42,7 @@ public class CommonRpcApplication implements InitializingBean{
 			CommonRpcServerService.getInstance().connectZookeeper(address, timeout);
 		}else if(flag==2){//客户端
 			CommonRpcClientService.getInstance().connectZookeeper(address, timeout);
+			CommonRpcTcpClientFactory.getInstance().startClient(timeout);//客户端启动
 		}
 		
 	}
