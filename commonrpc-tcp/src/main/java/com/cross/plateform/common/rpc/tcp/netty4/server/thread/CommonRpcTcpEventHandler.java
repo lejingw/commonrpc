@@ -77,6 +77,7 @@ public class CommonRpcTcpEventHandler implements EventHandler<RpcValueEvent> {
 			}
 			
 		}catch(Exception e){
+			e.printStackTrace();
 			sendErrorResponse(ctx, (CommonRpcRequest) event.getValue(),e.getMessage()+",server Ip:"+getLocalhost());
 		}	
 	}

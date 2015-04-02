@@ -37,8 +37,10 @@ public class CommonRpcTcpClientHandler extends ChannelInboundHandlerAdapter {
 	public void channelRead(ChannelHandlerContext ctx, Object msg)
 			throws Exception {
 		try{
+			
 			if (msg instanceof CommonRpcResponse) {
 				CommonRpcResponse response = (CommonRpcResponse) msg;
+				//System.out.println("处理结果集:"+response.getRequestId());
 				if (isDebugEnabled) {
 					// for performance trace
 					LOGGER.debug("receive response list from server: "

@@ -1,11 +1,10 @@
 package com.cross.plateform.common.rpc.core.client.factory;
 
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.client.AbstractRpcClient;
 import com.cross.plateform.common.rpc.core.client.RpcClient;
-
 public interface RpcClientFactory {
 	
 	/**
@@ -23,32 +22,16 @@ public interface RpcClientFactory {
 	 */
 	public void startClient(int connectiontimeout);
 	
-	
+	public void putResponse(Integer key,ArrayBlockingQueue<Object> queue) throws Exception;
 	/**
 	 * 接受消息
 	 * @param response
 	 * @throws Exception
 	 */
 	public void receiveResponse(CommonRpcResponse response) throws Exception;
-	/**
-	 * 获取消息
-	 * @param key
-	 * @return
-	 * @throws Exception
-	 */
-	public CommonRpcResponse getResponse(Integer key) throws Exception;
 	
-	/**
-	 * 放入消息
-	 * @param response
-	 */
-	public void putObject(Integer key,CountDownLatch object) throws Exception;
-	/**
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public boolean checkIdByKey(Integer key);
+	
+	
 	/**
 	 * 删除消息
 	 * @param key

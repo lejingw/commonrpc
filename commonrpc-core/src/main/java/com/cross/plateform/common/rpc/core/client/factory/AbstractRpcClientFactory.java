@@ -4,9 +4,10 @@
 package com.cross.plateform.common.rpc.core.client.factory;
 
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.client.AbstractRpcClient;
 import com.cross.plateform.common.rpc.core.client.RpcClient;
@@ -16,15 +17,14 @@ import com.cross.plateform.common.rpc.core.client.RpcClient;
  */
 public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 		
-	protected static Map<Integer, CommonRpcResponse> responses = 
-			new ConcurrentHashMap<Integer, CommonRpcResponse>();
+	protected static ConcurrentHashMap<Integer, ArrayBlockingQueue<Object>> responses = 
+			new ConcurrentHashMap<Integer, ArrayBlockingQueue<Object>>();
 	
-	protected static Map<Integer, CountDownLatch> caches = 
-			new ConcurrentHashMap<Integer, CountDownLatch>();
 	
 	protected static Map<String, AbstractRpcClient> rpcClients = 
 			new ConcurrentHashMap<String, AbstractRpcClient>();
 	
+	private static final Log LOGGER = LogFactory.getLog(AbstractRpcClientFactory.class);
 	/* (non-Javadoc)
 	 * @see com.cross.plateform.common.rpc.core.client.factory.RpcClientFactory#getClient(java.lang.String, int, int, boolean)
 	 */
@@ -40,6 +40,13 @@ public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 
 	protected abstract RpcClient createClient(String targetIP, int targetPort) throws Exception;
 	
+	
+	@Override
+	public void putResponse(Integer key, ArrayBlockingQueue<Object> queue)
+			throws Exception {
+		// TODO Auto-generated method stub
+		responses.put(key, queue);
+	}
 	/**
 	 * 停止客户端
 	 */
@@ -48,32 +55,25 @@ public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 	@Override
 	public void receiveResponse(CommonRpcResponse response) throws Exception {
 		// TODO Auto-generated method stub
-		responses.put(response.getRequestId(), response);
-		if(caches.containsKey(response.getRequestId())){
-				caches.get(response.getRequestId()).countDown();
-				caches.remove(response.getRequestId());
+		if (!responses.containsKey(response.getRequestId())) {
+			LOGGER.warn("give up the response,request id is:" + response.getRequestId() + ",maybe because timeout!");
+			return;
+		}
+		try {
+			ArrayBlockingQueue<Object> queue = responses.get(response.getRequestId());
+			if (queue != null) {
+				queue.put(response);
+			} else {
+				LOGGER.warn("give up the response,request id is:"
+						+ response.getRequestId() + ",because queue is null");
+			}
+		} catch (InterruptedException e) {
+			LOGGER.error("put response error,request id is:" + response.getRequestId(), e);
 		}
 		
-	}
-	
-	@Override
-	public CommonRpcResponse getResponse(Integer key) throws Exception {
-		// TODO Auto-generated method stub
-		return (CommonRpcResponse) responses.get(key);
-	}
-	
-	@Override
-	public void putObject(Integer key,CountDownLatch countDownLatch) throws Exception{
-		// TODO Auto-generated method stub
-		
-		caches.put(key, countDownLatch);
 		
 	}
-	@Override
-	public boolean checkIdByKey(Integer key) {
-		// TODO Auto-generated method stub
-		return caches.containsKey(key);
-	}
+	
 	@Override
 	public void removeResponse(Integer key) {
 		// TODO Auto-generated method stub
