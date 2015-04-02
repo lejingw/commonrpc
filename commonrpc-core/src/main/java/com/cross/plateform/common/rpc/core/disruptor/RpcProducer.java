@@ -3,9 +3,12 @@
  */
 package com.cross.plateform.common.rpc.core.disruptor;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.TimeoutBlockingWaitStrategy;
@@ -37,14 +40,11 @@ public class RpcProducer {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Disruptor<RpcValueEvent> getDisruptor(long timeout){
 		if(disruptor==null){
-			ThreadPoolExecutor threadPoolExecutor=new ThreadPoolExecutor(nThreads, nThreads,
-	                0L, TimeUnit.MILLISECONDS,
-	                new LinkedBlockingQueue<Runnable>(),
-	                new ThreadPoolExecutor.DiscardPolicy());//超过最大线程数，直接丢弃，可以让启动起来
-			
+
+			ExecutorService pool = Executors.newCachedThreadPool();
 			TimeoutBlockingWaitStrategy waitStrategy = new TimeoutBlockingWaitStrategy(timeout, TimeUnit.MILLISECONDS);
 			disruptor = new Disruptor(RpcValueEvent.EVENT_FACTORY, 
-		                2,threadPoolExecutor,
+		                2,pool,
 		                ProducerType.SINGLE, // Single producer
 		                waitStrategy
 		                );

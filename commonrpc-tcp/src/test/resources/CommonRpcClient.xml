@@ -18,6 +18,6 @@
     <commonrpc:application id="rpcRegistryApplicationClient" address="127.0.0.1:2181" flag="2" timeout="200"></commonrpc:application>
     
     <!--group 可以同时支持多组，以符合,隔开  -->
-    <commonrpc:reference id="demoServiceClient"  interfacename="test.cross.plateform.rocketrpc.demo.service.IDemoService"  procotolType="1" codecType="4" timeout="500" token="1122" group="demo"/>
+    <commonrpc:reference id="demoServiceClient"  interfacename="test.cross.plateform.rocketrpc.demo.service.IDemoService"  procotolType="1" codecType="4" timeout="5000" token="1122" group="demo"/>
     
 </beans>

@@ -21,6 +21,7 @@ public class DemoServiceImpl implements IDemoService {
 	public String sayDemo(String params) {
 		// TODO Auto-generated method stub
 		//LOGGER.info("sayDemo params:"+params);
+		
 		return "from server:"+params;
 	}
 

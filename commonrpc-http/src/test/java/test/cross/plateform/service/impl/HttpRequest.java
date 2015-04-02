@@ -38,11 +38,11 @@ public class HttpRequest {
             // 建立实际的连接
             connection.connect();
             // 获取所有响应头字段
-            Map<String, List<String>> map = connection.getHeaderFields();
+            //Map<String, List<String>> map = connection.getHeaderFields();
             // 遍历所有的响应头字段
-            for (String key : map.keySet()) {
-                System.out.println(key + "--->" + map.get(key));
-            }
+//            for (String key : map.keySet()) {
+//                //System.out.println(key + "--->" + map.get(key));
+//            }
             // 定义 BufferedReader输入流来读取URL的响应
             in = new BufferedReader(new InputStreamReader(
                     connection.getInputStream()));
@@ -129,12 +129,18 @@ public class HttpRequest {
     }
     
     public static void main(String[] args) {
-    	for(int i=0;i<1;i++){
-    		String s=HttpRequest.sendGet("http://127.0.0.1:10009/Demo/demoServiceImpl/sayDemo", "name=111&age=3333");
-            System.out.println(s);
+    	long begin=System.currentTimeMillis();
+    	for(int j=0;j<10;j++){
+    		for(int i=0;i<1000000;i++){
+        		HttpRequest.sendGet("http://127.0.0.1:10009/Demo/demoServiceImpl/sayDemo", "name=111&age=3333");
+                //System.out.println(s);
+        	}
+    		long endtime=System.currentTimeMillis(); 
+            System.out.println("完成时间:"+(endtime-begin));
     	}
-    	 
-         
+    	
+    	long endtime=System.currentTimeMillis(); 
+         System.out.println("完成时间:"+(endtime-begin));
          //发送 POST 请求
          //String sr=HttpRequest.sendPost("http://localhost:6144/Home/RequestPostString", "key=123&v=456");
         // System.out.println(sr);
