@@ -111,17 +111,13 @@ public class CommonRpcRequest implements Serializable{
 		return argTypes;
 	}
 	
-	private static int get(){
+	public static int get(){
 		Random random=new Random();
 		
 		return random.nextInt();
 	}
 	
-	public static void main(String[] args) {
-		Random random=new Random();
-		int index=random.nextInt();
-		System.out.print(index);
-	}
+
 	/**
 	 * @return the token
 	 */
@@ -134,6 +130,13 @@ public class CommonRpcRequest implements Serializable{
 	 */
 	public void setToken(byte[] token) {
 		this.token = token;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 	

@@ -5,6 +5,8 @@ package com.cross.plateform.common.rpc.core.client.factory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.client.AbstractRpcClient;
 import com.cross.plateform.common.rpc.core.client.RpcClient;
@@ -17,8 +19,8 @@ public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 	protected static Map<Integer, CommonRpcResponse> responses = 
 			new ConcurrentHashMap<Integer, CommonRpcResponse>();
 	
-	protected static Map<Integer, Object> caches = 
-			new ConcurrentHashMap<Integer, Object>();
+	protected static Map<Integer, CountDownLatch> caches = 
+			new ConcurrentHashMap<Integer, CountDownLatch>();
 	
 	protected static Map<String, AbstractRpcClient> rpcClients = 
 			new ConcurrentHashMap<String, AbstractRpcClient>();
@@ -48,14 +50,8 @@ public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 		// TODO Auto-generated method stub
 		responses.put(response.getRequestId(), response);
 		if(caches.containsKey(response.getRequestId())){
-			try{
-				synchronized (caches.get(response.getRequestId())) {
-					caches.get(response.getRequestId()).notify();
-		         }
-			}finally{
+				caches.get(response.getRequestId()).countDown();
 				caches.remove(response.getRequestId());
-			}
-			
 		}
 		
 	}
@@ -67,20 +63,17 @@ public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 	}
 	
 	@Override
-	public void putObject(Integer key,Object object,int timeout) throws Exception{
+	public void putObject(Integer key,CountDownLatch countDownLatch) throws Exception{
 		// TODO Auto-generated method stub
 		
-		caches.put(key, object);
-		synchronized (object) {
-            try {
-           	 object.wait(Long.parseLong(String.valueOf(timeout)));
-            } catch (InterruptedException e) {
-            	caches.remove(key);
-           	    throw new Exception(e);
-            }
-        }
+		caches.put(key, countDownLatch);
+		
 	}
-	
+	@Override
+	public boolean checkIdByKey(Integer key) {
+		// TODO Auto-generated method stub
+		return caches.containsKey(key);
+	}
 	@Override
 	public void removeResponse(Integer key) {
 		// TODO Auto-generated method stub

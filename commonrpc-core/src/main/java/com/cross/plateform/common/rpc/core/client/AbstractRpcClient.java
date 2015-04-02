@@ -3,6 +3,9 @@
  */
 package com.cross.plateform.common.rpc.core.client;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,14 +43,24 @@ public abstract class AbstractRpcClient implements RpcClient {
 		return invokeImplIntern(wrapper);
 	}
 	
+	
+	private void setRequestId(CommonRpcRequest rocketRPCRequest){
+		if(!getClientFactory().checkIdByKey(rocketRPCRequest.getId())){
+			rocketRPCRequest.setId(rocketRPCRequest.getId());
+			//setRequestId(rocketRPCRequest);
+		}
+	}
+	
 	private Object invokeImplIntern(CommonRpcRequest rocketRPCRequest) throws Exception {
 		
 		CommonRpcResponse commonRPCResponse = null;
-		Object object="1";
+		//Object object="1";
 		try {
 			if(LOGGER.isDebugEnabled()){
 				LOGGER.debug("client ready to send message,request id: "+rocketRPCRequest.getId());
 			}
+			setRequestId(rocketRPCRequest);
+			
 			sendRequest(rocketRPCRequest);
 			
 			if(LOGGER.isDebugEnabled()){
@@ -60,11 +73,14 @@ public abstract class AbstractRpcClient implements RpcClient {
 		}
 		Object result = null;
 		try {
-				 
-				getClientFactory().putObject(rocketRPCRequest.getId(), object,rocketRPCRequest.getTimeout());
+				CountDownLatch countDownLatch=new CountDownLatch(1);
+				
+				getClientFactory().putObject(rocketRPCRequest.getId(),countDownLatch);
+				countDownLatch.await(rocketRPCRequest.getTimeout(), TimeUnit.MILLISECONDS);
 				result=getClientFactory().getResponse(rocketRPCRequest.getId());
 		}catch(Exception e){
 			//responses.remove(rocketRPCRequest.getId());
+			e.printStackTrace();
 			LOGGER.error("receive response timeout ", e);
 		}finally{
 			getClientFactory().removeResponse(rocketRPCRequest.getId());

@@ -1,5 +1,7 @@
 package com.cross.plateform.common.rpc.core.client.factory;
 
+import java.util.concurrent.CountDownLatch;
+
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.client.AbstractRpcClient;
 import com.cross.plateform.common.rpc.core.client.RpcClient;
@@ -40,7 +42,13 @@ public interface RpcClientFactory {
 	 * 放入消息
 	 * @param response
 	 */
-	public void putObject(Integer key,Object object,int timeout) throws Exception;
+	public void putObject(Integer key,CountDownLatch object) throws Exception;
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public boolean checkIdByKey(Integer key);
 	/**
 	 * 删除消息
 	 * @param key
