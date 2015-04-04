@@ -5,25 +5,15 @@ package com.cross.plateform.common.rpc.tcp.netty4.server.handler;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
-import com.cross.plateform.common.rpc.core.disruptor.RpcProducer;
-import com.cross.plateform.common.rpc.core.thread.CommonRpcTaskExecutors;
+import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
+import com.cross.plateform.common.rpc.core.util.StringUtils;
 import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
-import com.cross.plateform.common.rpc.tcp.netty4.server.thread.CommonRpcServerFuture;
-import com.cross.plateform.common.rpc.tcp.netty4.server.thread.CommonRpcTcpEventHandler;
-import com.cross.plateform.common.rpc.tcp.netty4.server.thread.RocketRPCServerTask;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -47,21 +37,16 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	private int procotolType;//协议名称
 	
 	private int codecType;//编码类型
-	/**
-	 * 1:java 多线程
-	 * 2:disruptor
-	 */
-	private int handleType;//服务端处理方式
+	
 	
 	public CommonRpcTcpServerHandler(int timeout, int port, String token,
-			int procotolType, int codecType, int handleType) {
+			int procotolType, int codecType) {
 		super();
 		this.timeout = timeout;
 		this.port = port;
 		this.token = token;
 		this.procotolType = procotolType;
 		this.codecType = codecType;
-		this.handleType = handleType;
 	}
 
 	@Override
@@ -90,16 +75,13 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	public void channelRead(ChannelHandlerContext ctx, Object msg)
 			throws Exception {
 		// TODO Auto-generated method stub
+		
 		if (!(msg instanceof CommonRpcRequest) ) {
-		      LOGGER.error("receive message error,only support RequestWrapper");
-		      throw new Exception(
-		          "receive message error,only support RequestWrapper || List");
+			      LOGGER.error("receive message error,only support RequestWrapper");
+			      throw new Exception(
+			          "receive message error,only support RequestWrapper || List");
 		}
-		if(handleType==1||handleType==0){
-			handleRequest(ctx, msg);
-		}else if(handleType==2){
-			handleRequestWithDisruptor(ctx, msg);
-		}
+		handleRequestWithSingleThread(ctx, msg);
 		
 	}
 	/**
@@ -107,39 +89,42 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	 * @param ctx
 	 * @param message
 	 */
-	private void handleRequestWithDisruptor( ChannelHandlerContext ctx,  Object message){
-		
-		RpcProducer.getInstance().publish(timeout, new CommonRpcTcpEventHandler(token, procotolType, codecType, port), message,ctx);
-	}
-	/**
-	 * java 多线程处理
-	 * @param ctx
-	 * @param message
-	 */
-	private void handleRequest(final ChannelHandlerContext ctx, final Object message) {
-	    try {
-	    	ListeningExecutorService service = CommonRpcTaskExecutors.getInstance()
-					.getService();
-	    	ListenableFuture<CommonRpcResponse> future=service.submit(new RocketRPCServerTask(message,token,procotolType,codecType));
-	    	long begintime=System.currentTimeMillis();
-	    	try {
-				if(future.get(timeout, TimeUnit.MILLISECONDS)!=null){
-					Futures.addCallback(future, new CommonRpcServerFuture(ctx));
-				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-				long endtime=System.currentTimeMillis();
-				sendErrorResponse(ctx, (CommonRpcRequest) message,"the server operate CommonRpcRequest timeout,timeout is:"+timeout+",but really cost time is:"+(endtime-begintime)+",client Ip is:"+ctx.channel().remoteAddress().toString()+",server Ip:"+getLocalhost());
+	private void handleRequestWithSingleThread( final ChannelHandlerContext ctx,  Object message){
+		CommonRpcResponse rocketRPCResponse = null;
+		try{
+			CommonRpcRequest request = (CommonRpcRequest) message;
+			if (!StringUtils.isNullOrEmpty(request.getToken())&&!new String(request.getToken()).equals(this.token)) {
+					LOGGER.error("client token is wrong");
+					rocketRPCResponse = new CommonRpcResponse(request.getId(),
+							codecType, procotolType);
+					rocketRPCResponse.setException(new Exception(
+							"client token is wrong"));
+			}else{
+					rocketRPCResponse = CommonRpcServerHandlerFactory
+							.getServerHandler().handleRequest(request, codecType,
+									procotolType);
 			}
-	    	
-	    } catch (RejectedExecutionException exception) {
-	        
-	        sendErrorResponse(ctx, (CommonRpcRequest) message,"server threadpool full,maybe because server is slow or too many requests"+",server Ip:"+getLocalhost());
-	    }finally{
+			
+			if(ctx.channel().isOpen()){
+				ChannelFuture wf = ctx.channel().writeAndFlush(rocketRPCResponse);
+			    wf.addListener(new ChannelFutureListener() {
+			      public void operationComplete(ChannelFuture future) throws Exception {
+			        if (!future.isSuccess()) {
+			          LOGGER.error("server write response error,client  host is: " + ((InetSocketAddress) ctx.channel().remoteAddress()).getHostName()+":"+((InetSocketAddress) ctx.channel().remoteAddress()).getPort()+",server Ip:"+getLocalhost());
+			          ctx.channel().close();
+			        }
+			      }
+			    });
+			}
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			sendErrorResponse(ctx, (CommonRpcRequest) message,e.getMessage()+",server Ip:"+getLocalhost());
+		}finally{
 			ReferenceCountUtil.release(message);
 		}
 	}
+	
 	
 	private void sendErrorResponse(final ChannelHandlerContext ctx, final CommonRpcRequest request,String errorMessage) {
 	    CommonRpcResponse commonRpcResponse =

@@ -2,28 +2,35 @@
  * 
  */
 package com.cross.plateform.common.rpc.http.netty4.server.handler;
-import java.util.concurrent.TimeUnit;
+import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
-import com.cross.plateform.common.rpc.core.disruptor.RpcProducer;
-import com.cross.plateform.common.rpc.core.thread.CommonRpcTaskExecutors;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import com.alibaba.fastjson.JSONObject;
+import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
+import com.cross.plateform.common.rpc.core.server.service.bean.RpcRouteInfo;
+import com.cross.plateform.common.rpc.core.util.StringUtils;
 import com.cross.plateform.common.rpc.http.netty4.server.bean.ServerBean;
-import com.cross.plateform.common.rpc.http.netty4.server.thread.CommonRpcHttpServerEventHandler;
-import com.cross.plateform.common.rpc.http.netty4.server.thread.CommonRpcHttpServerTask;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpContent;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.DefaultLastHttpContent;
+import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.LastHttpContent;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
-
+import io.netty.util.ReferenceCountUtil;
 /**
  * @author liubing1
  *
@@ -31,16 +38,10 @@ import io.netty.util.CharsetUtil;
 public class CommonRpcHttpServerHander extends ChannelInboundHandlerAdapter {
 	
 	private int timeout;
-	/**
-	 * 处理类型
-	 * 1：java 多线程
-	 * 2：disruptor处理
-	 */
-	private int handType;
 	
-	public CommonRpcHttpServerHander(int handType) {
+	
+	public CommonRpcHttpServerHander() {
 		super();
-		this.handType = handType;
 	}
 
 	@Override
@@ -53,51 +54,131 @@ public class CommonRpcHttpServerHander extends ChannelInboundHandlerAdapter {
 	public void channelRead(ChannelHandlerContext ctx, Object msg)
 			throws Exception {
 		// TODO Auto-generated method stub
-		if(handType==1){
-			handRequest(ctx, msg);
-		}else if(handType==2){
-			handleRequestWithDisruptor(ctx, msg);
-		}
+		handleRequestWithsingleThread(ctx, msg);
+	}
+	
+	private void handleRequestWithsingleThread( ChannelHandlerContext ctx,  Object message){
 		
+		boolean keepAlive=true;
+		try{
+			
+			ServerBean serverBean=null;
+			Map<String, Object> map=new HashMap<String, Object>();
+			String httpType=null;
+			String url=null;
+			if (message instanceof HttpRequest) {
+				HttpRequest request = (HttpRequest)message;
+				if (HttpHeaders.is100ContinueExpected(request)){
+					DefaultHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus.CONTINUE);
+					serverBean=new ServerBean(response, null,keepAlive);
+					writeResponse(ctx, serverBean);
+					return;
+				}
+				httpType=request.getMethod().name();
+				url=request.getUri();
+				url=url.substring(1, url.length());
+				if(url.contains("?")){
+					url=url.substring(0, url.indexOf("?"));
+				}
+				keepAlive=HttpHeaders.isKeepAlive(request);
+				QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
+				map.putAll(getParametersByUrl(queryStringDecoder));
+			}
+			if (message instanceof HttpContent) {
+				HttpContent httpContent = (HttpContent) message;
+				ByteBuf content = httpContent.content();
+				if (content.isReadable()) {
+					String contentMsg=content.toString(CharsetUtil.UTF_8);
+					if(!StringUtils.isNullOrEmpty(contentMsg)){
+						Map<String, Object> params=JSONObject.parseObject(contentMsg, Map.class);
+						map.putAll(params);
+					}
+					
+				}
+				if (message instanceof LastHttpContent){
+					RpcRouteInfo rpcRouteInfo=CommonRpcServerHandlerFactory.getHttpServerHandler().isRouteInfos(url, httpType, map);
+					if(rpcRouteInfo==null||rpcRouteInfo.getRoute()==null){
+						DefaultHttpResponse response=getDefaultHttpResponse(404, null);
+						serverBean=new ServerBean(response, null,keepAlive);
+						writeResponse(ctx, serverBean);
+						return;
+					}else{
+						DefaultHttpResponse response=getDefaultHttpResponse(200, rpcRouteInfo.getReturnType());
+						Object result=CommonRpcServerHandlerFactory.getHttpServerHandler().methodInvoke(rpcRouteInfo);
+						if(result==null){
+							serverBean=new ServerBean(response, null,keepAlive);
+							writeResponse(ctx, serverBean);
+							return;
+						}else{
+							String resultMsg=JSONObject.toJSONString(result);
+							DefaultHttpContent defaultHttpContent = new DefaultHttpContent(Unpooled.copiedBuffer(resultMsg, CharsetUtil.UTF_8));
+							serverBean=new ServerBean(response, defaultHttpContent,keepAlive);
+							writeResponse(ctx, serverBean);
+							return;
+						}
+						
+					}
+				}
+			}
+		}catch(Exception e){
+			DefaultHttpResponse response=getDefaultHttpResponse(500, null);
+			DefaultHttpContent defaultHttpContent = new DefaultHttpContent(Unpooled.copiedBuffer(e.getMessage(), CharsetUtil.UTF_8));
+			ServerBean serverBean=new ServerBean(response, defaultHttpContent,keepAlive);
+			writeResponse(ctx, serverBean);
+			return;
+		}finally{
+			ReferenceCountUtil.release(message);
+		}
 		
 	}
 	
-	private void handleRequestWithDisruptor( ChannelHandlerContext ctx,  Object message){
-		
-		RpcProducer.getInstance().publish(timeout, new CommonRpcHttpServerEventHandler(), message,ctx);
-	}
-	/*
-	 * java 处理
-	 */
-	private void handRequest(ChannelHandlerContext ctx, Object msg){
-		ListeningExecutorService service = CommonRpcTaskExecutors.getInstance()
-				.getService();
-		ListenableFuture<ServerBean> future=service.submit(new CommonRpcHttpServerTask(msg));
-		try{
-			ServerBean result=future.get(timeout,TimeUnit.MILLISECONDS);
-			if(result!=null){
-				this.writeResponse(ctx, result);
+	
+	
+	private Map<String, Object> getParametersByUrl(QueryStringDecoder queryStringDecoder){
+		Map<String, Object> map=new HashMap<String, Object>();
+		Map<String, List<String>> params = queryStringDecoder.parameters();
+		if (!params.isEmpty()) {
+			for(Entry<String, List<String>> p: params.entrySet()) {
+				String key = p.getKey();
+				List<String> vals = p.getValue();
+				for (String val : vals) {
+					map.put(key, val);
+				}
 			}
-		}catch(Exception e){
-			e.printStackTrace();
-			DefaultHttpResponse httpResponse=new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-			httpResponse.headers().add(HttpHeaders.Names.TRANSFER_ENCODING,
-					HttpHeaders.Values.CHUNKED);
 			
+		}
+		return map;
+	}
+	
+	private DefaultHttpResponse getDefaultHttpResponse(int type,String returnType){
+		DefaultHttpResponse httpResponse=null;
+		if(type==404){
+			httpResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
+		}else if(type==500){
+			httpResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+		}else{
+			httpResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+		}
+		httpResponse.headers().add(HttpHeaders.Names.TRANSFER_ENCODING,
+				HttpHeaders.Values.CHUNKED);
+		if(type!=404&&type!=500){
+			if(returnType.equals("json")){
+				httpResponse.headers().set(HttpHeaders.Names.CONTENT_TYPE,"application/json; charset=UTF-8");
+			}else if(returnType.equals("html")){
+				httpResponse.headers().set(HttpHeaders.Names.CONTENT_TYPE,"text/plain; charset=UTF-8");
+			}else if(returnType.equals("xml")){
+				httpResponse.headers().set(HttpHeaders.Names.CONTENT_TYPE,"text/xml; charset=UTF-8");
+			}
+		}else{
 			httpResponse.headers().set(HttpHeaders.Names.CONTENT_TYPE,
 					"text/plain; charset=UTF-8");
-			
-			httpResponse.headers().set(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN, "*");
-			httpResponse.headers().set(HttpHeaders.Names.CACHE_CONTROL,"no-cache");
-			httpResponse.headers().set(HttpHeaders.Names.PRAGMA,"no-cache");
-			httpResponse.headers().set(HttpHeaders.Names.EXPIRES,"-1");
-			DefaultHttpContent defaultHttpContent = new DefaultHttpContent(Unpooled.copiedBuffer(e.getMessage(), CharsetUtil.UTF_8));
-			ServerBean result =new ServerBean(httpResponse, defaultHttpContent,true);
-			this.writeResponse(ctx, result);
-		}finally{
-			DefaultLastHttpContent lastHttpContent = new DefaultLastHttpContent();
-			ctx.writeAndFlush(lastHttpContent);
 		}
+		
+		httpResponse.headers().set(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+		httpResponse.headers().set(HttpHeaders.Names.CACHE_CONTROL,"no-cache");
+		httpResponse.headers().set(HttpHeaders.Names.PRAGMA,"no-cache");
+		httpResponse.headers().set(HttpHeaders.Names.EXPIRES,"-1");
+		return httpResponse;
 	}
 	
 	private void writeResponse(ChannelHandlerContext ctx,ServerBean serverBean){
@@ -114,6 +195,7 @@ public class CommonRpcHttpServerHander extends ChannelInboundHandlerAdapter {
 			}
 		}
 		
-		
+		DefaultLastHttpContent lastHttpContent = new DefaultLastHttpContent();
+		ctx.writeAndFlush(lastHttpContent);
 	}
 }

@@ -25,13 +25,11 @@ public class CommonRpcHttpRegisteryParser implements BeanDefinitionParser {
 		String id = element.getAttribute("id");
 		int port=Integer.parseInt(element.getAttribute("port"));
 		int timeout=Integer.parseInt(element.getAttribute("timeout"));
-		int handType=Integer.parseInt(element.getAttribute("handType"));
 		
 		RootBeanDefinition beanDefinition = new RootBeanDefinition();
 		beanDefinition.setBeanClass(CommonRpcHttpRegistery.class);
 		beanDefinition.getPropertyValues().addPropertyValue("port", port);
 		beanDefinition.getPropertyValues().addPropertyValue("timeout", timeout);
-		beanDefinition.getPropertyValues().addPropertyValue("handType", handType);
         parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
         
 		return beanDefinition;

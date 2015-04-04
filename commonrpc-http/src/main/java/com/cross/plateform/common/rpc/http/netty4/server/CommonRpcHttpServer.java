@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ThreadFactory;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
@@ -41,12 +42,6 @@ public class CommonRpcHttpServer implements RpcServer {
 	
 	private NioEventLoopGroup workerGroup;
 	
-	/**
-	 * 处理类型
-	 * 1：java 多线程
-	 * 2：disruptor处理
-	 */
-	private int handType;
 	
 	public CommonRpcHttpServer() {
 
@@ -91,7 +86,7 @@ public class CommonRpcHttpServer implements RpcServer {
 	    ThreadFactory serverWorkerTF = new NamedThreadFactory("NETTYSERVER-WORKER-");
 	    bossGroup = new NioEventLoopGroup(PROCESSORS, serverBossTF);
 	    workerGroup = new NioEventLoopGroup(PROCESSORS * 2, serverWorkerTF);
-	    workerGroup.setIoRatio(80);
+	    workerGroup.setIoRatio(50);
 	    ServerBootstrap bootstrap = new ServerBootstrap();
 	    bootstrap.group(bossGroup, workerGroup)
 	    .channel(NioServerSocketChannel.class)
@@ -101,8 +96,8 @@ public class CommonRpcHttpServer implements RpcServer {
         .option(ChannelOption.SO_KEEPALIVE, true)
 	 	.option(ChannelOption.SO_SNDBUF, 65535)
 	 	.option(ChannelOption.SO_RCVBUF, 65535)
-	 	.childOption(ChannelOption.TCP_NODELAY, true);
-	    
+	 	.childOption(ChannelOption.TCP_NODELAY, true)
+	    .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
 	    bootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
 
 	        protected void initChannel(SocketChannel channel) throws Exception {
@@ -110,7 +105,7 @@ public class CommonRpcHttpServer implements RpcServer {
 	          pipeline.addLast("codec", new HttpServerCodec());
 	          pipeline.addLast("aggegator", new HttpObjectAggregator(512 * 1024));
 	          pipeline.addLast("timeout",new IdleStateHandler(0, 0, 120));
-	          pipeline.addLast("biz", new CommonRpcHttpServerHander(handType));
+	          pipeline.addLast("biz", new CommonRpcHttpServerHander());
 	        }
 
 	      });
@@ -120,12 +115,6 @@ public class CommonRpcHttpServer implements RpcServer {
 	   LOGGER.info("-----------------启动结束--------------------------");
 	}
 
-	public int getHandType() {
-		return handType;
-	}
-
-	public void setHandType(int handType) {
-		this.handType = handType;
-	}
+	
 	
 }

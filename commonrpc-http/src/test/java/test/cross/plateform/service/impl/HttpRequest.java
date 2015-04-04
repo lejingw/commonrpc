@@ -130,8 +130,8 @@ public class HttpRequest {
     
     public static void main(String[] args) {
     	long begin=System.currentTimeMillis();
-    	for(int j=0;j<10;j++){
-    		for(int i=0;i<1000000;i++){
+    	for(int j=0;j<1;j++){
+    		for(int i=0;i<1;i++){
         		HttpRequest.sendGet("http://127.0.0.1:10009/Demo/demoServiceImpl/sayDemo", "name=111&age=3333");
                 //System.out.println(s);
         	}

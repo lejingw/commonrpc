@@ -28,11 +28,6 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 	
 	private String group;//组
 	
-	/**
-	 * 1:java 多线程
-	 * 2:disruptor
-	 */
-	private int handleType;//服务端处理方式
 	
 	@Override
 	public void destroy() throws Exception {
@@ -49,7 +44,6 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 		}
 		CommonRpcServerService.getInstance().registerService(group, getLocalhost());
 		CommonRpcTcpServer.getInstance().setToken(token);
-		CommonRpcTcpServer.getInstance().setHandleType(handleType);
 		CommonRpcTcpServer.getInstance().setCodecType(codecType);
 		CommonRpcTcpServer.getInstance().setProcotolType(procotolType);
 		CommonRpcTcpServer.getInstance().start(port,timeout);
@@ -131,14 +125,5 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 	public void setGroup(String group) {
 		this.group = group;
 	}
-
-	public int getHandleType() {
-		return handleType;
-	}
-
-	public void setHandleType(int handleType) {
-		this.handleType = handleType;
-	}
-	
 	
 }

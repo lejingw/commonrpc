@@ -18,8 +18,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
-
-import com.cross.plateform.common.rpc.core.disruptor.RpcProducer;
 import com.cross.plateform.common.rpc.core.server.RpcServer;
 import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
 import com.cross.plateform.common.rpc.core.thread.NamedThreadFactory;
@@ -47,11 +45,6 @@ public class CommonRpcTcpServer implements RpcServer {
 	
 	private int codecType;//编码类型
 	
-	/**
-	 * 1:java 多线程
-	 * 2:disruptor
-	 */
-	private int handleType;//服务端处理方式
 	
 	public CommonRpcTcpServer() {
 
@@ -82,7 +75,6 @@ public class CommonRpcTcpServer implements RpcServer {
 		CommonRpcServerHandlerFactory.getServerHandler().clear();
 		bossGroup.shutdownGracefully();
 		workerGroup.shutdownGracefully();
-		RpcProducer.getInstance().close();
 	}
 
 	/* (non-Javadoc)
@@ -113,7 +105,7 @@ public class CommonRpcTcpServer implements RpcServer {
 	          pipeline.addLast("decoder", new CommonRpcDecoderHandler());
 	          pipeline.addLast("encoder", new CommonRpcEncoderHandler());
 	          pipeline.addLast("timeout",new IdleStateHandler(0, 0, 120));
-	          pipeline.addLast("handler", new CommonRpcTcpServerHandler(timeout,port,token,procotolType,codecType,handleType));
+	          pipeline.addLast("handler", new CommonRpcTcpServerHandler(timeout,port,token,procotolType,codecType));
 	          
 	        }
 
@@ -142,13 +134,5 @@ public class CommonRpcTcpServer implements RpcServer {
 	public void setCodecType(int codecType) {
 		this.codecType = codecType;
 	}
-	public int getHandleType() {
-		return handleType;
-	}
-	public void setHandleType(int handleType) {
-		this.handleType = handleType;
-	}
-	
-	
 	
 }
