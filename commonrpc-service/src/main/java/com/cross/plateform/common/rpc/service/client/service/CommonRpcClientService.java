@@ -40,9 +40,4 @@ public class CommonRpcClientService {
 	public void connectZookeeper(String server, int timeout) throws Exception{
 		CommonRpcServiceFactory.getCommonServiceClient().connectZookeeper(server, timeout);
 	}
-	
-	public void removeServer(String address)throws Exception {
-		
-		CommonRpcServiceFactory.getCommonServiceClient().removeServer(address);
-	}
 }

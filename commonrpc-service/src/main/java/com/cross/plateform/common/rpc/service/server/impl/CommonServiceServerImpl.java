@@ -3,13 +3,17 @@
  */
 package com.cross.plateform.common.rpc.service.server.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.ZooDefs.Ids;
-
+import org.apache.zookeeper.data.Stat;
 import com.cross.plateform.common.rpc.service.server.ICommonServiceServer;
+import com.google.common.base.Charsets;
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 
 /**
  * @author liubing
@@ -17,16 +21,18 @@ import com.cross.plateform.common.rpc.service.server.ICommonServiceServer;
  */
 public class CommonServiceServerImpl implements ICommonServiceServer {
 	
-	private  ZooKeeper zk;
+	private  CuratorFramework client;
 	
 	public static final int TYPE = 0;
+	
+	private static final Log LOGGER = LogFactory.getLog(CommonServiceServerImpl.class);
 	/* (non-Javadoc)
 	 * @see com.cross.plateform.common.rpc.service.server.ICommonServiceServer#close()
 	 */
 	@Override
 	public void close() throws Exception{
 		// TODO Auto-generated method stub
-		zk.close();
+		client.close();
 	}
 
 	/* (non-Javadoc)
@@ -35,11 +41,13 @@ public class CommonServiceServerImpl implements ICommonServiceServer {
 	@Override
 	public void connectZookeeper(String server, int timeout) throws Exception {
 		// TODO Auto-generated method stub
-		zk = new ZooKeeper(server, timeout, new Watcher() {
-			public void process(WatchedEvent event) {
-				// 不做处理
-			}
-		});
+		client = CuratorFrameworkFactory.builder()
+	            .connectString(server)
+	            .sessionTimeoutMs(timeout)
+	            .connectionTimeoutMs(timeout)
+	            .retryPolicy(new ExponentialBackoffRetry(1000, 3))
+	            .build();
+	    client.start();
 		
 	}
 
@@ -49,13 +57,8 @@ public class CommonServiceServerImpl implements ICommonServiceServer {
 	@Override
 	public void registerServer(String group, String server) throws Exception{
 		// TODO Auto-generated method stub
-		if(zk.exists("/"+group, true) == null){
-			zk.create("/" + group, group.getBytes("utf-8"), 
-					Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-		}
-		
-		zk.create("/" + group + "/"+server , server.getBytes("utf-8"), 
-				Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+		this.createNode("/" + group, group,CreateMode.PERSISTENT);
+		this.createNode("/" + group + "/"+server, server, CreateMode.EPHEMERAL_SEQUENTIAL);
 	}
 	
 	/* (non-Javadoc)
@@ -64,13 +67,54 @@ public class CommonServiceServerImpl implements ICommonServiceServer {
 	@Override
 	public void registerClient(String server, String client) throws Exception {
 		// TODO Auto-generated method stub
-		if(zk.exists("/"+server, true) == null){
-			
-			zk.create("/" + server, server.getBytes("utf-8"), 
-					Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-		}
-		
-		zk.create("/" + server +client , client.getBytes("utf-8"), 
-				Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+
+		this.createNode("/" + server, server,CreateMode.PERSISTENT);
+		this.createNode("/" + server +client, client, CreateMode.EPHEMERAL_SEQUENTIAL);
 	}
+	
+
+    /**
+     * 创建node
+     * 
+     * @param nodeName
+     * @param value
+     * @return
+     */
+    public boolean createNode(String nodeName, String value,CreateMode createMode ) {
+        boolean suc = false;
+        try {
+            Stat stat = getClient().checkExists().forPath(nodeName);
+            if (stat == null) {
+                String opResult = null;
+                if (Strings.isNullOrEmpty(value)) {
+                    opResult = getClient().create().creatingParentsIfNeeded().withMode(createMode).forPath(nodeName);
+                }else {
+                    opResult =
+                            getClient().create().creatingParentsIfNeeded()
+                                .forPath(nodeName, value.getBytes(Charsets.UTF_8));
+                }
+                suc = Objects.equal(nodeName, opResult);
+            }
+        }
+        catch (Exception e) {
+        	 LOGGER.error("createNode fail",e);
+        }
+        return suc;
+    }
+	
+	/**
+	 * @return the client
+	 */
+	public CuratorFramework getClient() {
+		return client;
+	}
+
+	/**
+	 * @param client the client to set
+	 */
+	public void setClient(CuratorFramework client) {
+		this.client = client;
+	}
+	
+	
 }

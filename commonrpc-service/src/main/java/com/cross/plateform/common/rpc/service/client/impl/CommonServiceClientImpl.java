@@ -4,20 +4,29 @@
 package com.cross.plateform.common.rpc.service.client.impl;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.Watcher.Event.EventType;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.api.GetChildrenBuilder;
+import org.apache.curator.framework.api.GetDataBuilder;
+import org.apache.curator.framework.recipes.cache.PathChildrenCache;
+import org.apache.curator.framework.recipes.cache.PathChildrenCache.StartMode;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
+import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.data.Stat;
-
 import com.cross.plateform.common.rpc.service.client.ICommonServiceClient;
+import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
 
 /**
  * @author liubing
@@ -27,36 +36,73 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 	
 	private static Map<String, Set<InetSocketAddress>> servers=new ConcurrentHashMap<String, Set<InetSocketAddress>>();
 	
-	private ZooKeeper zk;
+	private static final Log LOGGER = LogFactory.getLog(CommonServiceClientImpl.class);
+	
+	/**
+	 * 客户端
+	 */
+	private  CuratorFramework client;
 	
 	public static final int TYPE = 0;
 	
-
+	private ConcurrentHashMap<String, Boolean> flag=new ConcurrentHashMap<String, Boolean>();
 	/* (non-Javadoc)
 	 * @see com.cross.plateform.common.rpc.service.client.ICommonServiceClient#getServersByGroup(java.lang.String)
 	 */
 	@Override
-	public Set<InetSocketAddress> getServersByGroup(String group) throws Exception {
+	public Set<InetSocketAddress> getServersByGroup(final String group) throws Exception {
 		// TODO Auto-generated method stub
+		if(!flag.containsKey(group)){
+
+		     ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+			 
+			 @SuppressWarnings("resource")
+			 PathChildrenCache childrenCache = new PathChildrenCache(client,"/"+group, true);
+		     childrenCache.start(StartMode.POST_INITIALIZED_EVENT);
+		     childrenCache.getListenable().addListener(
+		            new PathChildrenCacheListener() {
+		                @Override
+		                public void childEvent(CuratorFramework client, PathChildrenCacheEvent event)
+		                        throws Exception {
+		                    if(event.getType()==PathChildrenCacheEvent.Type.CHILD_REMOVED){//监听子节点被删除的情况
+		                   
+		                    	String path=event.getData().getPath();
+		                    	String[] nodes=path.split("/");// 1:group 2:address
+		                    	if(nodes.length>0&&nodes.length==3){
+		                    		updateServerList(nodes[1], nodes[2]);
+		                    	}
+		                    	
+		                    }else if(event.getType()==PathChildrenCacheEvent.Type.CHILD_ADDED){//监听增加
+		                    	String path=event.getData().getPath();
+		                    	String[] nodes=path.split("/");// 1:group 2:address
+		                    	if(nodes.length>0&&nodes.length==3){
+		                    		String[] host=nodes[2].split(":");
+		            				InetSocketAddress socketAddress=new InetSocketAddress(host[0], Integer.parseInt(host[1]));
+		            				Set<InetSocketAddress> addresses=servers.get(group);
+		            				addresses.add(socketAddress);
+		            				servers.put(group, addresses);
+		                    	}
+		                    }
+		                }
+		            },
+		            pool
+		        );
+		     flag.put(group, true);
+		}
+		
 		if(servers.containsKey(group)){
 			return servers.get(group);
 		}
 		Set<InetSocketAddress> addresses=new HashSet<InetSocketAddress>();
-		List<String> subList = zk.getChildren("/" + group, true);
-		Stat stat = new Stat();
-		if(subList!=null){
-			for (String subNode : subList) {
-				// 获取每个子节点下关联的server地址
-				byte[] data = zk.getData("/" + group + "/" + subNode, false, stat);
-				String server=new String(data, "utf-8");
-				
-				String[] host=server.split(":");
+		Map<String, String> maps=listChildrenDetail("/"+group);
+		if(maps!=null&&maps.values().size()>0){
+			for(String value:maps.values()){
+				String[] host=value.split(":");
 				InetSocketAddress socketAddress=new InetSocketAddress(host[0], Integer.parseInt(host[1]));
 				addresses.add(socketAddress);
 			}
 			servers.put(group, addresses);
 		}
-		
 		return addresses;
 	}
 
@@ -67,77 +113,102 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 	public void close() throws Exception {
 		// TODO Auto-generated method stub
 		servers.clear();
-		zk.close();
+		client.close();
 	}
 
 	/* (non-Javadoc)
 	 * @see com.cross.plateform.common.rpc.service.client.ICommonServiceClient#connectZookeeper(java.lang.String, int)
 	 */
 	@Override
-	public void connectZookeeper(String server, int timeout) throws Exception {
-		// TODO Auto-generated method stub
-		zk = new ZooKeeper(server, timeout, new Watcher() {
-			
-			public void process(WatchedEvent event) {
-				// 如果发生了"/sgroup"节点下的子节点变化事件, 更新server列表, 并重新注册监听
-				if (event.getType() == EventType.NodeChildrenChanged ) {
-					try {
-						updateServerList();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		});
-	}
-	
-	private void updateServerList() throws Exception{
-		Stat stat = new Stat();
+	public void connectZookeeper(final String server, final int timeout) throws Exception {
 		
-		Map<String, Set<InetSocketAddress>> newservers=new HashMap<String, Set<InetSocketAddress>>();
-		for(String group:servers.keySet()){
-			Set<InetSocketAddress> addresses=new HashSet<InetSocketAddress>();
-			List<String> subList = zk.getChildren("/" + group, true);
-			if(subList!=null&&!subList.isEmpty()){
-				for (String subNode : subList) {
-					// 获取每个子节点下关联的server地址
-					byte[] data = zk.getData("/" + group + "/" + subNode, false, stat);
-					String server=new String(data, "utf-8");
-					String[] host=server.split(":");
-					InetSocketAddress socketAddress=new InetSocketAddress(host[0], Integer.parseInt(host[1]));
-					addresses.add(socketAddress);
-				}
-				newservers.put(group, addresses);
-			}else{
-				
-				servers.remove(group);
-			}
-			
-		}
-		servers.putAll(newservers);
+		client = CuratorFrameworkFactory.builder()
+	            .connectString(server)
+	            .sessionTimeoutMs(timeout)
+	            .connectionTimeoutMs(timeout)
+	            .retryPolicy(new ExponentialBackoffRetry(1000, 3))
+	            .build();
+	    client.start();
+	    
+	     
 	}
-	
+	/**
+	 * 更新本地化的server
+	 * @param group
+	 * @param server
+	 * @throws Exception
+	 */
+	private void updateServerList(String group,String server) throws Exception{
+		if(servers.containsKey(group)){
+			Set<InetSocketAddress> rpcservers=servers.get(group);
+			Set<InetSocketAddress> newrpcservers=new HashSet<InetSocketAddress>();
+			for(InetSocketAddress socketAddress:rpcservers){
+				String server1=socketAddress.getAddress().toString();
+				String server2=server1.substring(1, server1.length());
+				if(!server2.equals(server)){//更新不包括
+					newrpcservers.add(socketAddress);
+				}else{//删除包括
+					deleteNode(server1);
+				}
+			}
+			servers.put(group, newrpcservers);
+		}
+	}
 
-	@Override
-	public void removeServer(String address) throws Exception {
+	/**
+     * 找到指定节点下所有子节点的名称与值
+     * 
+     * @param node
+     * @return
+     */
+    private Map<String, String> listChildrenDetail(String node) {
+        Map<String, String> map = Maps.newHashMap();
+        try {
+            GetChildrenBuilder childrenBuilder = getClient().getChildren();
+            List<String> children = childrenBuilder.forPath(node);
+            GetDataBuilder dataBuilder = getClient().getData();
+            if (children != null) {
+                for (String child : children) {
+                    String propPath = ZKPaths.makePath(node, child);
+                    map.put(child, new String(dataBuilder.forPath(propPath), Charsets.UTF_8));
+                }
+            }
+        }
+        catch (Exception e) {
+            LOGGER.error("listChildrenDetail fail",e);
+        }
+        return map;
+    }
+	
+	/**
+	 * 删除节点
+	 * @param path
+	 * @throws Exception
+	 */
+	private  void deleteNode(String path) throws Exception {
 		// TODO Auto-generated method stub
-		address=address.substring(1, address.length());
-		List<String> subList = zk.getChildren("/" + address, true);
-		if(!subList.isEmpty()){
-			for (String subNode : subList) {
-				zk.delete("/" + address+ "/" + subNode, -1);
+		try {
+			Stat stat = getClient().checkExists().forPath(path);
+			if (stat != null) {
+				 getClient().delete().deletingChildrenIfNeeded().forPath(path);
 			}
-		}
-		zk.delete("/"+address, -1);
-		String[] host=address.split(":");
-		
-		InetSocketAddress socketAddress=new InetSocketAddress(host[0], Integer.parseInt(host[1]));
-		for(Set<InetSocketAddress> inetSocketAddress:servers.values()){
-			if(inetSocketAddress.contains(socketAddress)){
-				inetSocketAddress.remove(socketAddress);
-				break;
-			}
-		}
+        }catch (Exception e) {
+        	LOGGER.error("deleteNode fail", e);
+        }
+	}
+	
+	/**
+	 * @return the client
+	 */
+	public CuratorFramework getClient() {
+		return client;
+	}
+
+	/**
+	 * @param client the client to set
+	 */
+	public void setClient(CuratorFramework client) {
+		this.client = client;
 	}
 	
 }
