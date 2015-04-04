@@ -38,17 +38,13 @@ public class CommonRpcRequest implements Serializable{
 	
 	private int messageLen;
 	
-	//秘钥
-	private byte[] token;
-	
-
 	public CommonRpcRequest(byte[] targetInstanceName,byte[] methodName,byte[][] argTypes,
-						  Object[] requestObjects,int timeout,int codecType,int protocolType,byte[] token){
-		this(targetInstanceName,methodName,argTypes,requestObjects,timeout,get(),codecType,protocolType,token);
+						  Object[] requestObjects,int timeout,int codecType,int protocolType){
+		this(targetInstanceName,methodName,argTypes,requestObjects,timeout,get(),codecType,protocolType);
 	}
 
 	public CommonRpcRequest(byte[] targetInstanceName,byte[] methodName,byte[][] argTypes,
-						  Object[] requestObjects,int timeout,int id,int codecType,int protocolType,byte[] token){
+						  Object[] requestObjects,int timeout,int id,int codecType,int protocolType){
 		this.requestObjects = requestObjects;
 		this.id = id;
 		this.timeout = timeout;
@@ -57,7 +53,7 @@ public class CommonRpcRequest implements Serializable{
 		this.argTypes = argTypes;
 		this.codecType = codecType;
 		this.protocolType = protocolType;
-		this.token=token;
+
 	}
 
 	public int getMessageLen() {
@@ -116,22 +112,6 @@ public class CommonRpcRequest implements Serializable{
 		
 		return random.nextInt();
 	}
-	
-
-	/**
-	 * @return the token
-	 */
-	public byte[] getToken() {
-		return token;
-	}
-
-	/**
-	 * @param token the token to set
-	 */
-	public void setToken(byte[] token) {
-		this.token = token;
-	}
-
 	/**
 	 * @param id the id to set
 	 */

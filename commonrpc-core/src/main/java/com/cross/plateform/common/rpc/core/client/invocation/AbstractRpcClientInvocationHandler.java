@@ -33,18 +33,18 @@ public abstract class AbstractRpcClientInvocationHandler implements
 	
 	private int protocolType;
 	
-	private String token ;
+
 	
 	public AbstractRpcClientInvocationHandler(
 			String group, int timeout,
-			String targetInstanceName, int codecType, int protocolType,String token) {
+			String targetInstanceName, int codecType, int protocolType) {
 		super();
 		this.group = group;
 		this.timeout = timeout;
 		this.targetInstanceName = targetInstanceName;
 		this.codecType = codecType;
 		this.protocolType = protocolType;
-		this.token=token;
+
 	}
 
 	/* (non-Javadoc)
@@ -71,7 +71,7 @@ public abstract class AbstractRpcClientInvocationHandler implements
 		client = getClientFactory().getClient(server.getAddress().getHostAddress(), server.getPort());
 		String methodName = method.getName();
 		String[] argTypes = createParamSignature(method.getParameterTypes());
-		Object result= client.invokeImpl(targetInstanceName, methodName, argTypes, args, timeout, codecType, protocolType,token);
+		Object result= client.invokeImpl(targetInstanceName, methodName, argTypes, args, timeout, codecType, protocolType);
 		return result;
 	}
 	

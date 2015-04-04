@@ -36,7 +36,6 @@ public class CommonRpcReference implements FactoryBean,
 	 */
 	private int protocolType;
 	
-	private String token ;
 	/**
 	 * 组名
 	 */
@@ -60,7 +59,7 @@ public class CommonRpcReference implements FactoryBean,
 	@Override
 	public Object getObject() throws Exception {
 		// TODO Auto-generated method stub
-		return CommonRpcTcpClientProxy.getInstance().getProxyService(getObjectType(), timeout, codecType, protocolType, getObjectType().getName(), group,token);
+		return CommonRpcTcpClientProxy.getInstance().getProxyService(getObjectType(), timeout, codecType, protocolType, getObjectType().getName(), group);
 	}
 
 	/* (non-Javadoc)
@@ -141,20 +140,6 @@ public class CommonRpcReference implements FactoryBean,
 	 */
 	public void setProtocolType(int protocolType) {
 		this.protocolType = protocolType;
-	}
-
-	/**
-	 * @return the token
-	 */
-	public String getToken() {
-		return token;
-	}
-
-	/**
-	 * @param token the token to set
-	 */
-	public void setToken(String token) {
-		this.token = token;
 	}
 
 	/**

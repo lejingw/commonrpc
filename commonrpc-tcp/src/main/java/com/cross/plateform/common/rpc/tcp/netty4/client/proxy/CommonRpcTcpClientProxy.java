@@ -28,7 +28,7 @@ public class CommonRpcTcpClientProxy implements ClientProxy{
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getProxyService(Class<T> clazz, int timeout, int codecType,
-			int protocolType, String targetInstanceName, String group,String token) {
+			int protocolType, String targetInstanceName, String group) {
 		// TODO Auto-generated method stub
 		
 		
@@ -36,6 +36,6 @@ public class CommonRpcTcpClientProxy implements ClientProxy{
 				Thread.currentThread().getContextClassLoader(),
 				new Class[] { clazz },
 				new CommonRpcTcpClientInvocationHandler(group, timeout,
-						targetInstanceName, codecType, protocolType,token));
+						targetInstanceName, codecType, protocolType));
 	}
 }

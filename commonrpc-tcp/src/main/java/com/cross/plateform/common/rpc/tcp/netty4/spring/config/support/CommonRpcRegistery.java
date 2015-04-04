@@ -19,9 +19,7 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 	private int port;//端口号
 	
 	private int timeout;
-	
-	private String token;
-	
+
 	private int procotolType;//协议名称
 	
 	private int codecType;//编码类型
@@ -43,7 +41,6 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 			throw new Exception("parameter  timeout port can not be null");
 		}
 		CommonRpcServerService.getInstance().registerService(group, getLocalhost());
-		CommonRpcTcpServer.getInstance().setToken(token);
 		CommonRpcTcpServer.getInstance().setCodecType(codecType);
 		CommonRpcTcpServer.getInstance().setProcotolType(procotolType);
 		CommonRpcTcpServer.getInstance().start(port,timeout);
@@ -65,18 +62,6 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 	}
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
-	}
-	/**
-	 * @return the token
-	 */
-	public String getToken() {
-		return token;
-	}
-	/**
-	 * @param token the token to set
-	 */
-	public void setToken(String token) {
-		this.token = token;
 	}
 	/**
 	 * @return the procotolType

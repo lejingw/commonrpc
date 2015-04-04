@@ -28,7 +28,6 @@ public class CommonRpcReferenceParser implements BeanDefinitionParser {
 		int procotolType=Integer.parseInt(element.getAttribute("procotolType"));
 		int codecType=Integer.parseInt(element.getAttribute("codecType"));
 		int timeout=Integer.parseInt(element.getAttribute("timeout"));
-		String token=element.getAttribute("token");
 		
 		RootBeanDefinition beanDefinition = new RootBeanDefinition();
 		beanDefinition.setBeanClass(CommonRpcReference.class);
@@ -39,7 +38,6 @@ public class CommonRpcReferenceParser implements BeanDefinitionParser {
         beanDefinition.getPropertyValues().addPropertyValue("protocolType", procotolType);
         beanDefinition.getPropertyValues().addPropertyValue("codecType", codecType);
         beanDefinition.getPropertyValues().addPropertyValue("timeout", timeout);
-        beanDefinition.getPropertyValues().addPropertyValue("token", token);
         
         parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
 		return beanDefinition;

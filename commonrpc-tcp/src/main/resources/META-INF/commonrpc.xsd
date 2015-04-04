@@ -45,9 +45,6 @@
 						<xsd:attribute name="timeout" type="xsd:int"
 						use="required" />
 						
-						<xsd:attribute name="token" type="xsd:string"
-						use="required" />
-						
 						<xsd:attribute name="procotolType" type="xsd:int"
 						use="required" />
 						
@@ -70,8 +67,7 @@
 					<xsd:attribute name="interfacename" type="xsd:string"
 						use="required" />
 						
-					<xsd:attribute name="token" type="xsd:string"
-						use="required" />
+					
 							
 					<xsd:attribute name="group" type="xsd:string"
 						use="required" />

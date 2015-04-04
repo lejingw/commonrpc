@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
@@ -18,6 +19,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+
 import com.cross.plateform.common.rpc.core.server.RpcServer;
 import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
 import com.cross.plateform.common.rpc.core.thread.NamedThreadFactory;
@@ -38,8 +40,6 @@ public class CommonRpcTcpServer implements RpcServer {
 	private EventLoopGroup bossGroup;
 	
 	private NioEventLoopGroup workerGroup;
-	
-	private String token;
 	
 	private int procotolType;//协议名称
 	
@@ -104,7 +104,7 @@ public class CommonRpcTcpServer implements RpcServer {
 	          pipeline.addLast("decoder", new CommonRpcDecoderHandler());
 	          pipeline.addLast("encoder", new CommonRpcEncoderHandler());
 	          pipeline.addLast("timeout",new IdleStateHandler(0, 0, 120));
-	          pipeline.addLast("handler", new CommonRpcTcpServerHandler(timeout,port,token,procotolType,codecType));
+	          pipeline.addLast("handler", new CommonRpcTcpServerHandler(timeout,port,procotolType,codecType));
 	          
 	        }
 
@@ -115,12 +115,7 @@ public class CommonRpcTcpServer implements RpcServer {
 	   LOGGER.info("-----------------启动结束--------------------------");
 	}
 	
-	/**
-	 * @param token the token to set
-	 */
-	public void setToken(String token) {
-		this.token = token;
-	}
+	
 	/**
 	 * @param procotolType the procotolType to set
 	 */

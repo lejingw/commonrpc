@@ -21,8 +21,8 @@ public class DemoClientThread {
 		final IDemoService demoService = (IDemoService) context
 				.getBean("demoServiceClient");
 		long time1 = System.currentTimeMillis();
-		final int count = 200000;
-		final int threadcount = 2;
+		final int count = 1000000;
+		final int threadcount = 100;
 		final java.util.concurrent.CountDownLatch countDownLatch = new CountDownLatch(
 				threadcount);
 

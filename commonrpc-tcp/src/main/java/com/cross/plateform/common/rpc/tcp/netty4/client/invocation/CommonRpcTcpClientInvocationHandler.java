@@ -16,9 +16,9 @@ public class CommonRpcTcpClientInvocationHandler extends
 
 	public CommonRpcTcpClientInvocationHandler(String group,
 			int timeout,  String targetInstanceName,
-			int codecType, int protocolType,String token) {
+			int codecType, int protocolType) {
 		super(group, timeout, targetInstanceName, codecType,
-				protocolType,token);
+				protocolType);
 		// TODO Auto-generated constructor stub
 	}
 

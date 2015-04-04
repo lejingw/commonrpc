@@ -12,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
-import com.cross.plateform.common.rpc.core.util.StringUtils;
 import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -32,18 +31,15 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	
 	private int port;
 	
-	private String token;
-	
 	private int procotolType;//协议名称
 	
 	private int codecType;//编码类型
 	
-	public CommonRpcTcpServerHandler(int timeout, int port, String token,
+	public CommonRpcTcpServerHandler(int timeout, int port,
 			int procotolType, int codecType) {
 		super();
 		this.timeout = timeout;
 		this.port = port;
-		this.token = token;
 		this.procotolType = procotolType;
 		this.codecType = codecType;
 	}
@@ -94,17 +90,11 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 		CommonRpcResponse rocketRPCResponse = null;
 		try{
 			CommonRpcRequest request = (CommonRpcRequest) message;
-			if (!StringUtils.isNullOrEmpty(request.getToken())&&!new String(request.getToken()).equals(this.token)) {
-					LOGGER.error("client token is wrong");
-					rocketRPCResponse = new CommonRpcResponse(request.getId(),
-							codecType, procotolType);
-					rocketRPCResponse.setException(new Exception(
-							"client token is wrong"));
-			}else{
-					rocketRPCResponse = CommonRpcServerHandlerFactory
+			
+			rocketRPCResponse = CommonRpcServerHandlerFactory
 							.getServerHandler().handleRequest(request, codecType,
 									procotolType);
-			}
+			
 			
 			if(ctx.channel().isOpen()){
 				ChannelFuture wf = ctx.channel().writeAndFlush(rocketRPCResponse);

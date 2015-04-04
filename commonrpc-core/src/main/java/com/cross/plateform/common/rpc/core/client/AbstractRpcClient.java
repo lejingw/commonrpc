@@ -28,7 +28,7 @@ public abstract class AbstractRpcClient implements RpcClient {
 	@Override
 	public Object invokeImpl(String targetInstanceName, String methodName,
 			String[] argTypes, Object[] args, int timeout, int codecType,
-			int protocolType,String token) throws Exception {
+			int protocolType) throws Exception {
 		// TODO Auto-generated method stub
 		byte[][] argTypeBytes = new byte[argTypes.length][];
 		for(int i =0; i < argTypes.length; i++) {
@@ -36,7 +36,7 @@ public abstract class AbstractRpcClient implements RpcClient {
 		}
 		
 		CommonRpcRequest wrapper = new CommonRpcRequest(targetInstanceName.getBytes(),
-				methodName.getBytes(), argTypeBytes, args, timeout, codecType, protocolType,token.getBytes());
+				methodName.getBytes(), argTypeBytes, args, timeout, codecType, protocolType);
 		
 		return invokeImplIntern(wrapper);
 	}

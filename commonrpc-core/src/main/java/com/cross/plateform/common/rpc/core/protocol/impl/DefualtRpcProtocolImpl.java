@@ -119,13 +119,13 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				}
 				byte[] targetInstanceNameByte = wrapper.getTargetInstanceName();
 				byte[] methodNameByte = wrapper.getMethodName();
-				byte[] tokenByte=wrapper.getToken();
+
 				
 				id = wrapper.getId();
 				int timeout = wrapper.getTimeout();
 				int capacity = CommonRpcProtocol.HEADER_LEN + REQUEST_HEADER_LEN
 						+ requestArgs.size() * 4 * 2
-						+ targetInstanceNameByte.length+tokenByte.length + methodNameByte.length
+						+ targetInstanceNameByte.length + methodNameByte.length
 						+ requestArgTypesLen + requestArgsLen;
 
 				RpcByteBuffer byteBuffer = bytebufferWrapper
@@ -142,7 +142,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				byteBuffer.writeInt(id);//4B
 				byteBuffer.writeInt(timeout);//4B
 				byteBuffer.writeInt(targetInstanceNameByte.length);//4B
-				byteBuffer.writeInt(tokenByte.length);
+
 				byteBuffer.writeInt(methodNameByte.length);//4B
 				
 				byteBuffer.writeInt(requestArgs.size());//4B
@@ -155,7 +155,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 					byteBuffer.writeInt(requestArg.length);
 				}
 				byteBuffer.writeBytes(targetInstanceNameByte);
-				byteBuffer.writeBytes(tokenByte);
+
 				
 				byteBuffer.writeBytes(methodNameByte);
 				
@@ -255,14 +255,15 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				wrapper.readByte();
 				wrapper.readByte();
 				wrapper.readByte();
+				
 				int requestId = wrapper.readInt();
 				int timeout = wrapper.readInt();
 				int targetInstanceLen = wrapper.readInt();
-				int tokenLen=wrapper.readInt();
+
 				int methodNameLen = wrapper.readInt();
 				int argsCount = wrapper.readInt();
 				int argInfosLen = argsCount * 4 * 2;
-				int expectedLenInfoLen = argInfosLen + targetInstanceLen+tokenLen
+				int expectedLenInfoLen = argInfosLen + targetInstanceLen
 						+ methodNameLen;
 				if (wrapper.readableBytes() < expectedLenInfoLen) {
 					wrapper.setReaderIndex(originPos);
@@ -281,9 +282,6 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				}
 				byte[] targetInstanceByte = new byte[targetInstanceLen];
 				wrapper.readBytes(targetInstanceByte);
-				
-				byte[] tokenByte = new byte[tokenLen];
-				wrapper.readBytes(tokenByte);
 				
 				byte[] methodNameByte = new byte[methodNameLen];
 				wrapper.readBytes(methodNameByte);
@@ -307,7 +305,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 
 				CommonRpcRequest rocketRPCRequest = new CommonRpcRequest(
 						targetInstanceByte, methodNameByte, argTypes, args,
-						timeout, requestId, codecType, TYPE,tokenByte);
+						timeout, requestId, codecType, TYPE);
 				
 				int messageLen = CommonRpcProtocol.HEADER_LEN + REQUEST_HEADER_LEN
 						+ expectedLenInfoLen + expectedLen;
