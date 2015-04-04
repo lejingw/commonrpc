@@ -6,11 +6,11 @@
 	<parent>
 		<groupId>com.rpc</groupId>
 		<artifactId>common-rpc</artifactId>
-		<version>1.0-stable</version>
+		<version>1.0.2</version>
 	</parent>
 	<groupId>com.rpc</groupId>
 	<artifactId>commonrpc-service</artifactId>
-	<version>1.0-stable</version>
+	<version>1.0.2</version>
 	<name>commonrpc-service</name>
 	<url>http://maven.apache.org</url>
 	<properties>

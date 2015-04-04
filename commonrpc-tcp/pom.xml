@@ -5,11 +5,11 @@
   <parent>
     <groupId>com.rpc</groupId>
     <artifactId>common-rpc</artifactId>
-    <version>1.0-stable</version>
+    <version>1.0.2</version>
   </parent>
   <groupId>com.rpc</groupId>
   <artifactId>commonrpc-tcp</artifactId>
-  <version>1.0-stable</version>
+  <version>1.0.2</version>
   <name>commonrpc-tcp</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -26,13 +26,13 @@
 	<dependency>
 	   <groupId>com.rpc</groupId>
   	   <artifactId>commonrpc-core</artifactId>
-  	   <version>1.0-stable</version>
+  	   <version>1.0.2</version>
 	</dependency>
 	
 	
   </dependencies>
    <build>
-	    <finalName>commonrpc-manager</finalName>
+	    <finalName>commonrpc-tcp</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

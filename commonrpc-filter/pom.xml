@@ -5,11 +5,11 @@
   <parent>
     <groupId>com.rpc</groupId>
     <artifactId>common-rpc</artifactId>
-    <version>1.0-stable</version>
+    <version>1.0.2</version>
   </parent>
   <groupId>com.rpc</groupId>
   <artifactId>commonrpc-filter</artifactId>
-  <version>1.0-stable</version>
+  <version>1.0.2</version>
   <name>commonrpc-filter</name>
   <url>http://maven.apache.org</url>
   <description>过滤器</description>
