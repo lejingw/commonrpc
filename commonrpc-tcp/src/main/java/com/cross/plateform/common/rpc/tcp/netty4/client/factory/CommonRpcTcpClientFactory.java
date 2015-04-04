@@ -57,7 +57,7 @@ public class CommonRpcTcpClientFactory extends AbstractRpcClientFactory {
 	        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout)
 	        .option(ChannelOption.TCP_NODELAY, true)
 	        .option(ChannelOption.SO_REUSEADDR,true)
-	        .option(ChannelOption.SO_KEEPALIVE, false)
+	        .option(ChannelOption.SO_KEEPALIVE, true)
 		 	.option(ChannelOption.SO_SNDBUF, 65535)
 		 	.option(ChannelOption.SO_RCVBUF, 65535);
 		 bootstrap.handler(new ChannelInitializer<SocketChannel>() {

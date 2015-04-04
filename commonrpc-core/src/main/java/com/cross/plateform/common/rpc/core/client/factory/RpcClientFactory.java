@@ -1,7 +1,7 @@
 package com.cross.plateform.common.rpc.core.client.factory;
 
-import java.util.concurrent.ArrayBlockingQueue;
 
+import java.util.concurrent.LinkedBlockingQueue;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.client.AbstractRpcClient;
 import com.cross.plateform.common.rpc.core.client.RpcClient;
@@ -22,7 +22,7 @@ public interface RpcClientFactory {
 	 */
 	public void startClient(int connectiontimeout);
 	
-	public void putResponse(Integer key,ArrayBlockingQueue<Object> queue) throws Exception;
+	public void putResponse(Integer key,LinkedBlockingQueue<Object> queue) throws Exception;
 	/**
 	 * 接受消息
 	 * @param response

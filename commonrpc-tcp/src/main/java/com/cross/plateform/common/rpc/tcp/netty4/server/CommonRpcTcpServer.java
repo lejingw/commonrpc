@@ -33,7 +33,7 @@ public class CommonRpcTcpServer implements RpcServer {
 	
 	private static final Log LOGGER = LogFactory.getLog(CommonRpcTcpServer.class);
 	
-	private static final int PROCESSORS = Runtime.getRuntime().availableProcessors();
+	private static final int PROCESSORS = Runtime.getRuntime().availableProcessors()*2;
 	
 	private EventLoopGroup bossGroup;
 	
@@ -87,14 +87,13 @@ public class CommonRpcTcpServer implements RpcServer {
 	    ThreadFactory serverWorkerTF = new NamedThreadFactory("NETTYSERVER-WORKER-");
 	    bossGroup = new NioEventLoopGroup(PROCESSORS, serverBossTF);
 	    workerGroup = new NioEventLoopGroup(PROCESSORS * 2, serverWorkerTF);
-	    workerGroup.setIoRatio(80);
 	    ServerBootstrap bootstrap = new ServerBootstrap();
 	    bootstrap.group(bossGroup, workerGroup)
 	        .channel(NioServerSocketChannel.class)
 	        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeout)
 	        .option(ChannelOption.SO_BACKLOG, 1024)
 	        .option(ChannelOption.SO_REUSEADDR,true)
-	        .option(ChannelOption.SO_KEEPALIVE, false)
+	        .option(ChannelOption.SO_KEEPALIVE, true)
 		 	.option(ChannelOption.SO_SNDBUF, 65535)
 		 	.option(ChannelOption.SO_RCVBUF, 65535)
 		 	.childOption(ChannelOption.TCP_NODELAY, true);

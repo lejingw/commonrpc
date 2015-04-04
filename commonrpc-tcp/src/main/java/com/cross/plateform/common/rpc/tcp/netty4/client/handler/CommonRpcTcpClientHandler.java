@@ -38,7 +38,6 @@ public class CommonRpcTcpClientHandler extends ChannelInboundHandlerAdapter {
 			
 			if (msg instanceof CommonRpcResponse) {
 				CommonRpcResponse response = (CommonRpcResponse) msg;
-				//System.out.println("处理结果集:"+response.getRequestId());
 				if (isDebugEnabled) {
 					// for performance trace
 					LOGGER.debug("receive response list from server: "
@@ -56,13 +55,6 @@ public class CommonRpcTcpClientHandler extends ChannelInboundHandlerAdapter {
 			ReferenceCountUtil.release(msg);
 		}
 		
-	}
-	
-	@Override
-	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-		// TODO Auto-generated method stub
-		//LOGGER.info(CommonRpcTcpClientFactory.getInstance().containClient(ctx.channel().remoteAddress().toString()));
-		super.channelReadComplete(ctx);
 	}
 	
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable e)

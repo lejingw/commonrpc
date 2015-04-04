@@ -3,12 +3,11 @@
  */
 package com.cross.plateform.common.rpc.core.client;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.codec.all.CommonRpcCodecs;
@@ -23,7 +22,6 @@ public abstract class AbstractRpcClient implements RpcClient {
 	
 	private static final Log LOGGER = LogFactory.getLog(AbstractRpcClient.class);
 
-	
 	/* (non-Javadoc)
 	 * @see com.cross.plateform.common.rpc.core.client.RPCClient#invokeImpl(java.lang.String, java.lang.String, java.lang.String[], java.lang.Object[], int, int, int)
 	 */
@@ -46,7 +44,7 @@ public abstract class AbstractRpcClient implements RpcClient {
 	
 	private Object invokeImplIntern(CommonRpcRequest rocketRPCRequest) throws Exception {
 		long beginTime = System.currentTimeMillis();
-		ArrayBlockingQueue<Object> responseQueue = new ArrayBlockingQueue<Object>(1);
+		LinkedBlockingQueue<Object> responseQueue = new LinkedBlockingQueue<Object>(1);
 		getClientFactory().putResponse(rocketRPCRequest.getId(), responseQueue);
 		CommonRpcResponse commonRPCResponse = null;
 		
@@ -54,7 +52,7 @@ public abstract class AbstractRpcClient implements RpcClient {
 			if(LOGGER.isDebugEnabled()){
 				LOGGER.debug("client ready to send message,request id: "+rocketRPCRequest.getId());
 			}
-			
+
 			sendRequest(rocketRPCRequest);
 			
 			if(LOGGER.isDebugEnabled()){
@@ -71,14 +69,8 @@ public abstract class AbstractRpcClient implements RpcClient {
 			result = responseQueue.poll(
 					rocketRPCRequest.getTimeout() - (System.currentTimeMillis() - beginTime),
 					TimeUnit.MILLISECONDS);
-		}catch(Exception e){
-			//responses.remove(rocketRPCRequest.getId());
-			LOGGER.error("receive response timeout ", e);
-		}finally{
-			getClientFactory().removeResponse(rocketRPCRequest.getId());
-		}
 
-		if (result == null) {
+		}catch(Exception e){
 			String errorMsg = "receive response timeout("
 					+ rocketRPCRequest.getTimeout() + " ms),server is: "
 					+ getServerIP() + ":" + getServerPort()
@@ -86,20 +78,20 @@ public abstract class AbstractRpcClient implements RpcClient {
 			LOGGER.error(errorMsg);
 			//throw new Exception(errorMsg);
 			commonRPCResponse=new CommonRpcResponse(rocketRPCRequest.getId(), rocketRPCRequest.getCodecType(), rocketRPCRequest.getProtocolType());
-			commonRPCResponse.setException( new Exception(errorMsg));
-			//return commonRPCResponse;
-		}else{
-			if(result instanceof CommonRpcResponse){
+			commonRPCResponse.setException( new Throwable(errorMsg));
+		}finally{
+			
+			getClientFactory().removeResponse(rocketRPCRequest.getId());
+		}
+
+		
+		if(result instanceof CommonRpcResponse){
 				commonRPCResponse = (CommonRpcResponse) result;
-				
 			}else{
 				commonRPCResponse=new CommonRpcResponse(rocketRPCRequest.getId(), rocketRPCRequest.getCodecType(), rocketRPCRequest.getProtocolType());
 				commonRPCResponse.setException( new Exception("only receive ResponseWrapper or List as response"));
 				//return commonRPCResponse;
-			}
 		}
-		
-		
 		
 		try{
 			if (commonRPCResponse.getResponse() instanceof byte[]) {
@@ -132,12 +124,14 @@ public abstract class AbstractRpcClient implements RpcClient {
 					+ ":" + getServerPort() + " request id is:"
 					+ rocketRPCRequest.getId();
 			LOGGER.error(errorMsg, t);
+			//destroy();
 			//throw new Exception(errorMsg, t);
 			return null;
 		}
 		
 		return commonRPCResponse.getResponse();
 	}
+	
 	/**
 	 * 发送请求
 	 * @param rocketRPCRequest
@@ -145,4 +139,9 @@ public abstract class AbstractRpcClient implements RpcClient {
 	 * @throws Exception
 	 */
 	public abstract void sendRequest(CommonRpcRequest commonRpcRequest) throws Exception; 
+	/**
+	 * 消灭消息
+	 * @throws Exception
+	 */
+	public abstract void destroy() throws Exception;
 }

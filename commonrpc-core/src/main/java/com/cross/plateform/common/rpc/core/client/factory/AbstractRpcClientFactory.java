@@ -4,8 +4,8 @@
 package com.cross.plateform.common.rpc.core.client.factory;
 
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
@@ -17,8 +17,8 @@ import com.cross.plateform.common.rpc.core.client.RpcClient;
  */
 public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 		
-	protected static ConcurrentHashMap<Integer, ArrayBlockingQueue<Object>> responses = 
-			new ConcurrentHashMap<Integer, ArrayBlockingQueue<Object>>();
+	protected static ConcurrentHashMap<Integer, LinkedBlockingQueue<Object>> responses = 
+			new ConcurrentHashMap<Integer, LinkedBlockingQueue<Object>>();
 	
 	
 	protected static Map<String, AbstractRpcClient> rpcClients = 
@@ -42,7 +42,7 @@ public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 	
 	
 	@Override
-	public void putResponse(Integer key, ArrayBlockingQueue<Object> queue)
+	public void putResponse(Integer key, LinkedBlockingQueue<Object> queue)
 			throws Exception {
 		// TODO Auto-generated method stub
 		responses.put(key, queue);
@@ -60,13 +60,18 @@ public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 			return;
 		}
 		try {
-			ArrayBlockingQueue<Object> queue = responses.get(response.getRequestId());
-			if (queue != null) {
-				queue.put(response);
-			} else {
-				LOGGER.warn("give up the response,request id is:"
-						+ response.getRequestId() + ",because queue is null");
+			
+			if(responses.containsKey(response.getRequestId())){
+				
+				LinkedBlockingQueue<Object> queue = responses.get(response.getRequestId());
+				if (queue != null) {
+					queue.put(response);
+				} else {
+					LOGGER.warn("give up the response,request id is:"
+							+ response.getRequestId() + ",because queue is null");
+				}
 			}
+			
 		} catch (InterruptedException e) {
 			LOGGER.error("put response error,request id is:" + response.getRequestId(), e);
 		}

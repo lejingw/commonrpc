@@ -38,7 +38,6 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	
 	private int codecType;//编码类型
 	
-	
 	public CommonRpcTcpServerHandler(int timeout, int port, String token,
 			int procotolType, int codecType) {
 		super();
@@ -52,6 +51,7 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
+		
 		CommonRpcServerService.getInstance().registerClient(getLocalhost(), ctx.channel().remoteAddress().toString());
 	}
 	
@@ -81,6 +81,7 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 			      throw new Exception(
 			          "receive message error,only support RequestWrapper || List");
 		}
+		
 		handleRequestWithSingleThread(ctx, msg);
 		
 	}
@@ -129,9 +130,9 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	private void sendErrorResponse(final ChannelHandlerContext ctx, final CommonRpcRequest request,String errorMessage) {
 	    CommonRpcResponse commonRpcResponse =
 	        new CommonRpcResponse(request.getId(), request.getCodecType(), request.getProtocolType());
-	    //commonRpcResponse.setException(new Exception("server threadpool full,maybe because server is slow or too many requests"));
 	    commonRpcResponse.setException(new Exception(errorMessage));
 	    ChannelFuture wf = ctx.channel().writeAndFlush(commonRpcResponse);
+	    
 	    wf.addListener(new ChannelFutureListener() {
 	      public void operationComplete(ChannelFuture future) throws Exception {
 	        if (!future.isSuccess()) {
