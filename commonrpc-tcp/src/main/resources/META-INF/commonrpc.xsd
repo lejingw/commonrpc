@@ -51,6 +51,9 @@
 						<xsd:attribute name="codecType" type="xsd:int"
 						use="required" />
 						
+						<xsd:attribute name="threadCount" type="xsd:int"
+						use="required" />
+						
 						<xsd:attribute name="group" type="xsd:string"
 						use="required" />
 						

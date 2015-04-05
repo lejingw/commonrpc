@@ -22,7 +22,7 @@ public class DemoClientThread {
 		final IDemoService demoService = (IDemoService) context
 				.getBean("demoServiceClient");
 		long time1 = System.currentTimeMillis();
-		final int count = 200;
+		final int count = 1000000;
 		final int threadcount = 10;
 		final java.util.concurrent.CountDownLatch countDownLatch = new CountDownLatch(
 				threadcount);
@@ -32,8 +32,8 @@ public class DemoClientThread {
 				@Override
 				public void run() {
 					for (int i = 0; i < count; i++) {
-						String ret = demoService.sayDemo("demo_" + i);
-						System.out.println(ret);
+						//demoService.sayDemo("demo_" + i);  性能慢测试
+						demoService.getParam("demo_" + i);//无业务测试
 					}
 					countDownLatch.countDown();
 				}

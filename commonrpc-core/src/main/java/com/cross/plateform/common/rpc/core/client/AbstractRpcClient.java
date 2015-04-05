@@ -71,7 +71,7 @@ public abstract class AbstractRpcClient implements RpcClient {
 			result = responseQueue.poll(
 					rocketRPCRequest.getTimeout() - (System.currentTimeMillis() - beginTime),
 					TimeUnit.MILLISECONDS);
-			System.out.println("pool时间:"+(System.currentTimeMillis() - beginTime));
+			//System.out.println("pool时间:"+(System.currentTimeMillis() - beginTime));
 		}finally{
 			getClientFactory().removeResponse(rocketRPCRequest.getId());
 		}

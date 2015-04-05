@@ -27,7 +27,9 @@ public class CommonRpcRegisteryParser implements BeanDefinitionParser {
 		int timeout=Integer.parseInt(element.getAttribute("timeout"));
 		int procotolType=Integer.parseInt(element.getAttribute("procotolType"));
 		int codecType=Integer.parseInt(element.getAttribute("codecType"));
+		int threadCount=Integer.parseInt(element.getAttribute("threadCount"));
 		String group=element.getAttribute("group");
+		
 		RootBeanDefinition beanDefinition = new RootBeanDefinition();
 		beanDefinition.setBeanClass(CommonRpcRegistery.class);
 		beanDefinition.getPropertyValues().addPropertyValue("port", port);
@@ -35,6 +37,8 @@ public class CommonRpcRegisteryParser implements BeanDefinitionParser {
 		beanDefinition.getPropertyValues().addPropertyValue("group", group);
 		beanDefinition.getPropertyValues().addPropertyValue("procotolType", procotolType);
 	    beanDefinition.getPropertyValues().addPropertyValue("codecType", codecType);
+	    beanDefinition.getPropertyValues().addPropertyValue("threadCount", threadCount);
+	    
         parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
         
 		return beanDefinition;

@@ -16,12 +16,13 @@
     <!--zk 注册中心地址  -->
     <commonrpc:application id="rpcRegistryApplication" address="127.0.0.1:2181" flag="1" timeout="5000"></commonrpc:application>
      
-    <commonrpc:registry id="rpcRegistry" port="10008" timeout="200"  procotolType="1" codecType="4" group="demo"></commonrpc:registry>
+    <commonrpc:registry id="rpcRegistry" port="10008" timeout="200"  procotolType="1" codecType="4" group="demo" threadCount="200"></commonrpc:registry>
     
     <commonrpc:service id="IDemoService"  interfacename="test.cross.plateform.rocketrpc.demo.service.IDemoService" ref="demoService" ></commonrpc:service>
     
     <bean id="demoService" class="test.cross.plateform.rocketrpc.demo.service.impl.DemoServiceImpl" ></bean>
     
-    
     <bean id="demoRpcFilter" class="test.cross.plateform.rocketrpc.demo.service.impl.DemoRpcFilter"></bean>
+    
+    
 </beans>

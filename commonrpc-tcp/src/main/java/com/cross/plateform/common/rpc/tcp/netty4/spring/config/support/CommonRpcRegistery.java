@@ -26,7 +26,7 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 	
 	private String group;//组
 	
-	
+	private int threadCount;//线程数
 	@Override
 	public void destroy() throws Exception {
 		// TODO Auto-generated method stub
@@ -43,7 +43,10 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 		CommonRpcServerService.getInstance().registerService(group, getLocalhost());
 		CommonRpcTcpServer.getInstance().setCodecType(codecType);
 		CommonRpcTcpServer.getInstance().setProcotolType(procotolType);
+		CommonRpcTcpServer.getInstance().setThreadCount(threadCount);
+		
 		CommonRpcTcpServer.getInstance().start(port,timeout);
+		
 	}
 	/**
 	 * @return the port
@@ -109,6 +112,20 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 	 */
 	public void setGroup(String group) {
 		this.group = group;
+	}
+
+	/**
+	 * @return the threadCount
+	 */
+	public int getThreadCount() {
+		return threadCount;
+	}
+
+	/**
+	 * @param threadCount the threadCount to set
+	 */
+	public void setThreadCount(int threadCount) {
+		this.threadCount = threadCount;
 	}
 	
 }

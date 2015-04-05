@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,7 +32,7 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	private static final Log LOGGER = LogFactory
 			.getLog(CommonRpcTcpServerHandler.class);
 	
-	private int timeout;
+	private ThreadPoolExecutor threadPoolExecutor;
 	
 	private int port;
 	
@@ -38,13 +40,13 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	
 	private int codecType;//编码类型
 	
-	public CommonRpcTcpServerHandler(int timeout, int port,
+	public CommonRpcTcpServerHandler(int threadCount, int port,
 			int procotolType, int codecType) {
 		super();
-		this.timeout = timeout;
 		this.port = port;
 		this.procotolType = procotolType;
 		this.codecType = codecType;
+		threadPoolExecutor= (ThreadPoolExecutor) Executors.newFixedThreadPool(threadCount);
 	}
 
 	@Override
@@ -79,8 +81,7 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 			      throw new Exception(
 			          "receive message error,only support RequestWrapper || List");
 		}
-		handleRequestWithSingleThread(ctx, msg);
-		
+		threadPoolExecutor.submit(new ServerHandlerRunnable(ctx, msg));
 	}
 	/**
 	 * disruptor处理方式
@@ -138,6 +139,32 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			throw new RuntimeException("无法获取本地Ip",e);
+		}
+		
+	}
+	
+	private class ServerHandlerRunnable implements Runnable{
+		
+		private  ChannelHandlerContext ctx;
+		
+		private  Object message;
+		
+		/**
+		 * @param ctx
+		 * @param message
+		 */
+		public ServerHandlerRunnable(ChannelHandlerContext ctx, Object message) {
+			super();
+			this.ctx = ctx;
+			this.message = message;
+		}
+
+
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			handleRequestWithSingleThread(ctx, message);
 		}
 		
 	}
