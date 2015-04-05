@@ -6,11 +6,11 @@
 	<parent>
 		<groupId>com.rpc</groupId>
 		<artifactId>common-rpc</artifactId>
-		<version>1.0.2</version>
+		<version>1.0.3</version>
 	</parent>
 	<groupId>com.rpc</groupId>
 	<artifactId>commonrpc-core</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 	<name>commonrpc-core</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -40,13 +40,13 @@
 		<dependency>
 			<groupId>com.rpc</groupId>
 			<artifactId>commonrpc-proxy</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.3</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.rpc</groupId>
 			<artifactId>commonrpc-filter</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.3</version>
 		</dependency>
 
 		<dependency>
@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>com.rpc</groupId>
 			<artifactId>commonrpc-service</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.3</version>
 		</dependency>
 	</dependencies>
 	 <build>
