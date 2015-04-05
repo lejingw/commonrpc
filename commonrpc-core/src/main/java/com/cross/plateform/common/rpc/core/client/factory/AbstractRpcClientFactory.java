@@ -56,7 +56,7 @@ public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 	public void receiveResponse(CommonRpcResponse response) throws Exception {
 		// TODO Auto-generated method stub
 		if (!responses.containsKey(response.getRequestId())) {
-			LOGGER.warn("give up the response,request id is:" + response.getRequestId() + ",maybe because timeout!");
+			LOGGER.error("give up the response,request id is:" + response.getRequestId() + ",maybe because timeout!");
 			return;
 		}
 		try {

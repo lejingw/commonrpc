@@ -9,7 +9,7 @@ package test.cross.plateform.rocketrpc.demo.service;
  */
 public interface IDemoService {
 	
-	public String sayDemo(String params);
+	public String sayDemo(String params) ;
 	
 	public String getParam(String params);
 }

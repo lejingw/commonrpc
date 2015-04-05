@@ -7,12 +7,15 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
 import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
+
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -47,7 +50,6 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
-		
 		CommonRpcServerService.getInstance().registerClient(getLocalhost(), ctx.channel().remoteAddress().toString());
 	}
 	
@@ -77,7 +79,6 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 			      throw new Exception(
 			          "receive message error,only support RequestWrapper || List");
 		}
-		
 		handleRequestWithSingleThread(ctx, msg);
 		
 	}
@@ -94,12 +95,10 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 			rocketRPCResponse = CommonRpcServerHandlerFactory
 							.getServerHandler().handleRequest(request, codecType,
 									procotolType);
-			
-			
 			if(ctx.channel().isOpen()){
 				ChannelFuture wf = ctx.channel().writeAndFlush(rocketRPCResponse);
 			    wf.addListener(new ChannelFutureListener() {
-			      public void operationComplete(ChannelFuture future) throws Exception {
+			    public void operationComplete(ChannelFuture future) throws Exception {
 			        if (!future.isSuccess()) {
 			          LOGGER.error("server write response error,client  host is: " + ((InetSocketAddress) ctx.channel().remoteAddress()).getHostName()+":"+((InetSocketAddress) ctx.channel().remoteAddress()).getPort()+",server Ip:"+getLocalhost());
 			          ctx.channel().close();
@@ -109,7 +108,6 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 			}
 			
 		}catch(Exception e){
-			e.printStackTrace();
 			sendErrorResponse(ctx, (CommonRpcRequest) message,e.getMessage()+",server Ip:"+getLocalhost());
 		}finally{
 			ReferenceCountUtil.release(message);

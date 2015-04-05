@@ -2,15 +2,16 @@
  * 
  */
 package test.cross.plateform.rocketrpc.demo.service.impl;
+
 import java.util.concurrent.CountDownLatch;
-
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import test.cross.plateform.rocketrpc.demo.service.IDemoService;
 
 public class DemoClientThread {
 	public static void main(String[] args) throws Exception {
 		testRpc();
+		
+		
 	}
 
 	public static void testRpc() throws Exception {
@@ -21,8 +22,8 @@ public class DemoClientThread {
 		final IDemoService demoService = (IDemoService) context
 				.getBean("demoServiceClient");
 		long time1 = System.currentTimeMillis();
-		final int count = 80000;
-		final int threadcount = 100;
+		final int count = 200;
+		final int threadcount = 10;
 		final java.util.concurrent.CountDownLatch countDownLatch = new CountDownLatch(
 				threadcount);
 
@@ -32,7 +33,7 @@ public class DemoClientThread {
 				public void run() {
 					for (int i = 0; i < count; i++) {
 						String ret = demoService.sayDemo("demo_" + i);
-						//System.out.println(ret);
+						System.out.println(ret);
 					}
 					countDownLatch.countDown();
 				}

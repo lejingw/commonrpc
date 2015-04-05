@@ -6,8 +6,10 @@ package com.cross.plateform.common.rpc.core.client;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.codec.all.CommonRpcCodecs;
@@ -69,28 +71,22 @@ public abstract class AbstractRpcClient implements RpcClient {
 			result = responseQueue.poll(
 					rocketRPCRequest.getTimeout() - (System.currentTimeMillis() - beginTime),
 					TimeUnit.MILLISECONDS);
-
-		}catch(Exception e){
+			System.out.println("pool时间:"+(System.currentTimeMillis() - beginTime));
+		}finally{
+			getClientFactory().removeResponse(rocketRPCRequest.getId());
+		}
+		if(result==null&&(System.currentTimeMillis() - beginTime)<=rocketRPCRequest.getTimeout()){//返回结果集为null
+			commonRPCResponse=new CommonRpcResponse(rocketRPCRequest.getId(), rocketRPCRequest.getCodecType(), rocketRPCRequest.getProtocolType());
+		}else if(result==null&&(System.currentTimeMillis() - beginTime)>rocketRPCRequest.getTimeout()){//结果集超时
 			String errorMsg = "receive response timeout("
 					+ rocketRPCRequest.getTimeout() + " ms),server is: "
 					+ getServerIP() + ":" + getServerPort()
 					+ " request id is:" + rocketRPCRequest.getId();
 			LOGGER.error(errorMsg);
-			//throw new Exception(errorMsg);
 			commonRPCResponse=new CommonRpcResponse(rocketRPCRequest.getId(), rocketRPCRequest.getCodecType(), rocketRPCRequest.getProtocolType());
 			commonRPCResponse.setException( new Throwable(errorMsg));
-		}finally{
-			
-			getClientFactory().removeResponse(rocketRPCRequest.getId());
-		}
-
-		
-		if(result instanceof CommonRpcResponse){
-				commonRPCResponse = (CommonRpcResponse) result;
-			}else{
-				commonRPCResponse=new CommonRpcResponse(rocketRPCRequest.getId(), rocketRPCRequest.getCodecType(), rocketRPCRequest.getProtocolType());
-				commonRPCResponse.setException( new Exception("only receive ResponseWrapper or List as response"));
-				//return commonRPCResponse;
+		}else if(result!=null){
+			commonRPCResponse = (CommonRpcResponse) result;
 		}
 		
 		try{
