@@ -10,6 +10,7 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
+
 import com.cross.plateform.common.rpc.service.server.ICommonServiceServer;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
@@ -68,7 +69,7 @@ public class CommonServiceServerImpl implements ICommonServiceServer {
 	public void registerClient(String server, String client) throws Exception {
 		// TODO Auto-generated method stub
 
-		this.createNode("/" + server, server,CreateMode.PERSISTENT);
+		//this.createNode("/" + server, server,CreateMode.PERSISTENT);
 		this.createNode("/" + server +client, client, CreateMode.EPHEMERAL_SEQUENTIAL);
 	}
 	
@@ -90,14 +91,14 @@ public class CommonServiceServerImpl implements ICommonServiceServer {
                     opResult = getClient().create().creatingParentsIfNeeded().withMode(createMode).forPath(nodeName);
                 }else {
                     opResult =
-                            getClient().create().creatingParentsIfNeeded()
+                            getClient().create().creatingParentsIfNeeded().withMode(createMode)
                                 .forPath(nodeName, value.getBytes(Charsets.UTF_8));
                 }
                 suc = Objects.equal(nodeName, opResult);
             }
         }
         catch (Exception e) {
-        	 LOGGER.error("createNode fail",e);
+        	 LOGGER.error("createNode fail,path:"+nodeName,e);
         }
         return suc;
     }

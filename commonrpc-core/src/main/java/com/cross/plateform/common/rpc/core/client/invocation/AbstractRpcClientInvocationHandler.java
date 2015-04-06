@@ -65,13 +65,16 @@ public abstract class AbstractRpcClientInvocationHandler implements
 		Set<InetSocketAddress>addresses =CommonRpcClientService.getInstance().getServersByGroup(groups[i]);
 		
 		List<RpcRouteServer> servers=SocketAddressUtil.getInetSocketAddress(addresses);
-				
-		InetSocketAddress server =CommonRpcRoute.GetBestServer(servers).getServer();
+		r=new Random(); 
+		
+		int j=r.nextInt(servers.size());		
+		InetSocketAddress server =servers.get(j).getServer();
 		
 		client = getClientFactory().getClient(server.getAddress().getHostAddress(), server.getPort());
 		String methodName = method.getName();
 		String[] argTypes = createParamSignature(method.getParameterTypes());
 		Object result= client.invokeImpl(targetInstanceName, methodName, argTypes, args, timeout, codecType, protocolType);
+		System.out.println(server.getAddress().getHostAddress()+",port:"+server.getPort());
 		return result;
 	}
 	

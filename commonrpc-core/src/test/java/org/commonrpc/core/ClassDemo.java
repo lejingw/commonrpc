@@ -16,6 +16,5 @@ public class ClassDemo {
 		
 		System.out.println(new ClassDemo().sayDemo());
 		
-
 	}
 }

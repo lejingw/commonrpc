@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.curator.framework.CuratorFramework;
@@ -24,6 +25,7 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.data.Stat;
+
 import com.cross.plateform.common.rpc.service.client.ICommonServiceClient;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
@@ -53,8 +55,8 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 	public Set<InetSocketAddress> getServersByGroup(final String group) throws Exception {
 		// TODO Auto-generated method stub
 		if(!flag.containsKey(group)){
-
-		     ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+			
+		     ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()*2);
 			 
 			 @SuppressWarnings("resource")
 			 PathChildrenCache childrenCache = new PathChildrenCache(client,"/"+group, true);
@@ -76,11 +78,16 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 		                    	String path=event.getData().getPath();
 		                    	String[] nodes=path.split("/");// 1:group 2:address
 		                    	if(nodes.length>0&&nodes.length==3){
-		                    		String[] host=nodes[2].split(":");
-		            				InetSocketAddress socketAddress=new InetSocketAddress(host[0], Integer.parseInt(host[1]));
-		            				Set<InetSocketAddress> addresses=servers.get(group);
-		            				addresses.add(socketAddress);
-		            				servers.put(group, addresses);
+		                    		Map<String, String> valueMap=listChildrenDetail(path);
+		                    		for(String value:valueMap.values()){
+		                    			String[] nodes1=value.split("/");
+		                    			InetSocketAddress socketAddress=new InetSocketAddress(nodes1[0], Integer.parseInt(nodes1[1]));
+			            				Set<InetSocketAddress> addresses=servers.get(group);
+			            				addresses.add(socketAddress);
+			            				servers.put(group, addresses);
+		                    		}
+		                    		
+		            				
 		                    	}
 		                    }
 		                }
@@ -143,9 +150,9 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 			Set<InetSocketAddress> rpcservers=servers.get(group);
 			Set<InetSocketAddress> newrpcservers=new HashSet<InetSocketAddress>();
 			for(InetSocketAddress socketAddress:rpcservers){
-				String server1=socketAddress.getAddress().toString();
+				String server1=socketAddress.getAddress().toString()+":"+socketAddress.getPort();
 				String server2=server1.substring(1, server1.length());
-				if(!server2.equals(server)){//更新不包括
+				if(!server.startsWith(server2)){//更新不包括
 					newrpcservers.add(socketAddress);
 				}else{//删除包括
 					deleteNode(server1);
@@ -193,7 +200,7 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 				 getClient().delete().deletingChildrenIfNeeded().forPath(path);
 			}
         }catch (Exception e) {
-        	LOGGER.error("deleteNode fail", e);
+        	//LOGGER.error("deleteNode fail", e);
         }
 	}
 	
