@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
+import com.cross.plateform.common.rpc.core.util.StringUtils;
 import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
 import com.cross.plateform.common.rpc.tcp.netty4.server.CommonRpcTcpServer;
 /**
@@ -16,6 +17,8 @@ import com.cross.plateform.common.rpc.tcp.netty4.server.CommonRpcTcpServer;
  */
 public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 
+	private String ip;//暴露的ip
+	
 	private int port;//端口号
 	
 	private int timeout;
@@ -38,7 +41,7 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 	public void afterPropertiesSet() throws Exception {
 		// TODO Auto-generated method stub
 		if(port==0){
-			throw new Exception("parameter  timeout port can not be null");
+			throw new Exception("parameter port can not be null");
 		}
 		CommonRpcServerService.getInstance().registerService(group, getLocalhost());
 		CommonRpcTcpServer.getInstance().setCodecType(codecType);
@@ -93,7 +96,7 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 	
 	private String getLocalhost(){
 		try {
-			String ip = InetAddress.getLocalHost().getHostAddress();
+			String ip = StringUtils.isNullOrEmpty(this.getIp()) ? InetAddress.getLocalHost().getHostAddress() : this.getIp();
 			return ip+":"+port;
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -126,6 +129,16 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 	 */
 	public void setThreadCount(int threadCount) {
 		this.threadCount = threadCount;
+	}
+
+	public String getIp()
+	{
+		return ip;
+	}
+
+	public void setIp(String ip)
+	{
+		this.ip = ip;
 	}
 	
 }

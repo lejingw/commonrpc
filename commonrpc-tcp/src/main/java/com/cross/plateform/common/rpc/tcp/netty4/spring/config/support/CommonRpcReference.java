@@ -7,6 +7,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
+
+import com.cross.plateform.common.rpc.core.util.StringUtils;
 import com.cross.plateform.common.rpc.service.client.service.CommonRpcClientService;
 import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
 import com.cross.plateform.common.rpc.tcp.netty4.client.proxy.CommonRpcTcpClientProxy;
@@ -69,7 +71,13 @@ public class CommonRpcReference implements FactoryBean,
 	public Class<?> getObjectType() {
 		// TODO Auto-generated method stub
 		try {
-			return Thread.currentThread().getContextClassLoader().loadClass(interfacename);
+			if (StringUtils.isNullOrEmpty(interfacename)){
+				LOGGER.warn("interfacename is null");
+				return null;
+			} else {
+				return Thread.currentThread().getContextClassLoader().loadClass(interfacename);
+			}
+			
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			LOGGER.error("spring 解析失败", e);

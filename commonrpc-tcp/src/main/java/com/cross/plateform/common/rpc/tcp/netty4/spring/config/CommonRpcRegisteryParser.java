@@ -23,6 +23,7 @@ public class CommonRpcRegisteryParser implements BeanDefinitionParser {
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		// TODO Auto-generated method stub
 		String id = element.getAttribute("id");
+		String ip = element.getAttribute("ip");
 		int port=Integer.parseInt(element.getAttribute("port"));
 		int timeout=Integer.parseInt(element.getAttribute("timeout"));
 		int procotolType=Integer.parseInt(element.getAttribute("procotolType"));
@@ -32,6 +33,7 @@ public class CommonRpcRegisteryParser implements BeanDefinitionParser {
 		
 		RootBeanDefinition beanDefinition = new RootBeanDefinition();
 		beanDefinition.setBeanClass(CommonRpcRegistery.class);
+		beanDefinition.getPropertyValues().addPropertyValue("ip", ip);
 		beanDefinition.getPropertyValues().addPropertyValue("port", port);
 		beanDefinition.getPropertyValues().addPropertyValue("timeout", timeout);
 		beanDefinition.getPropertyValues().addPropertyValue("group", group);
