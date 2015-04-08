@@ -35,7 +35,7 @@ import com.google.common.collect.Maps;
  *
  */
 public class CommonServiceClientImpl implements ICommonServiceClient {
-	
+    
 	private static Map<String, Set<InetSocketAddress>> servers=new ConcurrentHashMap<String, Set<InetSocketAddress>>();
 	
 	private static final Log LOGGER = LogFactory.getLog(CommonServiceClientImpl.class);
@@ -78,9 +78,9 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
 		                    	String path=event.getData().getPath();
 		                    	String[] nodes=path.split("/");// 1:group 2:address
 		                    	if(nodes.length>0&&nodes.length==3){
-		                    		Map<String, String> valueMap=listChildrenDetail(path);
+		                    		Map<String, String> valueMap=listChildrenDetail("/"+nodes[1]);
 		                    		for(String value:valueMap.values()){
-		                    			String[] nodes1=value.split("/");
+		                    			String[] nodes1=value.split(":");
 		                    			InetSocketAddress socketAddress=new InetSocketAddress(nodes1[0], Integer.parseInt(nodes1[1]));
 			            				Set<InetSocketAddress> addresses=servers.get(group);
 			            				addresses.add(socketAddress);
