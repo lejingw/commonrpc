@@ -9,13 +9,14 @@
 		<xsd:complexType>
 			<xsd:complexContent>
 				<xsd:extension base="beans:identifiedType">
-					
 					<xsd:attribute name="address" type="xsd:string"
 						use="required" />
+					<xsd:attribute name="clientid" type="xsd:string"
+						use="optional" />
 					<xsd:attribute name="timeout" type="xsd:int"
 						use="required" />
 					<xsd:attribute name="flag" type="xsd:int"
-						use="required" />	
+						use="required" />
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>

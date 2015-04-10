@@ -29,7 +29,7 @@ import com.cross.plateform.common.rpc.core.protocol.all.CommonRpcProtocol;
  *  KEEPED(1B):    
  *  KEEPED(1B):    
  *  KEEPED(1B):    
- *  ID(4B):        request id
+ *  ID(24B):       request id
  *  TIMEOUT(4B):   request timeout
  *  TARGETINSTANCELEN(4B):  target service name length
  *  METHODNAMELEN(4B):      method name length
@@ -59,7 +59,7 @@ import com.cross.plateform.common.rpc.core.protocol.all.CommonRpcProtocol;
  *  KEEPED(1B):    
  *  KEEPED(1B):    
  *  KEEPED(1B):    
- *  ID(4B):        request id
+ *  ID(24B):        request id
  *  BodyClassNameLen(4B): body className Len
  *  LENGTH(4B):    body length
  *  BodyClassName
@@ -69,14 +69,19 @@ import com.cross.plateform.common.rpc.core.protocol.all.CommonRpcProtocol;
  */
 public class DefualtRpcProtocolImpl implements RpcProtocol {
 
+	/**
+	 * request id length
+	 */
+	public static final int REQUEST_ID_LENGTH = 24;
+	
 	public static final int TYPE = 1;
 
 	private static final Log LOGGER = LogFactory
 			.getLog(DefualtRpcProtocolImpl.class);
+	
+	private static final int REQUEST_HEADER_LEN = 1 * 6 + 4 * 4 + REQUEST_ID_LENGTH;
 
-	private static final int REQUEST_HEADER_LEN = 1 * 6 + 5 * 4;
-
-	private static final int RESPONSE_HEADER_LEN = 1 * 6 + 3 * 4;
+	private static final int RESPONSE_HEADER_LEN = 1 * 6 + 2 * 4 + REQUEST_ID_LENGTH;
 
 	private static final byte VERSION = (byte) 1;
 
@@ -94,7 +99,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 			throw new Exception(
 					"only support send RequestWrapper && ResponseWrapper");
 		}
-		int id = 0;
+		String id = null;
 		byte type = REQUEST;
 		if (message instanceof CommonRpcRequest) {
 			try {
@@ -139,7 +144,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				byteBuffer.writeByte((byte) 0);//1B
 				byteBuffer.writeByte((byte) 0);//1B
 				byteBuffer.writeByte((byte) 0);//1B
-				byteBuffer.writeInt(id);//4B
+				byteBuffer.writeBytes(id.getBytes());
 				byteBuffer.writeInt(timeout);//4B
 				byteBuffer.writeInt(targetInstanceNameByte.length);//4B
 
@@ -213,7 +218,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 			byteBuffer.writeByte((byte) 0);
 			byteBuffer.writeByte((byte) 0);
 			byteBuffer.writeByte((byte) 0);
-			byteBuffer.writeInt(id);
+			byteBuffer.writeBytes(id.getBytes());
 			if (wrapper.getCodecType() == CommonRpcCodecs.PB_CODEC) {
 				byteBuffer.writeInt(className.length);
 			} else {
@@ -256,7 +261,9 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				wrapper.readByte();
 				wrapper.readByte();
 				
-				int requestId = wrapper.readInt();
+				byte[] requestIdBytes = new byte[REQUEST_ID_LENGTH];
+				wrapper.readBytes(requestIdBytes);
+				String requestId = new String(requestIdBytes);
 				int timeout = wrapper.readInt();
 				int targetInstanceLen = wrapper.readInt();
 
@@ -321,7 +328,11 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				wrapper.readByte();
 				wrapper.readByte();
 				wrapper.readByte();
-				int requestId = wrapper.readInt();
+				
+				byte[] requestIdBytes = new byte[REQUEST_ID_LENGTH];
+				wrapper.readBytes(requestIdBytes);
+				String requestId = new String(requestIdBytes);
+				
 				int classNameLen = wrapper.readInt();
 				int bodyLen = wrapper.readInt();
 				if (wrapper.readableBytes() < classNameLen + bodyLen) {

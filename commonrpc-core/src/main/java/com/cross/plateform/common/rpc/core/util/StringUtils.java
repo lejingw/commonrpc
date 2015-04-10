@@ -5,6 +5,7 @@ package com.cross.plateform.common.rpc.core.util;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * @author liubing
@@ -124,5 +125,56 @@ public class StringUtils {
        sb.append("]");
        return sb.toString();
    }
+   
+   /**
+    * 获取随机数
+    * @param length
+    * @return
+    */
+	public static String randomStr(int length)
+	{ //length表示生成字符串的长度
+		String base = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		Random random = new Random();
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < length; i++)
+		{
+			int number = random.nextInt(base.length());
+			sb.append(base.charAt(number));
+		}
+		return sb.toString();
+	}
+	
+	public static String fixLength(String str, int length, char fillChar)
+	{
+		if (str == null || "".equals(str.trim())){
+			return fixLength(length, fillChar);
+		}
+		if (str.length() == length){
+			return str;
+		}
+		
+		if (str.length() > length){
+			return str.substring((str.length() - length));
+		} else {  //str.length() < length
+			return str + fixLength(length - str.length(), fillChar);
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * @param length
+	 * @param fillChar
+	 * @return
+	 */
+	public static String fixLength(int length, char fillChar){
+		StringBuilder ret = new StringBuilder();
+		for (int i = 0; i < length; i++){
+			ret.append(fillChar);
+		}
+		return ret.toString();
+	}
+	
+	
    
 }

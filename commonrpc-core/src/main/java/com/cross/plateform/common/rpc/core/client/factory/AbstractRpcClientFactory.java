@@ -17,8 +17,8 @@ import com.cross.plateform.common.rpc.core.client.RpcClient;
  */
 public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 		
-	protected static ConcurrentHashMap<Integer, LinkedBlockingQueue<Object>> responses = 
-			new ConcurrentHashMap<Integer, LinkedBlockingQueue<Object>>();
+	protected static ConcurrentHashMap<String, LinkedBlockingQueue<Object>> responses = 
+			new ConcurrentHashMap<String, LinkedBlockingQueue<Object>>();
 	
 	
 	protected static Map<String, AbstractRpcClient> rpcClients = 
@@ -42,7 +42,7 @@ public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 	
 	
 	@Override
-	public void putResponse(Integer key, LinkedBlockingQueue<Object> queue)
+	public void putResponse(String key, LinkedBlockingQueue<Object> queue)
 			throws Exception {
 		// TODO Auto-generated method stub
 		responses.put(key, queue);
@@ -80,7 +80,7 @@ public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 	}
 	
 	@Override
-	public void removeResponse(Integer key) {
+	public void removeResponse(String key) {
 		// TODO Auto-generated method stub
 		responses.remove(key);
 	}
