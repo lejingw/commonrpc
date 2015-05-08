@@ -4,10 +4,8 @@
 package com.cross.plateform.common.rpc.core.all.message;
 
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicLong;
-
+import java.util.concurrent.atomic.AtomicInteger;
 import com.cross.plateform.common.rpc.core.codec.all.CommonRpcCodecs;
-import com.cross.plateform.common.rpc.core.protocol.impl.DefualtRpcProtocolImpl;
 /**
  * @author liubing1
  *
@@ -31,7 +29,7 @@ public class CommonRpcRequest implements Serializable{
 	
 	private int timeout = 0;
 	
-	private String id = null;
+	private int id ;
 	
 	private int protocolType;
 	
@@ -39,8 +37,7 @@ public class CommonRpcRequest implements Serializable{
 	
 	private int messageLen;
 	
-	private static String clientid = "";                               //requestId的固定前缀， add by 谭耀武
-	private static final AtomicLong requestIdSeq = new AtomicLong();   //用来和clientid一起组成requestid
+	private static final AtomicInteger requestIdSeq = new AtomicInteger(); 
 	
 	public CommonRpcRequest(byte[] targetInstanceName,byte[] methodName,byte[][] argTypes,
 						  Object[] requestObjects,int timeout,int codecType,int protocolType){
@@ -48,7 +45,7 @@ public class CommonRpcRequest implements Serializable{
 	}
 
 	public CommonRpcRequest(byte[] targetInstanceName,byte[] methodName,byte[][] argTypes,
-						  Object[] requestObjects,int timeout,String id,int codecType,int protocolType){
+						  Object[] requestObjects,int timeout,int id,int codecType,int protocolType){
 		this.requestObjects = requestObjects;
 		this.id = id;
 		this.timeout = timeout;
@@ -103,7 +100,7 @@ public class CommonRpcRequest implements Serializable{
 	/**
 	 * @return the id
 	 */
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
@@ -111,31 +108,14 @@ public class CommonRpcRequest implements Serializable{
 		return argTypes;
 	}
 	
-	public static String get(){
-//		Random random=new Random();
-//		
-//		return random.nextInt();
-		
-		String requestid = CommonRpcRequest.getClientid() + requestIdSeq.incrementAndGet();
-		return com.cross.plateform.common.rpc.core.util.StringUtils.fixLength(requestid, DefualtRpcProtocolImpl.REQUEST_ID_LENGTH, '1');
+	public static Integer get(){
+
+		return requestIdSeq.incrementAndGet();
 	}
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
-	}
-
-	public static String getClientid()
-	{
-		return clientid;
-	
-	}
-
-	public static void setClientid(String clientid)
-	{
-		CommonRpcRequest.clientid = clientid;
-	}
-	
-	
+	}	
 }

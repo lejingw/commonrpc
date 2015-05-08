@@ -72,7 +72,7 @@ public abstract class AbstractRpcClientInvocationHandler implements
 		String methodName = method.getName();
 		String[] argTypes = createParamSignature(method.getParameterTypes());
 		Object result= client.invokeImpl(targetInstanceName, methodName, argTypes, args, timeout, codecType, protocolType);
-		System.out.println(server.getAddress().getHostAddress()+",port:"+server.getPort());
+		//System.out.println(server.getAddress().getHostAddress()+",port:"+server.getPort());
 		return result;
 	}
 	

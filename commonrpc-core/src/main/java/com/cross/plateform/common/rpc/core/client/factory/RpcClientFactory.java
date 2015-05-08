@@ -22,7 +22,7 @@ public interface RpcClientFactory {
 	 */
 	public void startClient(int connectiontimeout);
 	
-	public void putResponse(String key,LinkedBlockingQueue<Object> queue) throws Exception;
+	public void putResponse(int key,LinkedBlockingQueue<Object> queue) throws Exception;
 	/**
 	 * 接受消息
 	 * @param response
@@ -36,7 +36,7 @@ public interface RpcClientFactory {
 	 * 删除消息
 	 * @param key
 	 */
-	public void removeResponse(String key);
+	public void removeResponse(int key);
 	/**
 	 *
 	 * @param key

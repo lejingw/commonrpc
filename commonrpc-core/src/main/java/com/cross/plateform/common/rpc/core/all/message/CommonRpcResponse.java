@@ -17,7 +17,7 @@ public class CommonRpcResponse implements Serializable{
 	 */
 	private static final long serialVersionUID = 4590846966635080090L;
 	
-	private String requestId = null;
+	private int requestId ;
 	
 	private Object response = null;
 	
@@ -33,7 +33,7 @@ public class CommonRpcResponse implements Serializable{
 	
 	private byte[] responseClassName;
 
-	public CommonRpcResponse(String requestId,int codecType,int protocolType){
+	public CommonRpcResponse(int requestId,int codecType,int protocolType){
 		this.requestId = requestId;
 		this.codecType = codecType;
 		this.protocolType = protocolType;
@@ -55,7 +55,7 @@ public class CommonRpcResponse implements Serializable{
 		return codecType;
 	}
 
-	public String getRequestId() {
+	public int getRequestId() {
 		return requestId;
 	}
 

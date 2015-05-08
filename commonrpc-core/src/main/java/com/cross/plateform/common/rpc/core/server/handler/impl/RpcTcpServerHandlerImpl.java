@@ -76,10 +76,10 @@ public class RpcTcpServerHandlerImpl extends AbstractRpcTcpServerHandler {
 				StringBuilder methodKeyBuilder = new StringBuilder();
 				methodKeyBuilder.append(targetInstanceName).append("#");
 				methodKeyBuilder.append(methodName).append("$");
-				Class<?>[] argTypeClasses = new Class<?>[argTypes.length];
+				//Class<?>[] argTypeClasses = new Class<?>[argTypes.length];
 				for (int i = 0; i < argTypes.length; i++) {
 					methodKeyBuilder.append(argTypes[i]).append("_");
-					argTypeClasses[i] = Class.forName(argTypes[i]);
+					//argTypeClasses[i] = Class.forName(argTypes[i]);
 				}
 				requestObjects = new Object[argTypes.length];
 				method = cacheMethods.get(methodKeyBuilder.toString());

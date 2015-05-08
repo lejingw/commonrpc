@@ -16,72 +16,18 @@ import com.cross.plateform.common.rpc.core.codec.all.CommonRpcCodecs;
 import com.cross.plateform.common.rpc.core.protocol.RpcProtocol;
 import com.cross.plateform.common.rpc.core.protocol.all.CommonRpcProtocol;
 
-/**
- * Common RPC Protocol
- * 
- * Protocol Header
- * 	VERSION(1B): Protocol Version
- *  TYPE(1B):    Protocol Type,so u can custom your protocol
- *  Request Protocol
- * 	VERSION(1B):   
- *  TYPE(1B):      request/response 
- *  CODECTYPE(1B):  serialize/deserialize type
- *  KEEPED(1B):    
- *  KEEPED(1B):    
- *  KEEPED(1B):    
- *  ID(24B):       request id
- *  TIMEOUT(4B):   request timeout
- *  TARGETINSTANCELEN(4B):  target service name length
- *  METHODNAMELEN(4B):      method name length
- *  ARGSCOUNT(4B):          method args count
- *  ARG1TYPELEN(4B):        method arg1 type len
- *  ARG2TYPELEN(4B):        method arg2 type len
- *  ...
- *  ARG1LEN(4B):            method arg1 len
- *  ARG2LEN(4B):            method arg2 len
- *  ...
- *  TARGETINSTANCENAME
- *  METHODNAME
- *  ARG1TYPENAME
- *  ARG2TYPENAME
- *  ...
- *  ARG1
- *  ARG2
- *  ...
- * 
- *  Protocol Header
- * 	VERSION(1B): Protocol Version
- *  TYPE(1B):    Protocol Type,so u can custom your protocol
- *  Response Protocol
- *  VERSION(1B):   
- *  TYPE(1B):      request/response 
- *  DATATYPE(1B):  serialize/deserialize type
- *  KEEPED(1B):    
- *  KEEPED(1B):    
- *  KEEPED(1B):    
- *  ID(24B):        request id
- *  BodyClassNameLen(4B): body className Len
- *  LENGTH(4B):    body length
- *  BodyClassName
- *  BODY if need than set
- *  
- * @author liubing1 
- */
+
 public class DefualtRpcProtocolImpl implements RpcProtocol {
 
-	/**
-	 * request id length
-	 */
-	public static final int REQUEST_ID_LENGTH = 24;
 	
 	public static final int TYPE = 1;
 
 	private static final Log LOGGER = LogFactory
 			.getLog(DefualtRpcProtocolImpl.class);
 	
-	private static final int REQUEST_HEADER_LEN = 1 * 6 + 4 * 4 + REQUEST_ID_LENGTH;
+	private static final int REQUEST_HEADER_LEN = 1 * 6 + 5 * 4 ;
 
-	private static final int RESPONSE_HEADER_LEN = 1 * 6 + 2 * 4 + REQUEST_ID_LENGTH;
+	private static final int RESPONSE_HEADER_LEN = 1 * 6 + 3 * 4 ;
 
 	private static final byte VERSION = (byte) 1;
 
@@ -99,7 +45,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 			throw new Exception(
 					"only support send RequestWrapper && ResponseWrapper");
 		}
-		String id = null;
+		int id = 0;
 		byte type = REQUEST;
 		if (message instanceof CommonRpcRequest) {
 			try {
@@ -144,7 +90,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				byteBuffer.writeByte((byte) 0);//1B
 				byteBuffer.writeByte((byte) 0);//1B
 				byteBuffer.writeByte((byte) 0);//1B
-				byteBuffer.writeBytes(id.getBytes());
+				byteBuffer.writeInt(id);
 				byteBuffer.writeInt(timeout);//4B
 				byteBuffer.writeInt(targetInstanceNameByte.length);//4B
 
@@ -218,7 +164,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 			byteBuffer.writeByte((byte) 0);
 			byteBuffer.writeByte((byte) 0);
 			byteBuffer.writeByte((byte) 0);
-			byteBuffer.writeBytes(id.getBytes());
+			byteBuffer.writeInt(id);
 			if (wrapper.getCodecType() == CommonRpcCodecs.PB_CODEC) {
 				byteBuffer.writeInt(className.length);
 			} else {
@@ -261,9 +207,8 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				wrapper.readByte();
 				wrapper.readByte();
 				
-				byte[] requestIdBytes = new byte[REQUEST_ID_LENGTH];
-				wrapper.readBytes(requestIdBytes);
-				String requestId = new String(requestIdBytes);
+				int requestId = wrapper.readInt();
+
 				int timeout = wrapper.readInt();
 				int targetInstanceLen = wrapper.readInt();
 
@@ -329,9 +274,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				wrapper.readByte();
 				wrapper.readByte();
 				
-				byte[] requestIdBytes = new byte[REQUEST_ID_LENGTH];
-				wrapper.readBytes(requestIdBytes);
-				String requestId = new String(requestIdBytes);
+				int requestId = wrapper.readInt();
 				
 				int classNameLen = wrapper.readInt();
 				int bodyLen = wrapper.readInt();

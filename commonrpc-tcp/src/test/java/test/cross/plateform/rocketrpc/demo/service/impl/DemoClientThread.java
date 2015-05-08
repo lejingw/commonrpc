@@ -4,7 +4,10 @@
 package test.cross.plateform.rocketrpc.demo.service.impl;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import test.cross.plateform.rocketrpc.demo.service.IDemoService;
 
 public class DemoClientThread {
@@ -18,12 +21,12 @@ public class DemoClientThread {
 
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
 				"CommonRpcClient.xml");
-
+		final AtomicLong totalTimeCosted = new AtomicLong(0);
 		final IDemoService demoService = (IDemoService) context
 				.getBean("demoServiceClient");
 		long time1 = System.currentTimeMillis();
-		final int count = 1;
-		final int threadcount = 2;
+		final int count = 25000;
+		final int threadcount = 200;
 		final java.util.concurrent.CountDownLatch countDownLatch = new CountDownLatch(
 				threadcount);
 
@@ -34,6 +37,7 @@ public class DemoClientThread {
 					for (int i = 0; i < count; i++) {
 						//demoService.sayDemo("demo_" + i);  //性能慢测试
 						demoService.getParam("demo_" + i);//无业务测试
+						
 					}
 					countDownLatch.countDown();
 				}
@@ -43,5 +47,6 @@ public class DemoClientThread {
 		long end1 = System.currentTimeMillis();
 		System.out.println("完成时间:" + (end1 - time1) + ",平均时间："
 				+ ((double) (end1 - time1) / (double) (count * threadcount)));
+		System.out.println("total time costed:" + totalTimeCosted.get()	+ "|req/s=" + count * threadcount / (double) ((end1-time1) / 1000));
 	}
 }
