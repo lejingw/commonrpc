@@ -60,23 +60,17 @@ public abstract class AbstractRpcClientFactory implements RpcClientFactory {
 			return;
 		}
 		try {
-			
 			if(responses.containsKey(response.getRequestId())){
-				
 				LinkedBlockingQueue<Object> queue = responses.get(response.getRequestId());
 				if (queue != null) {
 					queue.put(response);
 				} else {
-					LOGGER.warn("give up the response,request id is:"
-							+ response.getRequestId() + ",because queue is null");
+					LOGGER.warn("give up the response,request id is:" + response.getRequestId() + ",because queue is null");
 				}
 			}
-			
 		} catch (InterruptedException e) {
 			LOGGER.error("put response error,request id is:" + response.getRequestId(), e);
 		}
-		
-		
 	}
 	
 	@Override

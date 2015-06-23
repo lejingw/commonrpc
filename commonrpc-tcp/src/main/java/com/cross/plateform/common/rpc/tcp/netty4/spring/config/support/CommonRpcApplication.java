@@ -46,8 +46,6 @@ public class CommonRpcApplication implements InitializingBean{
 		if(flag==1){//服务端
 			CommonRpcServerService.getInstance().connectZookeeper(address, timeout);
 		}else if(flag==2){//客户端
-			
-			
 			CommonRpcClientService.getInstance().connectZookeeper(address, timeout);
 			CommonRpcTcpClientFactory.getInstance().startClient(timeout);//客户端启动
 		}

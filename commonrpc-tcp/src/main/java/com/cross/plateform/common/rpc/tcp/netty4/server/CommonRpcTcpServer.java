@@ -108,7 +108,7 @@ public class CommonRpcTcpServer implements RpcServer {
 	      });
 	   LOGGER.info("-----------------开始启动--------------------------");
 	   bootstrap.bind(new InetSocketAddress(port)).sync();
-	   LOGGER.info("端口号："+port+"的服务端已经启动,作者:liubing");
+	   LOGGER.info("端口号："+port+"的服务端已经启动");
 	   LOGGER.info("-----------------启动结束--------------------------");
 	}
 	

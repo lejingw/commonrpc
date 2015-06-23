@@ -38,5 +38,6 @@
     <module>commonrpc-http</module>
     <module>commonrpc-service</module>
     <module>commonrpc-manager</module>
+    <module>another-rpc</module>
   </modules>
 </project>
