@@ -40,8 +40,8 @@ public class CommonRpcApplicationParser implements BeanDefinitionParser {
 		beanDefinition.setLazyInit(false);
         beanDefinition.getPropertyValues().addPropertyValue("address", address);
         beanDefinition.getPropertyValues().addPropertyValue("clientid", clientid);
-        beanDefinition.getPropertyValues().addPropertyValue("flag", Integer.parseInt(flag));
-        beanDefinition.getPropertyValues().addPropertyValue("timeout", Integer.parseInt(timeout));
+        beanDefinition.getPropertyValues().addPropertyValue("flag", flag);
+        beanDefinition.getPropertyValues().addPropertyValue("timeout", timeout);
         
         
         parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);

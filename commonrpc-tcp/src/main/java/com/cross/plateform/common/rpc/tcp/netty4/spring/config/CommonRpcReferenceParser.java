@@ -25,9 +25,9 @@ public class CommonRpcReferenceParser implements BeanDefinitionParser {
 		String interfacename = element.getAttribute("interfacename");
 		String id = element.getAttribute("id");
 		String group=element.getAttribute("group");
-		int procotolType=Integer.parseInt(element.getAttribute("procotolType"));
-		int codecType=Integer.parseInt(element.getAttribute("codecType"));
-		int timeout=Integer.parseInt(element.getAttribute("timeout"));
+		String procotolType=element.getAttribute("procotolType");
+		String codecType=element.getAttribute("codecType");
+		String timeout=element.getAttribute("timeout");
 		
 		RootBeanDefinition beanDefinition = new RootBeanDefinition();
 		beanDefinition.setBeanClass(CommonRpcReference.class);

@@ -12,8 +12,8 @@
                 <xsd:extension base="beans:identifiedType">
                     <xsd:attribute name="address" type="xsd:string" use="required"/>
                     <xsd:attribute name="clientid" type="xsd:string" use="optional"/>
-                    <xsd:attribute name="timeout" type="xsd:int" use="required"/>
-                    <xsd:attribute name="flag" type="xsd:int" use="required"/>
+                    <xsd:attribute name="timeout" type="xsd:string" use="required"/>
+                    <xsd:attribute name="flag" type="xsd:string" use="required"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -36,11 +36,11 @@
             <xsd:complexContent>
                 <xsd:extension base="beans:identifiedType">
                     <xsd:attribute name="ip" type="xsd:string" use="optional"/>
-                    <xsd:attribute name="port" type="xsd:int" use="required"/>
-                    <xsd:attribute name="timeout" type="xsd:int" use="required"/>
-                    <xsd:attribute name="procotolType" type="xsd:int" use="required"/>
-                    <xsd:attribute name="codecType" type="xsd:int" use="required"/>
-                    <xsd:attribute name="threadCount" type="xsd:int" use="required"/>
+                    <xsd:attribute name="port" type="xsd:string" use="required"/>
+                    <xsd:attribute name="timeout" type="xsd:string" use="required"/>
+                    <xsd:attribute name="procotolType" type="xsd:string" use="required"/>
+                    <xsd:attribute name="codecType" type="xsd:string" use="required"/>
+                    <xsd:attribute name="threadCount" type="xsd:string" use="required"/>
                     <xsd:attribute name="group" type="xsd:string" use="required"/>
                 </xsd:extension>
             </xsd:complexContent>
@@ -53,9 +53,9 @@
                 <xsd:extension base="beans:identifiedType">
                     <xsd:attribute name="interfacename" type="xsd:string" use="required"/>
                     <xsd:attribute name="group" type="xsd:string" use="required"/>
-                    <xsd:attribute name="procotolType" type="xsd:int" use="required"/>
-                    <xsd:attribute name="codecType" type="xsd:int" use="required"/>
-                    <xsd:attribute name="timeout" type="xsd:int" use="required"/>
+                    <xsd:attribute name="procotolType" type="xsd:string" use="required"/>
+                    <xsd:attribute name="codecType" type="xsd:string" use="required"/>
+                    <xsd:attribute name="timeout" type="xsd:string" use="required"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

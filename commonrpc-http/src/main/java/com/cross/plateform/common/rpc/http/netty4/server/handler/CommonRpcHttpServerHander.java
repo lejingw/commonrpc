@@ -48,7 +48,6 @@ public class CommonRpcHttpServerHander extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-
         ctx.channel().close();
     }
 
@@ -60,10 +59,8 @@ public class CommonRpcHttpServerHander extends ChannelInboundHandlerAdapter {
     }
 
     private void handleRequestWithsingleThread(ChannelHandlerContext ctx, Object message) {
-
         boolean keepAlive = true;
         try {
-
             ServerBean serverBean = null;
             Map<String, Object> map = new HashMap<String, Object>();
             String httpType = null;
@@ -95,7 +92,6 @@ public class CommonRpcHttpServerHander extends ChannelInboundHandlerAdapter {
                         Map<String, Object> params = JSONObject.parseObject(contentMsg, Map.class);
                         map.putAll(params);
                     }
-
                 }
                 if (message instanceof LastHttpContent) {
                     RpcRouteInfo rpcRouteInfo = CommonRpcServerHandlerFactory.getHttpServerHandler().isRouteInfos(url, httpType, map);
@@ -118,7 +114,6 @@ public class CommonRpcHttpServerHander extends ChannelInboundHandlerAdapter {
                             writeResponse(ctx, serverBean);
                             return;
                         }
-
                     }
                 }
             }

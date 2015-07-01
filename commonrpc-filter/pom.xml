@@ -6,17 +6,17 @@
     <parent>
         <groupId>com.rpc</groupId>
         <artifactId>common-rpc</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4-SNAPSHOT</version>
     </parent>
-    <groupId>com.rpc</groupId>
     <artifactId>commonrpc-filter</artifactId>
-    <version>1.0.3</version>
     <name>commonrpc-filter</name>
     <url>http://maven.apache.org</url>
     <description>过滤器</description>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

@@ -24,12 +24,12 @@ public class CommonRpcRegisteryParser implements BeanDefinitionParser {
 		// TODO Auto-generated method stub
 		String id = element.getAttribute("id");
 		String ip = element.getAttribute("ip");
-		int port=Integer.parseInt(element.getAttribute("port"));
-		int timeout=Integer.parseInt(element.getAttribute("timeout"));
-		int procotolType=Integer.parseInt(element.getAttribute("procotolType"));
-		int codecType=Integer.parseInt(element.getAttribute("codecType"));
-		int threadCount=Integer.parseInt(element.getAttribute("threadCount"));
-		String group=element.getAttribute("group");
+		String port = element.getAttribute("port");
+		String timeout = element.getAttribute("timeout");
+		String procotolType = element.getAttribute("procotolType");
+		String codecType = element.getAttribute("codecType");
+		String threadCount = element.getAttribute("threadCount");
+		String group = element.getAttribute("group");
 		
 		RootBeanDefinition beanDefinition = new RootBeanDefinition();
 		beanDefinition.setBeanClass(CommonRpcRegistery.class);
