@@ -8,6 +8,5 @@ target
 *.iml
 .idea
 /out
-
 /*.iws
 .DS_Store
