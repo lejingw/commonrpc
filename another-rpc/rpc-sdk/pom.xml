@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>another-rpc</artifactId>
-        <groupId>com.rpc</groupId>
-        <version>1.0.3</version>
+        <groupId>com.lejingw.apps.rpc</groupId>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
