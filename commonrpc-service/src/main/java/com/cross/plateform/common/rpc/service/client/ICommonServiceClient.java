@@ -19,12 +19,12 @@ public interface ICommonServiceClient {
 	 * @param group
 	 * @return
 	 */
-	public Set<InetSocketAddress> getServersByGroup(String group) throws Exception;
+	Set<InetSocketAddress> getServersByGroup(String group) throws Exception;
 	
 	/**
 	 * 关闭服务
 	 */
-	public void close() throws Exception;
+	void close() throws Exception;
 	
 	/**
 	 * 连接zk
@@ -32,7 +32,7 @@ public interface ICommonServiceClient {
 	 * @param timeout
 	 * @throws Exception
 	 */
-	public void connectZookeeper(String server,int timeout) throws Exception;
+	void connectZookeeper(String server,int timeout) throws Exception;
 	
 	
 }

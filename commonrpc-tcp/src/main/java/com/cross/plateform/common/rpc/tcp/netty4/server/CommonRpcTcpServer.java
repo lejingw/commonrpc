@@ -56,32 +56,20 @@ public class CommonRpcTcpServer implements RpcServer {
         return SingletonHolder.instance;
     }
 
-    /* (non-Javadoc)
-     * @see com.cross.plateform.common.rpc.core.server.RpcServer#registerProcessor(java.lang.String, java.lang.Object)
-     */
     @Override
     public void registerProcessor(String serviceName, Object serviceInstance, RpcFilter rpcFilter) {
-        // TODO Auto-generated method stub
         CommonRpcServerHandlerFactory.getServerHandler().registerProcessor(serviceName, serviceInstance, rpcFilter);
     }
 
-    /* (non-Javadoc)
-     * @see com.cross.plateform.common.rpc.core.server.RpcServer#stop()
-     */
     @Override
     public void stop() throws Exception {
-        // TODO Auto-generated method stub
         CommonRpcServerHandlerFactory.getServerHandler().clear();
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }
 
-    /* (non-Javadoc)
-     * @see com.cross.plateform.common.rpc.core.server.RpcServer#start(int, int)
-     */
     @Override
     public void start(final int port, final int timeout) throws Exception {
-        // TODO Auto-generated method stub
         ThreadFactory serverBossTF = new NamedThreadFactory("NETTYSERVER-BOSS-");
         ThreadFactory serverWorkerTF = new NamedThreadFactory("NETTYSERVER-WORKER-");
         bossGroup = new NioEventLoopGroup(PROCESSORS, serverBossTF);
@@ -114,33 +102,19 @@ public class CommonRpcTcpServer implements RpcServer {
         LOGGER.info("-----------------启动结束--------------------------");
     }
 
-
-    /**
-     * @param procotolType the procotolType to set
-     */
     public void setProcotolType(int procotolType) {
         this.procotolType = procotolType;
     }
 
-    /**
-     * @param codecType the codecType to set
-     */
     public void setCodecType(int codecType) {
         this.codecType = codecType;
     }
 
-    /**
-     * @return the threadCount
-     */
     public int getThreadCount() {
         return threadCount;
     }
 
-    /**
-     * @param threadCount the threadCount to set
-     */
     public void setThreadCount(int threadCount) {
         this.threadCount = threadCount;
     }
-
 }

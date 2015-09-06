@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.cross.plateform.common.rpc.service.client.impl;
 
 import java.net.InetSocketAddress;
@@ -12,6 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+//import com.cross.plateform.common.rpc.core.client.AbstractRpcClient;
+//import com.cross.plateform.common.rpc.core.client.RpcClient;
+//import com.cross.plateform.common.rpc.core.client.factory.AbstractRpcClientFactory;
+//import com.cross.plateform.common.rpc.core.client.factory.RpcClientFactory;
+//import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.curator.framework.CuratorFramework;
@@ -30,9 +32,6 @@ import com.cross.plateform.common.rpc.service.client.ICommonServiceClient;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 
-/**
- * @author liubing
- */
 public class CommonServiceClientImpl implements ICommonServiceClient {
 
     private static Map<String, Set<InetSocketAddress>> servers = new ConcurrentHashMap<String, Set<InetSocketAddress>>();
@@ -151,12 +150,20 @@ public class CommonServiceClientImpl implements ICommonServiceClient {
                 if (!server.startsWith(server2)) {//更新不包括
                     newrpcservers.add(socketAddress);
                 } else {//删除包括
+//                    if(getClientFactory().containClient(server1)) {
+//                        AbstractRpcClient client2 = (AbstractRpcClient) getClientFactory().getClient(socketAddress.getAddress().getHostAddress(), socketAddress.getPort());
+//                        client2.destroy();
+//                    }
                     deleteNode(server1);
                 }
             }
             servers.put(group, newrpcservers);
         }
     }
+
+//    private AbstractRpcClientFactory getClientFactory() {
+//        return CommonRpcTcpClientFactory.getInstance();
+//    }
 
     /**
      * 找到指定节点下所有子节点的名称与值

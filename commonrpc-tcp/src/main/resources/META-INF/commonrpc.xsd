@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.jd.com/rocketrpcserver" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+<xsd:schema xmlns="http://www.jd.com/rocketrpcserver"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:beans="http://www.springframework.org/schema/beans"
-            targetNamespace="http://www.commonrpc.com/commonrpc"
-            elementFormDefault="qualified" attributeFormDefault="unqualified">
+            targetNamespace="http://www.izhuan365.com/commonrpc"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.springframework.org/schema/beans"/>
 

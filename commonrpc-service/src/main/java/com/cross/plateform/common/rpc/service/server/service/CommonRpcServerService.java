@@ -1,14 +1,7 @@
-/**
- * 
- */
 package com.cross.plateform.common.rpc.service.server.service;
 
 import com.cross.plateform.common.rpc.service.factory.CommonRpcServiceFactory;
 
-/**
- * @author liubing
- *
- */
 public class CommonRpcServerService {
 	
 	public CommonRpcServerService() {

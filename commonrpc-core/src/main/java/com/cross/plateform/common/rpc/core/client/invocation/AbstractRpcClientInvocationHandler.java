@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.cross.plateform.common.rpc.core.client.invocation;
 
 import java.lang.reflect.InvocationHandler;
@@ -16,22 +13,13 @@ import com.cross.plateform.common.rpc.core.route.bean.RpcRouteServer;
 import com.cross.plateform.common.rpc.core.util.SocketAddressUtil;
 import com.cross.plateform.common.rpc.service.client.service.CommonRpcClientService;
 
-/**
- * @author liubing1
- */
 public abstract class AbstractRpcClientInvocationHandler implements
         InvocationHandler {
-
     private String group;
-
     private int timeout;
-
     private String targetInstanceName;
-
     private int codecType;
-
     private int protocolType;
-
 
     public AbstractRpcClientInvocationHandler(
             String group, int timeout,
@@ -42,24 +30,14 @@ public abstract class AbstractRpcClientInvocationHandler implements
         this.targetInstanceName = targetInstanceName;
         this.codecType = codecType;
         this.protocolType = protocolType;
-
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
-     */
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args)
-            throws Throwable {
-        // TODO Auto-generated method stub
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         RpcClient client = null;
-
         String[] groups = group.split(",");
-
         Random r = new Random();
-
         int i = r.nextInt(groups.length);
-
         Set<InetSocketAddress> addresses = CommonRpcClientService.getInstance().getServersByGroup(groups[i]);
 
         List<RpcRouteServer> servers = SocketAddressUtil.getInetSocketAddress(addresses);
