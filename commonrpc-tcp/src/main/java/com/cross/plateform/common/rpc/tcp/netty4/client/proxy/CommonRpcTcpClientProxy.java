@@ -7,9 +7,7 @@ import com.cross.plateform.common.rpc.tcp.netty4.client.invocation.CommonRpcTcpC
 
 public class CommonRpcTcpClientProxy implements ClientProxy {
 
-
     public CommonRpcTcpClientProxy() {
-
     }
 
     private static class SingletonHolder {
@@ -20,14 +18,11 @@ public class CommonRpcTcpClientProxy implements ClientProxy {
         return SingletonHolder.instance;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> T getProxyService(Class<T> clazz, int timeout, int codecType,
-                                 int protocolType, String targetInstanceName, String group) {
+    public <T> T getProxyService(Class<T> clazz, int timeout, int codecType, int protocolType, String targetInstanceName, String group) {
         return (T) Proxy.newProxyInstance(
                 Thread.currentThread().getContextClassLoader(),
                 new Class[]{clazz},
-                new CommonRpcTcpClientInvocationHandler(group, timeout,
-                        targetInstanceName, codecType, protocolType));
+                new CommonRpcTcpClientInvocationHandler(group, timeout, targetInstanceName, codecType, protocolType));
     }
 }

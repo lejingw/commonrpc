@@ -30,53 +30,31 @@ public class CommonRpcService implements ApplicationContextAware, ApplicationLis
         this.applicationContext = applicationContext;
     }
 
-    /**
-     * @param interfacename the interfacename to set
-     */
-    public void setInterfacename(String interfacename) {
-        this.interfacename = interfacename;
-    }
-
-    /**
-     * @param ref the ref to set
-     */
-    public void setRef(String ref) {
-        this.ref = ref;
-    }
-
-    /**
-     * @return the interfacename
-     */
     public String getInterfacename() {
         return interfacename;
     }
 
-    /**
-     * @return the ref
-     */
+    public void setInterfacename(String interfacename) {
+        this.interfacename = interfacename;
+    }
+
     public String getRef() {
         return ref;
     }
 
-    /**
-     * @return the applicationContext
-     */
+    public void setRef(String ref) {
+        this.ref = ref;
+    }
+
     public ApplicationContext getApplicationContext() {
         return applicationContext;
     }
 
-    /**
-     * @return the filterRef
-     */
     public String getFilterRef() {
         return filterRef;
     }
 
-    /**
-     * @param filterRef the filterRef to set
-     */
     public void setFilterRef(String filterRef) {
         this.filterRef = filterRef;
     }
-
 }

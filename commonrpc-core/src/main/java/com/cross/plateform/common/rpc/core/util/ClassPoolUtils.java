@@ -3,24 +3,23 @@
  */
 package com.cross.plateform.common.rpc.core.util;
 
-import java.lang.reflect.Modifier;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.LocalVariableAttribute;
 import javassist.bytecode.MethodInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Modifier;
 
 /**
  * @author liubing1
  *
  */
 public class ClassPoolUtils {
-	
-	private static final Log LOGGER = LogFactory.getLog(ClassPoolUtils.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ClassPoolUtils.class);
 
 	/**
 	 * 获取方法的参数变量名称

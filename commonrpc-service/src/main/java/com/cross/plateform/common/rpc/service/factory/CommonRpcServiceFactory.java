@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.cross.plateform.common.rpc.service.factory;
 
 import com.cross.plateform.common.rpc.service.client.ICommonServiceClient;
@@ -8,20 +5,16 @@ import com.cross.plateform.common.rpc.service.client.impl.CommonServiceClientImp
 import com.cross.plateform.common.rpc.service.server.ICommonServiceServer;
 import com.cross.plateform.common.rpc.service.server.impl.CommonServiceServerImpl;
 
-/**
- * @author liubing
- */
 public class CommonRpcServiceFactory {
-
     private static ICommonServiceServer[] serverHandlers = new ICommonServiceServer[1];
-
     private static ICommonServiceClient[] clientHandlers = new ICommonServiceClient[1];
-
     static {
-        registerProtocol(CommonServiceServerImpl.TYPE, new CommonServiceServerImpl(), CommonServiceClientImpl.TYPE, new CommonServiceClientImpl());
+        registerProtocol(0, new CommonServiceServerImpl(),
+                0, new CommonServiceClientImpl());
     }
 
-    private static void registerProtocol(int type, ICommonServiceServer serverHandler, int httptype, ICommonServiceClient clientHandler) {
+    private static void registerProtocol(int type, ICommonServiceServer serverHandler,
+                                         int httptype, ICommonServiceClient clientHandler) {
         if (type > serverHandlers.length) {
             ICommonServiceServer[] newServerHandlers = new ICommonServiceServer[type + 1];
             System.arraycopy(serverHandlers, 0, newServerHandlers, 0, serverHandlers.length);

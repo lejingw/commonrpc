@@ -1,36 +1,22 @@
-/**
- *
- */
 package com.cross.plateform.common.rpc.core.client;
-
-
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.codec.all.CommonRpcCodecs;
 import com.cross.plateform.common.rpc.core.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
-/**
- * @author liubing1
- */
 public abstract class AbstractRpcClient implements RpcClient {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRpcClient.class);
 
-    private static final Log LOGGER = LogFactory.getLog(AbstractRpcClient.class);
-
-    /* (non-Javadoc)
-     * @see com.cross.plateform.common.rpc.core.client.RPCClient#invokeImpl(java.lang.String, java.lang.String, java.lang.String[], java.lang.Object[], int, int, int)
-     */
     @Override
     public Object invokeImpl(String targetInstanceName, String methodName,
                              String[] argTypes, Object[] args, int timeout, int codecType,
                              int protocolType) throws Exception {
-        // TODO Auto-generated method stub
         byte[][] argTypeBytes = new byte[argTypes.length][];
         for (int i = 0; i < argTypes.length; i++) {
             argTypeBytes[i] = argTypes[i].getBytes();
@@ -38,35 +24,30 @@ public abstract class AbstractRpcClient implements RpcClient {
 
         CommonRpcRequest wrapper = new CommonRpcRequest(targetInstanceName.getBytes(),
                 methodName.getBytes(), argTypeBytes, args, timeout, codecType, protocolType);
-
         return invokeImplIntern(wrapper);
     }
-
 
     private Object invokeImplIntern(CommonRpcRequest rocketRPCRequest) throws Exception {
         long beginTime = System.currentTimeMillis();
         LinkedBlockingQueue<Object> responseQueue = new LinkedBlockingQueue<Object>(1);
         getClientFactory().putResponse(rocketRPCRequest.getId(), responseQueue);
-        CommonRpcResponse commonRPCResponse = null;
+
 
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("client ready to send message,request id: " + rocketRPCRequest.getId());
             }
-
             sendRequest(rocketRPCRequest);
-
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("client write message to send buffer,wait for response,request id: " + rocketRPCRequest.getId());
             }
         } catch (Exception e) {
-            commonRPCResponse = null;
             LOGGER.error("send request to os sendbuffer error", e);
             throw new RuntimeException("send request to os sendbuffer error", e);
         }
+
         Object result = null;
         try {
-
             result = responseQueue.poll(
                     rocketRPCRequest.getTimeout() - (System.currentTimeMillis() - beginTime),
                     TimeUnit.MILLISECONDS);
@@ -74,6 +55,8 @@ public abstract class AbstractRpcClient implements RpcClient {
         } finally {
             getClientFactory().removeResponse(rocketRPCRequest.getId());
         }
+
+        CommonRpcResponse commonRPCResponse = null;
         if (result == null && (System.currentTimeMillis() - beginTime) <= rocketRPCRequest.getTimeout()) {//返回结果集为null
             commonRPCResponse = new CommonRpcResponse(rocketRPCRequest.getId(), rocketRPCRequest.getCodecType(), rocketRPCRequest.getProtocolType());
         } else if (result == null && (System.currentTimeMillis() - beginTime) > rocketRPCRequest.getTimeout()) {//结果集超时
@@ -129,14 +112,13 @@ public abstract class AbstractRpcClient implements RpcClient {
     /**
      * 发送请求
      *
-     * @param rocketRPCRequest
-     * @param timeout
+     * @param commonRpcRequest
      * @throws Exception
      */
     public abstract void sendRequest(CommonRpcRequest commonRpcRequest) throws Exception;
 
     /**
-     * 消灭消息
+     * 销毁消息
      *
      * @throws Exception
      */

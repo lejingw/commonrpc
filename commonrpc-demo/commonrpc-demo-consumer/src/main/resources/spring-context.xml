@@ -5,19 +5,22 @@
        xmlns:commonrpc="http://www.izhuan365.com/commonrpc"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+        http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context-4.1.xsd
+        http://www.springframework.org/schema/context/spring-context.xsd
         http://www.izhuan365.com/commonrpc
         http://www.izhuan365.com/commonrpc/commonrpc.xsd">
+
+    <!-- 加载配置属性文件 -->
+    <context:property-placeholder ignore-unresolvable="true" location="classpath:project.properties" />
 
     <!--
         address：zookeeper 注册中心地址
         flag：标记是提供者(1)，还是消费者(2)
         timeout：zookeeper连接超时时间
     -->
-    <commonrpc:application id="rpcRegistryApplicationClient" address="127.0.0.1:2181" flag="2"
-                           timeout="200"></commonrpc:application>
+    <commonrpc:application id="rpcRegistryApplicationClient" address="${zookeeper.addrs}" flag="2"
+                           timeout="${zookeeper.timeout}"></commonrpc:application>
 
     <!--
         interfacename：接口名称
@@ -27,7 +30,7 @@
         group：服务所在的组（可以同时支持多组，以符合,隔开）
      -->
     <commonrpc:reference id="demoService" interfacename="com.commonrpc.demo.sdk.DemoService" procotolType="1"
-                         codecType="4" timeout="30000" group="demo"/>
+                         codecType="${commonrpc.registry.codecType}" timeout="30000" group="demo"/>
 
 
 </beans>

@@ -1,56 +1,58 @@
 package com.cross.plateform.common.rpc.core.client.invocation;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import com.cross.plateform.common.rpc.core.client.RpcClient;
 import com.cross.plateform.common.rpc.core.client.factory.RpcClientFactory;
 import com.cross.plateform.common.rpc.core.route.bean.RpcRouteServer;
 import com.cross.plateform.common.rpc.core.util.SocketAddressUtil;
 import com.cross.plateform.common.rpc.service.client.service.CommonRpcClientService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.rmi.runtime.Log;
 
-public abstract class AbstractRpcClientInvocationHandler implements
-        InvocationHandler {
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
+public abstract class AbstractRpcClientInvocationHandler implements InvocationHandler {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractRpcClientInvocationHandler.class);
     private String group;
     private int timeout;
     private String targetInstanceName;
     private int codecType;
     private int protocolType;
+    private Random random;
 
-    public AbstractRpcClientInvocationHandler(
-            String group, int timeout,
-            String targetInstanceName, int codecType, int protocolType) {
-        super();
+    public AbstractRpcClientInvocationHandler(String group, int timeout, String targetInstanceName, int codecType, int protocolType) {
         this.group = group;
         this.timeout = timeout;
         this.targetInstanceName = targetInstanceName;
         this.codecType = codecType;
         this.protocolType = protocolType;
+        this.random = new Random();
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        RpcClient client = null;
         String[] groups = group.split(",");
-        Random r = new Random();
-        int i = r.nextInt(groups.length);
+        int i = random.nextInt(groups.length);
         Set<InetSocketAddress> addresses = CommonRpcClientService.getInstance().getServersByGroup(groups[i]);
-
+        if(null == addresses || addresses.size()<1){
+            logger.error("count not find remote server, please check the server side");
+            throw new RuntimeException("count not find remote server, please check the server side");
+        }
         List<RpcRouteServer> servers = SocketAddressUtil.getInetSocketAddress(addresses);
-        r = new Random();
-
-        int j = r.nextInt(servers.size());
+        int j = random.nextInt(servers.size());
         InetSocketAddress server = servers.get(j).getServer();
+//        InetSocketAddress server = new ArrayList<InetSocketAddress>(addresses).get(random.nextInt(addresses.size()));
 
-        client = getClientFactory().getClient(server.getAddress().getHostAddress(), server.getPort());
+        RpcClient client = getClientFactory().getClient(server.getAddress().getHostAddress(), server.getPort());
         String methodName = method.getName();
         String[] argTypes = createParamSignature(method.getParameterTypes());
         Object result = client.invokeImpl(targetInstanceName, methodName, argTypes, args, timeout, codecType, protocolType);
-        //System.out.println(server.getAddress().getHostAddress()+",port:"+server.getPort());
         return result;
     }
 
@@ -66,6 +68,4 @@ public abstract class AbstractRpcClientInvocationHandler implements
     }
 
     public abstract RpcClientFactory getClientFactory();
-
-
 }

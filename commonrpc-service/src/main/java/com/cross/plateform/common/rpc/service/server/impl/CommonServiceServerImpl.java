@@ -1,48 +1,39 @@
 package com.cross.plateform.common.rpc.service.server.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.cross.plateform.common.rpc.service.server.ICommonServiceServer;
+import com.google.common.base.Charsets;
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.api.CuratorEvent;
-import org.apache.curator.framework.api.CuratorListener;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
-import org.apache.curator.framework.listen.Listenable;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
-
-import com.cross.plateform.common.rpc.service.server.ICommonServiceServer;
-import com.google.common.base.Charsets;
-import com.google.common.base.Objects;
-import com.google.common.base.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CommonServiceServerImpl implements ICommonServiceServer {
-
-    private CuratorFramework client;
-
-    public static final int TYPE = 0;
-
-    private static final Log LOGGER = LogFactory.getLog(CommonServiceServerImpl.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonServiceServerImpl.class);
+    private CuratorFramework zookeeperClient;
 
     @Override
     public void close() throws Exception {
-        CuratorFrameworkState state = client.getState();
-        if(state != CuratorFrameworkState.STOPPED) {
-            client.close();
+        CuratorFrameworkState state = zookeeperClient.getState();
+        if (state != CuratorFrameworkState.STOPPED) {
+            zookeeperClient.close();
         }
     }
 
     @Override
     public void connectZookeeper(String server, int timeout) throws Exception {
-        client = CuratorFrameworkFactory.builder()
+        zookeeperClient = CuratorFrameworkFactory.builder()
                 .connectString(server)
                 .sessionTimeoutMs(timeout)
                 .connectionTimeoutMs(timeout)
-                .retryPolicy(new ExponentialBackoffRetry(1000, 3))
+                .retryPolicy(new ExponentialBackoffRetry(2000, 3))
                 .build();
 //        client.getCuratorListenable().addListener(new CuratorListener() {
 //            @Override
@@ -50,7 +41,7 @@ public class CommonServiceServerImpl implements ICommonServiceServer {
 //
 //            }
 //        });
-        client.start();
+        zookeeperClient.start();
     }
 
     @Override
@@ -58,7 +49,7 @@ public class CommonServiceServerImpl implements ICommonServiceServer {
         this.createNode("/" + group, group, CreateMode.PERSISTENT);
         this.createNode("/" + group + "/" + server, server, CreateMode.EPHEMERAL_SEQUENTIAL);
 
-        client.getConnectionStateListenable().addListener(new ConnectionStateListener() {
+        zookeeperClient.getConnectionStateListenable().addListener(new ConnectionStateListener() {
             @Override
             public void stateChanged(CuratorFramework client, ConnectionState newState) {
                 if (newState == ConnectionState.RECONNECTED) {
@@ -74,10 +65,23 @@ public class CommonServiceServerImpl implements ICommonServiceServer {
     }
 
     @Override
-    public void registerClient(String server, String client) throws Exception {
-        // TODO Auto-generated method stub
+    public void registerClient(final String server, final String client) throws Exception {
         //this.createNode("/" + server, server,CreateMode.PERSISTENT);
         this.createNode("/" + server + client, client, CreateMode.EPHEMERAL_SEQUENTIAL);
+
+        zookeeperClient.getConnectionStateListenable().addListener(new ConnectionStateListener() {
+            @Override
+            public void stateChanged(CuratorFramework curatorFramework, ConnectionState newState) {
+                if (newState == ConnectionState.RECONNECTED) {
+                    try {
+                        LOGGER.debug("register server when state change to RECONNECTED");
+                        registerClient(server, client);
+                    } catch (Exception e) {
+                        LOGGER.error("create \"/group+server\" node fail when reconnect");
+                    }
+                }
+            }
+        });
     }
 
 
@@ -91,14 +95,14 @@ public class CommonServiceServerImpl implements ICommonServiceServer {
     public boolean createNode(String nodeName, String value, CreateMode createMode) {
         boolean suc = false;
         try {
-            Stat stat = getClient().checkExists().forPath(nodeName);
+            Stat stat = zookeeperClient.checkExists().forPath(nodeName);
             if (stat == null) {
                 String opResult = null;
                 if (Strings.isNullOrEmpty(value)) {
-                    opResult = getClient().create().creatingParentsIfNeeded().withMode(createMode).forPath(nodeName);
+                    opResult = zookeeperClient.create().creatingParentsIfNeeded().withMode(createMode).forPath(nodeName);
                 } else {
                     opResult =
-                            getClient().create().creatingParentsIfNeeded().withMode(createMode)
+                            zookeeperClient.create().creatingParentsIfNeeded().withMode(createMode)
                                     .forPath(nodeName, value.getBytes(Charsets.UTF_8));
                 }
                 suc = Objects.equal(nodeName, opResult);
@@ -108,20 +112,20 @@ public class CommonServiceServerImpl implements ICommonServiceServer {
         }
         return suc;
     }
-
-    /**
-     * @return the client
-     */
-    public CuratorFramework getClient() {
-        return client;
-    }
-
-    /**
-     * @param client the client to set
-     */
-    public void setClient(CuratorFramework client) {
-        this.client = client;
-    }
+//
+//    /**
+//     * @return the client
+//     */
+//    public CuratorFramework getClient() {
+//        return zookeeperClient;
+//    }
+//
+//    /**
+//     * @param client the client to set
+//     */
+//    public void setClient(CuratorFramework client) {
+//        this.zookeeperClient = client;
+//    }
 
 
 }

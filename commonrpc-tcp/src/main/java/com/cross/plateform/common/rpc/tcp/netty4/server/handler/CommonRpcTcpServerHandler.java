@@ -1,42 +1,29 @@
-/**
- *
- */
 package com.cross.plateform.common.rpc.tcp.netty4.server.handler;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
 import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
-
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * @author liubing1
- */
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
-
-    private static final Log LOGGER = LogFactory.getLog(CommonRpcTcpServerHandler.class);
-
-    private ThreadPoolExecutor threadPoolExecutor;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonRpcTcpServerHandler.class);
+    private ExecutorService threadPoolExecutor;
     private int port;
-
     private int procotolType;//协议名称
-
     private int codecType;//编码类型
 
     public CommonRpcTcpServerHandler(int threadCount, int port,
@@ -45,18 +32,16 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
         this.port = port;
         this.procotolType = procotolType;
         this.codecType = codecType;
-        this.threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadCount);
+        this.threadPoolExecutor = Executors.newFixedThreadPool(threadCount);
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        // TODO Auto-generated method stub
         CommonRpcServerService.getInstance().registerClient(getLocalhost(), ctx.channel().remoteAddress().toString());
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        // TODO Auto-generated method stub
         ctx.channel().close();
     }
 
@@ -73,8 +58,6 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
-        // TODO Auto-generated method stub
-
         if (!(msg instanceof CommonRpcRequest)) {
             LOGGER.error("receive message error,only support RequestWrapper");
             throw new Exception(
@@ -93,7 +76,6 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
         CommonRpcResponse rocketRPCResponse = null;
         try {
             CommonRpcRequest request = (CommonRpcRequest) message;
-
             rocketRPCResponse = CommonRpcServerHandlerFactory
                     .getServerHandler().handleRequest(request, codecType,
                             procotolType);
@@ -137,34 +119,24 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
             String ip = InetAddress.getLocalHost().getHostAddress();
             return ip + ":" + port;
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
             throw new RuntimeException("无法获取本地Ip", e);
         }
 
     }
 
     private class ServerHandlerRunnable implements Runnable {
-
         private ChannelHandlerContext ctx;
-
         private Object message;
 
-        /**
-         * @param ctx
-         * @param message
-         */
         public ServerHandlerRunnable(ChannelHandlerContext ctx, Object message) {
             super();
             this.ctx = ctx;
             this.message = message;
         }
 
-
         @Override
         public void run() {
-            // TODO Auto-generated method stub
             handleRequestWithSingleThread(ctx, message);
         }
-
     }
 }

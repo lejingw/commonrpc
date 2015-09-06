@@ -1,55 +1,18 @@
-/**
- * 
- */
 package com.cross.plateform.common.rpc.tcp.netty4.spring.config.support;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.DisposableBean;
+import com.cross.plateform.common.rpc.core.util.StringUtils;
+import com.cross.plateform.common.rpc.tcp.netty4.client.proxy.CommonRpcTcpClientProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 
-import com.cross.plateform.common.rpc.core.util.StringUtils;
-import com.cross.plateform.common.rpc.service.client.service.CommonRpcClientService;
-import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
-import com.cross.plateform.common.rpc.tcp.netty4.client.proxy.CommonRpcTcpClientProxy;
-/**
- * @author liubing1
- *
- */
-public class CommonRpcReference implements FactoryBean, DisposableBean {
-	
-	/**
-	 * 接口名称
-	 */
-	private String interfacename;
-	
-	/**
-	 * 超时时间
-	 */
-	private int timeout;
-	
-	/**
-	 * 编码类型
-	 */
-	private int codecType;
-	/**
-	 * 协议类型
-	 */
-	private int protocolType;
-	
-	/**
-	 * 组名
-	 */
-	private String group;
-	
-	private static final Log LOGGER = LogFactory.getLog(CommonRpcReference.class);
-	
-
-	@Override
-	public void destroy() throws Exception {
-		CommonRpcClientService.getInstance().close();
-		CommonRpcTcpClientFactory.getInstance().stopClient();
-	}
+public class CommonRpcReference implements FactoryBean {
+	private static final Logger LOGGER = LoggerFactory.getLogger(CommonRpcReference.class);
+	private String interfacename;//接口名称
+	private int timeout;//超时时间
+	private int codecType;//编码类型
+	private int protocolType;//协议类型
+	private String group;//组名，如果属于多个组，则用逗号分隔
 
 	@Override
 	public Object getObject() throws Exception {
@@ -65,7 +28,6 @@ public class CommonRpcReference implements FactoryBean, DisposableBean {
 			} else {
 				return Thread.currentThread().getContextClassLoader().loadClass(interfacename);
 			}
-			
 		} catch (ClassNotFoundException e) {
 			LOGGER.error("spring 解析失败", e);
 		}

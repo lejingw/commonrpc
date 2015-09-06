@@ -3,22 +3,22 @@
  */
 package test.cross.plateform.rocketrpc.demo.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import test.cross.plateform.rocketrpc.demo.service.IDemoService;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Random;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import test.cross.plateform.rocketrpc.demo.service.IDemoService;
 
 /**
  * @author liubing1
  *
  */
 public class DemoServiceImpl implements IDemoService {
-
-	private static final Log LOGGER = LogFactory.getLog(DemoServiceImpl.class);
-	Random r = new Random();
+	private static final Logger LOGGER = LoggerFactory.getLogger(DemoServiceImpl.class);
+	private Random r = new Random();
 
 	@Override
 	public String sayDemo(String params) {

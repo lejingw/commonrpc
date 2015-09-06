@@ -1,13 +1,12 @@
-/**
- *
- */
 package com.cross.plateform.common.rpc.tcp.netty4.server;
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.ThreadFactory;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.cross.plateform.common.rpc.core.server.RpcServer;
+import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
+import com.cross.plateform.common.rpc.core.thread.NamedThreadFactory;
+import com.cross.plateform.common.rpc.server.filter.RpcFilter;
+import com.cross.plateform.common.rpc.tcp.netty4.codec.CommonRpcDecoderHandler;
+import com.cross.plateform.common.rpc.tcp.netty4.codec.CommonRpcEncoderHandler;
+import com.cross.plateform.common.rpc.tcp.netty4.server.handler.CommonRpcTcpServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -17,35 +16,22 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
-import com.cross.plateform.common.rpc.core.server.RpcServer;
-import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
-import com.cross.plateform.common.rpc.core.thread.NamedThreadFactory;
-import com.cross.plateform.common.rpc.server.filter.RpcFilter;
-import com.cross.plateform.common.rpc.tcp.netty4.codec.CommonRpcDecoderHandler;
-import com.cross.plateform.common.rpc.tcp.netty4.codec.CommonRpcEncoderHandler;
-import com.cross.plateform.common.rpc.tcp.netty4.server.handler.CommonRpcTcpServerHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * @author liubing1
- */
+import java.net.InetSocketAddress;
+import java.util.concurrent.ThreadFactory;
+
 public class CommonRpcTcpServer implements RpcServer {
-
-    private static final Log LOGGER = LogFactory.getLog(CommonRpcTcpServer.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonRpcTcpServer.class);
     private static final int PROCESSORS = Runtime.getRuntime().availableProcessors() * 2;
-
     private EventLoopGroup bossGroup;
-
     private NioEventLoopGroup workerGroup;
-
     private int procotolType;//协议名称
-
     private int codecType;//编码类型
-
     private int threadCount;//线程数
 
-    public CommonRpcTcpServer() {
-
+    private CommonRpcTcpServer() {
     }
 
     private static class SingletonHolder {
@@ -70,10 +56,8 @@ public class CommonRpcTcpServer implements RpcServer {
 
     @Override
     public void start(final int port, final int timeout) throws Exception {
-        ThreadFactory serverBossTF = new NamedThreadFactory("NETTYSERVER-BOSS-");
-        ThreadFactory serverWorkerTF = new NamedThreadFactory("NETTYSERVER-WORKER-");
-        bossGroup = new NioEventLoopGroup(PROCESSORS, serverBossTF);
-        workerGroup = new NioEventLoopGroup(PROCESSORS * 2, serverWorkerTF);
+        bossGroup = new NioEventLoopGroup(PROCESSORS, new NamedThreadFactory("NETTYSERVER-BOSS-"));
+        workerGroup = new NioEventLoopGroup(PROCESSORS * 2, new NamedThreadFactory("NETTYSERVER-WORKER-"));
         ServerBootstrap bootstrap = new ServerBootstrap();
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -84,18 +68,17 @@ public class CommonRpcTcpServer implements RpcServer {
                 .option(ChannelOption.SO_SNDBUF, 65535)
                 .option(ChannelOption.SO_RCVBUF, 65535)
                 .childOption(ChannelOption.TCP_NODELAY, true);
-        bootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
 
+        bootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
             protected void initChannel(SocketChannel channel) throws Exception {
                 ChannelPipeline pipeline = channel.pipeline();
                 pipeline.addLast("decoder", new CommonRpcDecoderHandler());
                 pipeline.addLast("encoder", new CommonRpcEncoderHandler());
                 pipeline.addLast("timeout", new IdleStateHandler(0, 0, 120));
                 pipeline.addLast("handler", new CommonRpcTcpServerHandler(threadCount, port, procotolType, codecType));
-
             }
-
         });
+
         LOGGER.info("-----------------开始启动--------------------------");
         bootstrap.bind(new InetSocketAddress(port)).sync();
         LOGGER.info("端口号：" + port + "的服务端已经启动");

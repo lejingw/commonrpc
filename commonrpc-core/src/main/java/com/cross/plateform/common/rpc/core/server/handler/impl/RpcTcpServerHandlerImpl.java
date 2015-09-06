@@ -1,20 +1,20 @@
 package com.cross.plateform.common.rpc.core.server.handler.impl;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.codec.all.CommonRpcCodecs;
 import com.cross.plateform.common.rpc.core.server.handler.AbstractRpcTcpServerHandler;
 import com.cross.plateform.common.rpc.server.filter.RpcFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RpcTcpServerHandlerImpl extends AbstractRpcTcpServerHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RpcTcpServerHandlerImpl.class);
     public static final int TYPE = 0;
-    private static final Log LOGGER = LogFactory.getLog(RpcTcpServerHandlerImpl.class);
     private static Map<String, RpcFilterServerBean> processors = new HashMap<String, RpcFilterServerBean>();
     private static Map<String, Method> cacheMethods = new HashMap<String, Method>();
 
@@ -69,8 +69,7 @@ public class RpcTcpServerHandlerImpl extends AbstractRpcTcpServerHandler {
                 if (method == null) {
                     throw new Exception("no method: " + methodKeyBuilder.toString() + " find in " + targetInstanceName + " on the server");
                 }
-                Object[] tmprequestObjects = request
-                        .getRequestObjects();
+                Object[] tmprequestObjects = request.getRequestObjects();
                 for (int i = 0; i < tmprequestObjects.length; i++) {
                     try {
                         requestObjects[i] = CommonRpcCodecs.getDecoder(request.getCodecType()).decode(argTypes[i], (byte[]) tmprequestObjects[i]);
@@ -79,8 +78,7 @@ public class RpcTcpServerHandlerImpl extends AbstractRpcTcpServerHandler {
                     }
                 }
             } else {
-                method = rpcFilterServerBean.getObject().getClass().getMethod(methodName,
-                        new Class<?>[]{});
+                method = rpcFilterServerBean.getObject().getClass().getMethod(methodName, new Class<?>[]{});
                 if (method == null) {
                     throw new Exception("no method: " + methodName + " find in " + targetInstanceName + " on the server");
                 }
@@ -98,7 +96,6 @@ public class RpcTcpServerHandlerImpl extends AbstractRpcTcpServerHandler {
             } else {
                 responseWrapper.setResponse(method.invoke(rpcFilterServerBean.getObject(), requestObjects));
             }
-
         } catch (Exception e) {
             LOGGER.error("server handle request error", e);
             responseWrapper.setException(e);
@@ -127,10 +124,6 @@ public class RpcTcpServerHandlerImpl extends AbstractRpcTcpServerHandler {
 
         public RpcFilter getRpcFilter() {
             return rpcFilter;
-        }
-
-        public void setRpcFilter(RpcFilter rpcFilter) {
-            this.rpcFilter = rpcFilter;
         }
 
         public RpcFilterServerBean(Object object, RpcFilter rpcFilter) {

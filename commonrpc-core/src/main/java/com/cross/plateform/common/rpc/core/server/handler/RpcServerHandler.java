@@ -1,13 +1,7 @@
-/**
- *
- */
 package com.cross.plateform.common.rpc.core.server.handler;
 
 import com.cross.plateform.common.rpc.server.filter.RpcFilter;
 
-/**
- * @author liubing1
- */
 public interface RpcServerHandler {
 
     /**
@@ -16,10 +10,10 @@ public interface RpcServerHandler {
      * @param instanceName
      * @param instance
      */
-    public void registerProcessor(String instanceName, Object instance, RpcFilter rpcFilter);
+    void registerProcessor(String instanceName, Object instance, RpcFilter rpcFilter);
 
     /**
      * 清除
      */
-    public void clear();
+    void clear();
 }

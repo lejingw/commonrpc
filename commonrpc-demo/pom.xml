@@ -5,7 +5,7 @@
     <parent>
         <artifactId>common-rpc</artifactId>
         <groupId>com.rpc</groupId>
-        <version>1.0.4-SNAPSHOT</version>
+        <version>1.0.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,7 +21,7 @@
     </modules>
 
     <properties>
-        <commonrpc.version>1.0.4-SNAPSHOT</commonrpc.version>
+        <commonrpc.version>1.0.5-SNAPSHOT</commonrpc.version>
         <springframework.version>3.2.8.RELEASE</springframework.version>
         <slf4j.version>1.7.6</slf4j.version>
     </properties>

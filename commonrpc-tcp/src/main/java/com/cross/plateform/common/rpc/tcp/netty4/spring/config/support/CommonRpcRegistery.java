@@ -21,14 +21,12 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 
     @Override
     public void destroy() throws Exception {
-        // TODO Auto-generated method stub
         CommonRpcServerService.getInstance().close();
         CommonRpcTcpServer.getInstance().stop();//停止
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        // TODO Auto-generated method stub
         if (port == 0) {
             throw new Exception("parameter port can not be null");
         }
@@ -41,16 +39,20 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 
     }
 
-    /**
-     * @return the port
-     */
+    private String getLocalhost() {
+        try {
+            String ip = StringUtils.isNullOrEmpty(this.getIp()) ? InetAddress.getLocalHost().getHostAddress() : this.getIp();
+            return ip + ":" + port;
+        } catch (UnknownHostException e) {
+            throw new RuntimeException("无法获取本地Ip", e);
+        }
+
+    }
+
     public int getPort() {
         return port;
     }
 
-    /**
-     * @param port the port to set
-     */
     public void setPort(int port) {
         this.port = port;
     }
@@ -63,71 +65,20 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
         this.timeout = timeout;
     }
 
-    /**
-     * @return the procotolType
-     */
     public int getProcotolType() {
         return procotolType;
     }
 
-    /**
-     * @param procotolType the procotolType to set
-     */
     public void setProcotolType(int procotolType) {
         this.procotolType = procotolType;
     }
 
-    /**
-     * @return the codecType
-     */
     public int getCodecType() {
         return codecType;
     }
 
-    /**
-     * @param codecType the codecType to set
-     */
     public void setCodecType(int codecType) {
         this.codecType = codecType;
-    }
-
-    private String getLocalhost() {
-        try {
-            String ip = StringUtils.isNullOrEmpty(this.getIp()) ? InetAddress.getLocalHost().getHostAddress() : this.getIp();
-            return ip + ":" + port;
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            throw new RuntimeException("无法获取本地Ip", e);
-        }
-
-    }
-
-    /**
-     * @return the group
-     */
-    public String getGroup() {
-        return group;
-    }
-
-    /**
-     * @param group the group to set
-     */
-    public void setGroup(String group) {
-        this.group = group;
-    }
-
-    /**
-     * @return the threadCount
-     */
-    public int getThreadCount() {
-        return threadCount;
-    }
-
-    /**
-     * @param threadCount the threadCount to set
-     */
-    public void setThreadCount(int threadCount) {
-        this.threadCount = threadCount;
     }
 
     public String getIp() {
@@ -138,4 +89,19 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
         this.ip = ip;
     }
 
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    public int getThreadCount() {
+        return threadCount;
+    }
+
+    public void setThreadCount(int threadCount) {
+        this.threadCount = threadCount;
+    }
 }

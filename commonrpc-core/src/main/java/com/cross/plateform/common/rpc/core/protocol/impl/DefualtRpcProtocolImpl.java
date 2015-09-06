@@ -3,27 +3,22 @@
  */
 package com.cross.plateform.common.rpc.core.protocol.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.bytebuffer.RpcByteBuffer;
 import com.cross.plateform.common.rpc.core.codec.all.CommonRpcCodecs;
 import com.cross.plateform.common.rpc.core.protocol.RpcProtocol;
 import com.cross.plateform.common.rpc.core.protocol.all.CommonRpcProtocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class DefualtRpcProtocolImpl implements RpcProtocol {
-
-	
+	private static final Logger LOGGER = LoggerFactory.getLogger(DefualtRpcProtocolImpl.class);
 	public static final int TYPE = 1;
-
-	private static final Log LOGGER = LogFactory
-			.getLog(DefualtRpcProtocolImpl.class);
 	
 	private static final int REQUEST_HEADER_LEN = 1 * 6 + 5 * 4 ;
 

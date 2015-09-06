@@ -1,55 +1,67 @@
 package com.cross.plateform.common.rpc.core.client.factory;
 
+import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
+import com.cross.plateform.common.rpc.core.client.RpcClient;
 
 import java.util.concurrent.LinkedBlockingQueue;
-import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
-import com.cross.plateform.common.rpc.core.client.AbstractRpcClient;
-import com.cross.plateform.common.rpc.core.client.RpcClient;
-public interface RpcClientFactory {
-	
-	/**
-	 * 
-	 * @param host
-	 * @param port
-	 * @param connectiontimeout
-	 * @param keepalive
-	 */
-	public RpcClient getClient(String host,int port) throws Exception;
-	
-	/**
-	 * 创建客户端
-	 * @param connectiontimeout  连接超时时间
-	 */
-	public void startClient(int connectiontimeout);
-	
-	public void putResponse(int key,LinkedBlockingQueue<Object> queue) throws Exception;
-	/**
-	 * 接受消息
-	 * @param response
-	 * @throws Exception
-	 */
-	public void receiveResponse(CommonRpcResponse response) throws Exception;
-	
-	
-	
-	/**
-	 * 删除消息
-	 * @param key
-	 */
-	public void removeResponse(int key);
-	/**
-	 *
-	 * @param key
-	 * @param rpcClient
-	 */
-	public void putRpcClient(String key,AbstractRpcClient rpcClient);
-	
-	/**
-	 * 
-	 * @param key
-	 */
-	public void removeRpcClient(String key);
-	
-	public boolean containClient(String key);
-	
+
+public interface RpcClientFactory<T extends RpcClient> {
+
+    /**
+     * 创建客户端服务
+     *
+     * @param connectiontimeout 连接超时时间
+     */
+    void startClientFactory(int connectiontimeout);
+
+    /**
+     * 停止客户端服务
+     *
+     * @throws Exception
+     */
+    void stopClientFactory() throws Exception;
+
+    /**
+     * 获取调用客户端
+     *
+     * @param host
+     * @param port
+     */
+    T getClient(String host, int port) throws Exception;
+
+    String getKey(String host, int port);
+
+    T getClient(String key);
+
+    boolean containClient(String key);
+
+    /**
+     * @param key
+     * @param rpcClient
+     */
+    void putRpcClient(String key, T rpcClient);
+
+    /**
+     * @param key
+     */
+    void removeRpcClient(String key);
+
+
+    /**
+     * 接受消息
+     *
+     * @param response
+     * @throws Exception
+     */
+    void receiveResponse(CommonRpcResponse response) throws Exception;
+
+
+    void putResponse(int key, LinkedBlockingQueue<Object> queue) throws Exception;
+
+    /**
+     * 删除消息
+     *
+     * @param key
+     */
+    void removeResponse(int key);
 }
