@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 public class CommonServiceServerImpl implements ICommonServiceServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonServiceServerImpl.class);
     private CuratorFramework zookeeperClient;
+    private boolean registReconnectListenerFlag = false;
 
     @Override
     public void close() throws Exception {
@@ -35,53 +36,65 @@ public class CommonServiceServerImpl implements ICommonServiceServer {
                 .connectionTimeoutMs(timeout)
                 .retryPolicy(new ExponentialBackoffRetry(2000, 3))
                 .build();
-//        client.getCuratorListenable().addListener(new CuratorListener() {
-//            @Override
-//            public void eventReceived(CuratorFramework client, CuratorEvent event) throws Exception {
-//
-//            }
-//        });
         zookeeperClient.start();
+        registReconnectListenerFlag = false;
     }
 
     @Override
     public void registerServer(final String group, final String server) throws Exception {
-        this.createNode("/" + group, group, CreateMode.PERSISTENT);
-        this.createNode("/" + group + "/" + server, server, CreateMode.EPHEMERAL_SEQUENTIAL);
-
-        zookeeperClient.getConnectionStateListenable().addListener(new ConnectionStateListener() {
-            @Override
-            public void stateChanged(CuratorFramework client, ConnectionState newState) {
-                if (newState == ConnectionState.RECONNECTED) {
-                    try {
-                        LOGGER.debug("register server when state change to RECONNECTED");
-                        registerServer(group, server);
-                    } catch (Exception e) {
-                        LOGGER.error("create \"/group+server\" node fail when reconnect");
+        createNode("/" + group, group, CreateMode.PERSISTENT);
+        createNode("/" + group + "/" + server, server, CreateMode.EPHEMERAL_SEQUENTIAL);
+        if (!registReconnectListenerFlag) {
+            zookeeperClient.getConnectionStateListenable().addListener(new ConnectionStateListener() {
+                @Override
+                public void stateChanged(CuratorFramework client, ConnectionState newState) {
+                    if (newState == ConnectionState.RECONNECTED) {
+                        try {
+                            LOGGER.debug("[stateChanged]register server when state change to RECONNECTED");
+                            registerServer(group, server);
+                        } catch (Exception e) {
+                            LOGGER.error("registerServer fail when reconnect");
+                        }
                     }
                 }
-            }
-        });
+            });
+//            zookeeperClient.getCuratorListenable().addListener(new CuratorListener() {
+//                @Override
+//                public void eventReceived(CuratorFramework client, CuratorEvent event) throws Exception {
+//                    if(Watcher.Event.KeeperState.SyncConnected == event.getWatchedEvent().getState()){
+//                        try {
+//                            LOGGER.debug("[eventReceived]register server when state change to RECONNECTED");
+//                            registerServer(group, server);
+//                        } catch (Exception e) {
+//                            LOGGER.error("registerServer fail when reconnect");
+//                        }
+//                    }
+//                }
+//            });
+            registReconnectListenerFlag = true;
+        }
     }
 
     @Override
     public void registerClient(final String server, final String client) throws Exception {
-        //this.createNode("/" + server, server,CreateMode.PERSISTENT);
-        this.createNode("/" + server + client, client, CreateMode.EPHEMERAL_SEQUENTIAL);
-
-        zookeeperClient.getConnectionStateListenable().addListener(new ConnectionStateListener() {
-            @Override
-            public void stateChanged(CuratorFramework curatorFramework, ConnectionState newState) {
-                if (newState == ConnectionState.RECONNECTED) {
-                    try {
-                        LOGGER.debug("register server when state change to RECONNECTED");
-                        registerClient(server, client);
-                    } catch (Exception e) {
-                        LOGGER.error("create \"/group+server\" node fail when reconnect");
+        //createNode("/" + server, server,CreateMode.PERSISTENT);
+        createNode("/" + server + client, client, CreateMode.EPHEMERAL_SEQUENTIAL);
+        if (!registReconnectListenerFlag) {
+            zookeeperClient.getConnectionStateListenable().addListener(new ConnectionStateListener() {
+                @Override
+                public void stateChanged(CuratorFramework curatorFramework, ConnectionState newState) {
+                    if (newState == ConnectionState.RECONNECTED) {
+                        try {
+                            LOGGER.debug("[stateChanged]register client when state change to RECONNECTED");
+                            registerClient(server, client);
+                        } catch (Exception e) {
+                            LOGGER.error("registerClient fail when reconnect");
+                        }
                     }
                 }
-            }
-        });
+            });
+            registReconnectListenerFlag = true;
+        }
     }
 
 
@@ -112,20 +125,4 @@ public class CommonServiceServerImpl implements ICommonServiceServer {
         }
         return suc;
     }
-//
-//    /**
-//     * @return the client
-//     */
-//    public CuratorFramework getClient() {
-//        return zookeeperClient;
-//    }
-//
-//    /**
-//     * @param client the client to set
-//     */
-//    public void setClient(CuratorFramework client) {
-//        this.zookeeperClient = client;
-//    }
-
-
 }
