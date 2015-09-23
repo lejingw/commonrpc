@@ -10,7 +10,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 public class CommonRpcApplicationParser implements BeanDefinitionParser {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CommonRpcApplicationParser.class);
+	private static final Logger logger = LoggerFactory.getLogger(CommonRpcApplicationParser.class);
 
 	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {

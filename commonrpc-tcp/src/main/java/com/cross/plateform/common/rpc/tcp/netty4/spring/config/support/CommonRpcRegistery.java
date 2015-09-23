@@ -3,6 +3,8 @@ package com.cross.plateform.common.rpc.tcp.netty4.spring.config.support;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -11,6 +13,7 @@ import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerServ
 import com.cross.plateform.common.rpc.tcp.netty4.server.CommonRpcTcpServer;
 
 public class CommonRpcRegistery implements InitializingBean, DisposableBean {
+    private static final Logger logger = LoggerFactory.getLogger(CommonRpcRegistery.class);
     private String ip;//暴露的ip
     private int port;//端口号
     private int timeout;
@@ -21,7 +24,7 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 
     @Override
     public void destroy() throws Exception {
-        CommonRpcServerService.getInstance().close();
+        logger.debug("========destroy CommonRpcRegistery========");
         CommonRpcTcpServer.getInstance().stop();//停止
     }
 

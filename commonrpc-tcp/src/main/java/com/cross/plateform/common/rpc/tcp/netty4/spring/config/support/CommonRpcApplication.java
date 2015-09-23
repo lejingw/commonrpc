@@ -1,5 +1,8 @@
 package com.cross.plateform.common.rpc.tcp.netty4.spring.config.support;
 
+import com.cross.plateform.common.rpc.tcp.netty4.server.CommonRpcTcpServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import com.cross.plateform.common.rpc.core.util.StringUtils;
@@ -8,6 +11,7 @@ import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerServ
 import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
 
 public class CommonRpcApplication implements InitializingBean, DisposableBean {
+    private static final Logger logger = LoggerFactory.getLogger(CommonRpcApplication.class);
     private String address = null;
     private String clientid = null;
     private Integer flag;//server :1  client :2
@@ -35,7 +39,10 @@ public class CommonRpcApplication implements InitializingBean, DisposableBean {
 
     @Override
     public void destroy() throws Exception {
-        if(flag == 2) {
+        logger.debug("========destroy CommonRpcApplication========");
+        if (flag == 1) {
+            CommonRpcServerService.getInstance().close();
+        }else if(flag == 2) {
             CommonRpcClientService.getInstance().close();
             CommonRpcTcpClientFactory.getInstance().stopClientFactory();
         }
