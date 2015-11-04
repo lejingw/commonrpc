@@ -7,11 +7,10 @@ if [ -z "$PROJECT_PATH" ] ; then
 	BASE=`pwd`
 fi
 
-PROJECT=demo-consumer
+CLASSPATH=$JAVA_HOME/lib/*:$BASE/conf:$BASE/libs/*
 
-CLASSPATH=`echo $JAVA_HOME/lib/*.jar | tr ' ' ':'`
-CLASSPATH=$CLASSPATH:`echo $BASE/libs/*.jar | tr ' ' ':'`
+PROJECT_DIR_NAME=`basename \`pwd\``
 
-ISRUN=$(ps ux|grep "/$PROJECT/"|grep java |wc -l)
+ISRUN=$(ps ux|grep "/$PROJECT_DIR_NAME/"|grep java |wc -l| sed 's/ //g')
 
 JAVA_CONF="-Xmx256M -Dfile.encoding=UTF-8"

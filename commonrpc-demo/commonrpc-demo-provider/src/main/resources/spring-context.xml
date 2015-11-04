@@ -32,7 +32,6 @@
      -->
     <commonrpc:registry id="rpcRegistry"
                         port="${commonrpc.registry.port}" timeout="2000"
-                        procotolType="${commonrpc.registry.procotolType}"
                         codecType="${commonrpc.registry.codecType}"
                         group="${commonrpc.registry.group}"
                         threadCount="${commonrpc.registry.threadCount}"/>
