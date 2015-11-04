@@ -6,9 +6,9 @@ public class DemoServiceImpl implements DemoService {
 
 	@Override
 	public String sayHello(String name) {
-		String str = "---------------2----";
+		String str = "---------------1----";
 		System.out.println(str);
-		return "Hello " + name + str;
+		return "Hello 1 " + name;
 	}
 
 }

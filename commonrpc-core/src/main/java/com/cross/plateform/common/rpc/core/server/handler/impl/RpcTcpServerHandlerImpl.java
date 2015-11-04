@@ -9,14 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RpcTcpServerHandlerImpl extends AbstractRpcTcpServerHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RpcTcpServerHandlerImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(RpcTcpServerHandlerImpl.class);
     public static final int TYPE = 0;
-    private static Map<String, RpcFilterServerBean> processors = new HashMap<String, RpcFilterServerBean>();
-    private static Map<String, Method> cacheMethods = new HashMap<String, Method>();
+    private static Map<String, RpcFilterServerBean> processors = new ConcurrentHashMap<>();
+    private static Map<String, Method> cacheMethods = new ConcurrentHashMap<String, Method>();
 
     @Override
     public void registerProcessor(String instanceName, Object instance, RpcFilter rpcFilter) {
@@ -97,7 +97,7 @@ public class RpcTcpServerHandlerImpl extends AbstractRpcTcpServerHandler {
                 responseWrapper.setResponse(method.invoke(rpcFilterServerBean.getObject(), requestObjects));
             }
         } catch (Exception e) {
-            LOGGER.error("server handle request error", e);
+            logger.error("server handle request error", e);
             responseWrapper.setException(e);
         }
         return responseWrapper;

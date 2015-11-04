@@ -41,7 +41,6 @@ public abstract class AbstractRpcClientInvocationHandler implements InvocationHa
         int i = random.nextInt(groups.length);
         Set<InetSocketAddress> addresses = CommonRpcClientService.getInstance().getServersByGroup(groups[i]);
         if(null == addresses || addresses.size()<1){
-            logger.error("count not find remote server, please check the server side");
             throw new RuntimeException("count not find remote server, please check the server side");
         }
         List<RpcRouteServer> servers = SocketAddressUtil.getInetSocketAddress(addresses);

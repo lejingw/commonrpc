@@ -1,60 +1,37 @@
 package com.cross.plateform.common.rpc.tcp.netty4.spring.config.support;
 
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-
-import com.cross.plateform.common.rpc.core.util.StringUtils;
 import com.cross.plateform.common.rpc.server.filter.RpcFilter;
 import com.cross.plateform.common.rpc.tcp.netty4.server.CommonRpcTcpServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 
-public class CommonRpcService implements ApplicationContextAware, ApplicationListener {
-    private String interfacename;//接口名称 key
-    private String ref;//服务类bean value
-    private ApplicationContext applicationContext;
-    private String filterRef;//拦截器类
+public class CommonRpcService implements InitializingBean {
+	private static final Logger logger = LoggerFactory.getLogger(CommonRpcService.class);
 
-    @Override
-    public void onApplicationEvent(ApplicationEvent event) {
-        if (StringUtils.isNullOrEmpty(filterRef) || !(applicationContext.getBean(filterRef) instanceof RpcFilter)) {//为空
-            CommonRpcTcpServer.getInstance().registerProcessor(interfacename, applicationContext.getBean(ref), null);
-        } else {
-            CommonRpcTcpServer.getInstance().registerProcessor(interfacename, applicationContext.getBean(ref), (RpcFilter) applicationContext.getBean(filterRef));
-        }
-    }
+	private Object ref;//服务类bean value
+	private RpcFilter filterRef;//拦截器类
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		if (null == ref) {
+			logger.error("could not found the ref class");
+			return;
+		}
+		Class<?>[] interfaces = ref.getClass().getInterfaces();
+		if (null == interfaces || 1 != interfaces.length) {
+			logger.error("could not found the only one interface from class:" + ref.getClass());
+			return;
+		}
+		String interfacename = interfaces[0].getName();
+		CommonRpcTcpServer.getInstance().registerProcessor(interfacename, ref, filterRef);//filterRef 允许为null
+	}
 
-    public String getInterfacename() {
-        return interfacename;
-    }
+	public void setRef(Object ref) {
+		this.ref = ref;
+	}
 
-    public void setInterfacename(String interfacename) {
-        this.interfacename = interfacename;
-    }
-
-    public String getRef() {
-        return ref;
-    }
-
-    public void setRef(String ref) {
-        this.ref = ref;
-    }
-
-    public ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
-    public String getFilterRef() {
-        return filterRef;
-    }
-
-    public void setFilterRef(String filterRef) {
-        this.filterRef = filterRef;
-    }
+	public void setFilterRef(RpcFilter filterRef) {
+		this.filterRef = filterRef;
+	}
 }

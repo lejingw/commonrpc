@@ -38,14 +38,12 @@ public class ZkServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doPost(req, resp);
 	}
 	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		request.setCharacterEncoding("UTF-8");  
         response.setContentType("text/html;charset=utf-8");
         commonRpcManagerClient=(CommonRpcManagerClient) SpringContextUtil.getBean("commonRpcManagerClient");
@@ -58,15 +56,11 @@ public class ZkServlet extends HttpServlet {
         		try {
 					result=commonRpcManagerClient.getServersByGroup(param);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					
 				}
-        		
         	}else{
         		try {
 					result=commonRpcManagerClient.getClientsByServer(param);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 				}
         	}
         	String json=JSONObject.toJSONString(result);

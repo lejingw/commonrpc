@@ -28,7 +28,7 @@ public class CommonRpcServerService {
         CommonRpcServiceFactory.getCommonServiceServer().connectZookeeper(server, timeout);
     }
 
-    public void registerClient(String server, String client) throws Exception {
-        CommonRpcServiceFactory.getCommonServiceServer().registerClient(server, client);
+    public void registerClient(String group, String server, String client) throws Exception {
+        CommonRpcServiceFactory.getCommonServiceServer().registerClient(group, server, client);
     }
 }

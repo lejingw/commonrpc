@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.cross.plateform.common.rpc.core.util;
 
 import java.lang.reflect.Array;
@@ -8,12 +5,11 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
- * @author liubing
  * string 工具类对象
  */
 public class StringUtils {
-	
 	 private static final String EMPTY = "";
+
 	/**
 	 * 判断是否为空
 	 * @param paramObject
@@ -39,11 +35,8 @@ public class StringUtils {
 	
 	/**
     * 将一个字符串重复 N 次
-    * 
-    * @param str
-    *            要重复的字符串
-    * @param times
-    *            重复次数
+    * @param str 要重复的字符串
+    * @param times 重复次数
     * @return
     */
    public static String repeat(String str, int times) {
@@ -56,11 +49,8 @@ public class StringUtils {
    
    /**
     * 连接字符串
-    * 
-    * @param elements
-    *            要连接的数组
-    * @param separator
-    *            分隔符
+    * @param elements 要连接的数组
+    * @param separator 分隔符
     * @return 连接结果
     */
    public static String join(Object[] elements, String separator) {
@@ -70,9 +60,7 @@ public class StringUtils {
        if (separator == null) {
            separator = EMPTY;
        }
-
        StringBuilder sb = new StringBuilder(elements.length * 16);
-
        for (int i = 0; i < elements.length; i++) {
            if (i > 0) {
                sb.append(separator);
@@ -131,8 +119,7 @@ public class StringUtils {
     * @param length
     * @return
     */
-	public static String randomStr(int length)
-	{ //length表示生成字符串的长度
+	public static String randomStr(int length) { //length表示生成字符串的长度
 		String base = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		Random random = new Random();
 		StringBuffer sb = new StringBuffer();
@@ -144,21 +131,18 @@ public class StringUtils {
 		return sb.toString();
 	}
 	
-	public static String fixLength(String str, int length, char fillChar)
-	{
+	public static String fixLength(String str, int length, char fillChar) {
 		if (str == null || "".equals(str.trim())){
 			return fixLength(length, fillChar);
 		}
 		if (str.length() == length){
 			return str;
 		}
-		
 		if (str.length() > length){
 			return str.substring((str.length() - length));
 		} else {  //str.length() < length
 			return str + fixLength(length - str.length(), fillChar);
 		}
-		
 	}
 	
 	/**
@@ -174,7 +158,4 @@ public class StringUtils {
 		}
 		return ret.toString();
 	}
-	
-	
-   
 }

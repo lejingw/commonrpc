@@ -5,7 +5,7 @@
 
     <groupId>com.rpc</groupId>
     <artifactId>common-rpc</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>common-rpc</name>
@@ -52,13 +52,8 @@
     </dependencies>
     <modules>
         <module>commonrpc-core</module>
-        <module>commonrpc-filter</module>
-        <module>commonrpc-proxy</module>
         <module>commonrpc-tcp</module>
-        <module>commonrpc-http</module>
         <module>commonrpc-service</module>
-        <module>commonrpc-manager</module>
-        <module>commonrpc-demo</module>
     </modules>
 
     <build>

@@ -4,26 +4,28 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.commonrpc.demo.sdk.DemoService2;
+import com.commonrpc.demo.sdk.RequestVo;
+import com.commonrpc.demo.sdk.ResponseVo;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.commonrpc.demo.sdk.DemoService;
 
 public class ConsumerStartup {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"spring-context.xml"});
-        DemoService demoService = (DemoService) context.getBean("demoService");
+	public static void main(String[] args) throws IOException, InterruptedException {
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"spring-context.xml"});
+		context.registerShutdownHook();
 
-        for (int i = 0; i < 100000000; i++) {
-            System.out.println("------------------call------");
-            try {
-                String hello = demoService.sayHello("world");
-                System.err.println("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "] " + hello + "\n");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            Thread.sleep(1500);
-        }
+		DemoService demoService = (DemoService) context.getBean("demoService");
+		DemoService2 demoService2 = (DemoService2) context.getBean("demoService2");
 
-    }
+		System.out.println("------------------call------" + demoService.sayHello("world"));
+		RequestVo req = new RequestVo();
+		req.setStr("hello world !");
+		ResponseVo res = demoService2.sayHello(req);
+		System.out.println("------------------call------" + res.getStr1());
+		Thread.sleep(10 * 1000);
+		context.close();
+	}
 }

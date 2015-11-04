@@ -1,14 +1,17 @@
 package com.commonrpc.demo.provider;
 
-import com.commonrpc.demo.sdk.DemoService;
+import com.commonrpc.demo.sdk.DemoService2;
+import com.commonrpc.demo.sdk.RequestVo;
+import com.commonrpc.demo.sdk.ResponseVo;
 
-public class DemoService2Impl implements DemoService {
+public class DemoService2Impl implements DemoService2 {
 
 	@Override
-	public String sayHello(String name) {
+	public ResponseVo sayHello(RequestVo req) {
+		System.out.println(req.getStr());
+		ResponseVo res = new ResponseVo();
 		String str = "---------------2----";
-		System.out.println(str);
-		return "Hello 2 " + name + str;
+		res.setStr1(str);
+		return res;
 	}
-
 }

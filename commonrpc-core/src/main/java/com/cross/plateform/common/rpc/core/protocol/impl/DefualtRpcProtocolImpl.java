@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.cross.plateform.common.rpc.core.protocol.impl;
 
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
@@ -15,50 +12,39 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class DefualtRpcProtocolImpl implements RpcProtocol {
-	private static final Logger LOGGER = LoggerFactory.getLogger(DefualtRpcProtocolImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefualtRpcProtocolImpl.class);
 	public static final int TYPE = 1;
-	
 	private static final int REQUEST_HEADER_LEN = 1 * 6 + 5 * 4 ;
-
 	private static final int RESPONSE_HEADER_LEN = 1 * 6 + 3 * 4 ;
-
 	private static final byte VERSION = (byte) 1;
-
 	private static final byte REQUEST = (byte) 0;
-
 	private static final byte RESPONSE = (byte) 1;
 
-	
 	@Override
-	public RpcByteBuffer encode(Object message,
-			RpcByteBuffer bytebufferWrapper) throws Exception {
-		// TODO Auto-generated method stub
-		if (!(message instanceof CommonRpcRequest)
-				&& !(message instanceof CommonRpcResponse)) {
-			throw new Exception(
-					"only support send RequestWrapper && ResponseWrapper");
+	public RpcByteBuffer encode(Object message, RpcByteBuffer bytebufferWrapper) throws Exception {
+		if (!(message instanceof CommonRpcRequest)&& !(message instanceof CommonRpcResponse)) {
+			throw new Exception("only support send RequestWrapper && ResponseWrapper");
 		}
 		int id = 0;
-		byte type = REQUEST;
 		if (message instanceof CommonRpcRequest) {
 			try {
-				int requestArgTypesLen = 0;
-				int requestArgsLen = 0;
-				List<byte[]> requestArgTypes = new ArrayList<byte[]>();
-				List<byte[]> requestArgs = new ArrayList<byte[]>();
 				CommonRpcRequest wrapper = (CommonRpcRequest) message;
+
+				int requestArgTypesLen = 0;
+				List<byte[]> requestArgTypes = new ArrayList<>();
 				byte[][] requestArgTypeStrings = wrapper.getArgTypes();
 				for (byte[] requestArgType : requestArgTypeStrings) {
 					requestArgTypes.add(requestArgType);
 					requestArgTypesLen += requestArgType.length;
 				}
+
+				int requestArgsLen = 0;
+				List<byte[]> requestArgs = new ArrayList<>();
 				Object[] requestObjects = wrapper.getRequestObjects();
 				if (requestObjects != null) {
 					for (Object requestArg : requestObjects) {
-						byte[] requestArgByte = CommonRpcCodecs.getEncoder(
-								wrapper.getCodecType()).encode(requestArg);
+						byte[] requestArgByte = CommonRpcCodecs.getEncoder(wrapper.getCodecType()).encode(requestArg);
 						requestArgs.add(requestArgByte);
 						requestArgsLen += requestArgByte.length;
 					}
@@ -74,26 +60,23 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 						+ targetInstanceNameByte.length + methodNameByte.length
 						+ requestArgTypesLen + requestArgsLen;
 
-				RpcByteBuffer byteBuffer = bytebufferWrapper
-						.get(capacity);
+				RpcByteBuffer byteBuffer = bytebufferWrapper.get(capacity);
 				byteBuffer.writeByte(CommonRpcProtocol.CURRENT_VERSION);
 				byteBuffer.writeByte((byte) TYPE);
 				//--------------HEADER_LEN----------------
 				byteBuffer.writeByte(VERSION);//1B
-				byteBuffer.writeByte(type);//1B
+				byteBuffer.writeByte(REQUEST);//1B
 				byteBuffer.writeByte((byte) wrapper.getCodecType());//1B
 				byteBuffer.writeByte((byte) 0);//1B
 				byteBuffer.writeByte((byte) 0);//1B
 				byteBuffer.writeByte((byte) 0);//1B
-				byteBuffer.writeInt(id);
+
+				byteBuffer.writeInt(id);//4B
 				byteBuffer.writeInt(timeout);//4B
 				byteBuffer.writeInt(targetInstanceNameByte.length);//4B
-
 				byteBuffer.writeInt(methodNameByte.length);//4B
-				
 				byteBuffer.writeInt(requestArgs.size());//4B
 				//---------------REQUEST_HEADER_LEN----------
-				
 				for (byte[] requestArgType : requestArgTypes) {
 					byteBuffer.writeInt(requestArgType.length);
 				}
@@ -101,10 +84,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 					byteBuffer.writeInt(requestArg.length);
 				}
 				byteBuffer.writeBytes(targetInstanceNameByte);
-
-				
 				byteBuffer.writeBytes(methodNameByte);
-				
 				for (byte[] requestArgType : requestArgTypes) {
 					byteBuffer.writeBytes(requestArgType);
 				}
@@ -113,7 +93,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				}
 				return byteBuffer;
 			} catch (Exception e) {
-				LOGGER.error("encode request object error", e);
+				logger.error("encode request object error", e);
 				throw e;
 			}
 		} else {
@@ -123,49 +103,41 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 			try {
 				// no return object
 				if (wrapper.getResponse() != null) {
-					className = wrapper.getResponse().getClass().getName()
-							.getBytes();
-					body = CommonRpcCodecs.getEncoder(wrapper.getCodecType())
-							.encode(wrapper.getResponse());
+					className = wrapper.getResponse().getClass().getName().getBytes();
+					body = CommonRpcCodecs.getEncoder(wrapper.getCodecType()).encode(wrapper.getResponse());
 				}
 				if (wrapper.isError()) {
-					className = wrapper.getException().getClass().getName()
-							.getBytes();
-					body = CommonRpcCodecs.getEncoder(wrapper.getCodecType())
-							.encode(wrapper.getException());
+					className = wrapper.getException().getClass().getName().getBytes();
+					body = CommonRpcCodecs.getEncoder(wrapper.getCodecType()).encode(wrapper.getException());
 				}
 				id = wrapper.getRequestId();
 			} catch (Exception e) {
-				LOGGER.error("encode response object error", e);
+				logger.error("encode response object error", e);
 				// still create responsewrapper,so client can get exception
-				wrapper.setResponse(new Exception(
-						"serialize response object error", e));
-				className = Exception.class.getName().getBytes();
-				body = CommonRpcCodecs.getEncoder(wrapper.getCodecType())
-						.encode(wrapper.getResponse());
+				Exception response = new Exception("serialize response object error", e);
+				wrapper.setResponse(response);
+				className = response.getClass().getName().getBytes();
+				body = CommonRpcCodecs.getEncoder(wrapper.getCodecType()).encode(response);
 			}
-			type = RESPONSE;
-			int capacity = CommonRpcProtocol.HEADER_LEN + RESPONSE_HEADER_LEN
-					+ body.length;
+			int capacity = CommonRpcProtocol.HEADER_LEN + RESPONSE_HEADER_LEN + body.length;
 			if (wrapper.getCodecType() == CommonRpcCodecs.PB_CODEC) {
 				capacity += className.length;
 			}
 			RpcByteBuffer byteBuffer = bytebufferWrapper.get(capacity);
 			byteBuffer.writeByte(CommonRpcProtocol.CURRENT_VERSION);
 			byteBuffer.writeByte((byte) TYPE);
-			byteBuffer.writeByte(VERSION);
-			byteBuffer.writeByte(type);
-			byteBuffer.writeByte((byte) wrapper.getCodecType());
-			byteBuffer.writeByte((byte) 0);
-			byteBuffer.writeByte((byte) 0);
-			byteBuffer.writeByte((byte) 0);
+			//--------------HEADER_LEN----------------
+			byteBuffer.writeByte(VERSION);//1B
+			byteBuffer.writeByte(RESPONSE);//1B
+			byteBuffer.writeByte((byte) wrapper.getCodecType());//1B
+			byteBuffer.writeByte((byte) 0);//1B
+			byteBuffer.writeByte((byte) 0);//1B
+			byteBuffer.writeByte((byte) 0);//1B
+
 			byteBuffer.writeInt(id);
-			if (wrapper.getCodecType() == CommonRpcCodecs.PB_CODEC) {
-				byteBuffer.writeInt(className.length);
-			} else {
-				byteBuffer.writeInt(0);
-			}
+			byteBuffer.writeInt(wrapper.getCodecType() == CommonRpcCodecs.PB_CODEC?className.length:0);
 			byteBuffer.writeInt(body.length);
+			//---------------REQUEST_HEADER_LEN----------
 			if (wrapper.getCodecType() == CommonRpcCodecs.PB_CODEC) {
 				byteBuffer.writeBytes(className);
 			}
@@ -176,9 +148,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 
 	
 	@Override
-	public Object decode(RpcByteBuffer wrapper, Object errorObject,
-			int... originPosArray) throws Exception {
-		// TODO Auto-generated method stub
+	public Object decode(RpcByteBuffer wrapper, Object errorObject, int... originPosArray) throws Exception {
 		final int originPos;
 		if (originPosArray != null && originPosArray.length == 1) {
 			originPos = originPosArray[0];
@@ -198,20 +168,19 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 					return errorObject;
 				}
 				int codecType = wrapper.readByte();
+
 				wrapper.readByte();
 				wrapper.readByte();
 				wrapper.readByte();
 				
 				int requestId = wrapper.readInt();
-
 				int timeout = wrapper.readInt();
 				int targetInstanceLen = wrapper.readInt();
-
 				int methodNameLen = wrapper.readInt();
 				int argsCount = wrapper.readInt();
+
 				int argInfosLen = argsCount * 4 * 2;
-				int expectedLenInfoLen = argInfosLen + targetInstanceLen
-						+ methodNameLen;
+				int expectedLenInfoLen = argInfosLen + targetInstanceLen + methodNameLen;
 				if (wrapper.readableBytes() < expectedLenInfoLen) {
 					wrapper.setReaderIndex(originPos);
 					return errorObject;
@@ -250,15 +219,12 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 					args[i] = argByte;
 				}
 
-				CommonRpcRequest rocketRPCRequest = new CommonRpcRequest(
+				CommonRpcRequest rpcRequest = new CommonRpcRequest(
 						targetInstanceByte, methodNameByte, argTypes, args,
 						timeout, requestId, codecType, TYPE);
-				
-				int messageLen = CommonRpcProtocol.HEADER_LEN + REQUEST_HEADER_LEN
-						+ expectedLenInfoLen + expectedLen;
-				rocketRPCRequest.setMessageLen(messageLen);
-				return rocketRPCRequest;
-				
+				int messageLen = CommonRpcProtocol.HEADER_LEN + REQUEST_HEADER_LEN + expectedLenInfoLen + expectedLen;
+				rpcRequest.setMessageLen(messageLen);
+				return rpcRequest;
 			} else if (type == RESPONSE) {
 				if (wrapper.readableBytes() < RESPONSE_HEADER_LEN - 2) {
 					wrapper.setReaderIndex(originPos);
@@ -270,7 +236,6 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				wrapper.readByte();
 				
 				int requestId = wrapper.readInt();
-				
 				int classNameLen = wrapper.readInt();
 				int bodyLen = wrapper.readInt();
 				if (wrapper.readableBytes() < classNameLen + bodyLen) {
@@ -286,21 +251,17 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				byte[] bodyBytes = new byte[bodyLen];
 				wrapper.readBytes(bodyBytes);
 				
-				CommonRpcResponse responseWrapper = new CommonRpcResponse(
-						requestId, codecType, TYPE);
+				CommonRpcResponse responseWrapper = new CommonRpcResponse(requestId, codecType, TYPE);
 				responseWrapper.setResponse(bodyBytes);
 				responseWrapper.setResponseClassName(classNameBytes);
-				int messageLen = CommonRpcProtocol.HEADER_LEN + RESPONSE_HEADER_LEN
-						+ classNameLen + bodyLen;
+				int messageLen = CommonRpcProtocol.HEADER_LEN + RESPONSE_HEADER_LEN + classNameLen + bodyLen;
 				responseWrapper.setMessageLen(messageLen);
 				return responseWrapper;
 			} else {
-				throw new UnsupportedOperationException("protocol type : "
-						+ type + " is not supported!");
+				throw new UnsupportedOperationException("protocol type : " + type + " is not supported!");
 			}
 		} else {
-			throw new UnsupportedOperationException("protocol version :"
-					+ version + " is not supported!");
+			throw new UnsupportedOperationException("protocol version :" + version + " is not supported!");
 		}
 	}
 

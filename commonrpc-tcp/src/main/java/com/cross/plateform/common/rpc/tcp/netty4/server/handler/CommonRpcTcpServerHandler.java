@@ -2,8 +2,11 @@ package com.cross.plateform.common.rpc.tcp.netty4.server.handler;
 
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
+import com.cross.plateform.common.rpc.core.client.factory.RpcClientFactory;
 import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
 import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
+import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
+import com.cross.plateform.common.rpc.tcp.netty4.util.NetworkKit;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,128 +18,124 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonRpcTcpServerHandler.class);
-    private ExecutorService threadPoolExecutor;
-    private int port;
-    private int procotolType;//协议名称
-    private int codecType;//编码类型
+	private static final Logger logger = LoggerFactory.getLogger(CommonRpcTcpServerHandler.class);
+	private String group;
+	private String ip;
+	private int port;
+	private int procotolType;//协议名称
+	private int codecType;//编码类型
+	private ExecutorService threadPoolExecutor;
 
-    public CommonRpcTcpServerHandler(int threadCount, int port,
-                                     int procotolType, int codecType) {
-        super();
-        this.port = port;
-        this.procotolType = procotolType;
-        this.codecType = codecType;
-        this.threadPoolExecutor = Executors.newFixedThreadPool(threadCount);
-    }
+	public CommonRpcTcpServerHandler(String group, String ip, int port, ExecutorService threadPoolExecutor, int procotolType, int codecType) {
+		this.group = group;
+		this.ip = ip;
+		this.port = port;
+		this.procotolType = procotolType;
+		this.codecType = codecType;
+		this.threadPoolExecutor = threadPoolExecutor;
+	}
 
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        CommonRpcServerService.getInstance().registerClient(getLocalhost(), ctx.channel().remoteAddress().toString());
-    }
+	@Override
+	public void channelActive(ChannelHandlerContext ctx) throws Exception {
+		logger.info("client:{} connected", ctx.channel().remoteAddress().toString());
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ctx.channel().close();
-    }
+		SocketAddress socketAddress = ctx.channel().remoteAddress();
+		if (socketAddress instanceof InetSocketAddress) {
+			InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
+			String remoteAddr = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
+			CommonRpcServerService instance = CommonRpcServerService.getInstance();
+			instance.registerClient(group, ip + ":" + port, remoteAddr);
+		}
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable e)
-            throws Exception {
-        if (!(e.getCause() instanceof IOException)) {
-            // only log
-            LOGGER.error("catch some exception not IOException", e);
-        }
-        ctx.channel().close();
-    }
+	}
 
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg)
-            throws Exception {
-        if (!(msg instanceof CommonRpcRequest)) {
-            LOGGER.error("receive message error,only support RequestWrapper");
-            throw new Exception(
-                    "receive message error,only support RequestWrapper || List");
-        }
-        threadPoolExecutor.submit(new ServerHandlerRunnable(ctx, msg));
-    }
+	@Override
+	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+		ctx.channel().close();
+	}
 
-    /**
-     * disruptor处理方式
-     *
-     * @param ctx
-     * @param message
-     */
-    private void handleRequestWithSingleThread(final ChannelHandlerContext ctx, Object message) {
-        CommonRpcResponse rocketRPCResponse = null;
-        try {
-            CommonRpcRequest request = (CommonRpcRequest) message;
-            rocketRPCResponse = CommonRpcServerHandlerFactory
-                    .getServerHandler().handleRequest(request, codecType,
-                            procotolType);
-            if (ctx.channel().isOpen()) {
-                ChannelFuture wf = ctx.channel().writeAndFlush(rocketRPCResponse);
-                wf.addListener(new ChannelFutureListener() {
-                    public void operationComplete(ChannelFuture future) throws Exception {
-                        if (!future.isSuccess()) {
-                            LOGGER.error("server write response error,client  host is: " + ((InetSocketAddress) ctx.channel().remoteAddress()).getHostName() + ":" + ((InetSocketAddress) ctx.channel().remoteAddress()).getPort() + ",server Ip:" + getLocalhost());
-                            ctx.channel().close();
-                        }
-                    }
-                });
-            }
-        } catch (Exception e) {
-            sendErrorResponse(ctx, (CommonRpcRequest) message, e.getMessage() + ",server Ip:" + getLocalhost());
-        } finally {
-            ReferenceCountUtil.release(message);
-        }
-    }
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable e)
+			throws Exception {
+		if (!(e.getCause() instanceof IOException)) {
+			logger.error("catch some exception not IOException", e);
+		}
+		ctx.channel().close();
+	}
+
+	@Override
+	public void channelRead(ChannelHandlerContext ctx, Object msg)
+			throws Exception {
+		if (msg instanceof CommonRpcRequest) {
+			threadPoolExecutor.submit(new ServerHandlerRunnable(ctx, (CommonRpcRequest) msg));
+		} else {
+			throw new Exception("receive message error,only support CommonRpcRequest || List");
+		}
+	}
 
 
-    private void sendErrorResponse(final ChannelHandlerContext ctx, final CommonRpcRequest request, String errorMessage) {
-        CommonRpcResponse commonRpcResponse =
-                new CommonRpcResponse(request.getId(), request.getCodecType(), request.getProtocolType());
-        commonRpcResponse.setException(new Exception(errorMessage));
-        ChannelFuture wf = ctx.channel().writeAndFlush(commonRpcResponse);
+	private class ServerHandlerRunnable implements Runnable {
+		private ChannelHandlerContext ctx;
+		private CommonRpcRequest message;
 
-        wf.addListener(new ChannelFutureListener() {
-            public void operationComplete(ChannelFuture future) throws Exception {
-                if (!future.isSuccess()) {
-                    LOGGER.error("server write response error,request id is: " + request.getId() + ",client Ip is:" + ctx.channel().remoteAddress().toString() + ",server Ip:" + getLocalhost());
-                    ctx.channel().close();
-                }
-            }
-        });
-    }
+		public ServerHandlerRunnable(ChannelHandlerContext ctx, CommonRpcRequest message) {
+			super();
+			this.ctx = ctx;
+			this.message = message;
+		}
 
-    private String getLocalhost() {
-        try {
-            String ip = InetAddress.getLocalHost().getHostAddress();
-            return ip + ":" + port;
-        } catch (UnknownHostException e) {
-            throw new RuntimeException("无法获取本地Ip", e);
-        }
+		@Override
+		public void run() {
+			handleRequestWithSingleThread(ctx, message);
+		}
+	}
 
-    }
+	/**
+	 * disruptor处理方式
+	 *
+	 * @param ctx
+	 * @param request
+	 */
+	private void handleRequestWithSingleThread(final ChannelHandlerContext ctx, CommonRpcRequest request) {
+		try {
+			CommonRpcResponse rocketRPCResponse = CommonRpcServerHandlerFactory.getServerHandler().handleRequest(request, codecType, procotolType);
+			if (ctx.channel().isOpen()) {
+				ChannelFuture wf = ctx.channel().writeAndFlush(rocketRPCResponse);
+				wf.addListener(new ChannelFutureListener() {
+					public void operationComplete(ChannelFuture future) throws Exception {
+						if (!future.isSuccess()) {
+							InetSocketAddress remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();
+							logger.error("server write response error, client host is:{}:{}", remoteAddress.getHostName(), remoteAddress.getPort());
+							ctx.channel().close();
+						}
+					}
+				});
+			}
+		} catch (Exception e) {
+			sendErrorResponse(ctx, request, e.getMessage());
+		} finally {
+			ReferenceCountUtil.release(request);
+		}
+	}
 
-    private class ServerHandlerRunnable implements Runnable {
-        private ChannelHandlerContext ctx;
-        private Object message;
-
-        public ServerHandlerRunnable(ChannelHandlerContext ctx, Object message) {
-            super();
-            this.ctx = ctx;
-            this.message = message;
-        }
-
-        @Override
-        public void run() {
-            handleRequestWithSingleThread(ctx, message);
-        }
-    }
+	private void sendErrorResponse(final ChannelHandlerContext ctx, final CommonRpcRequest request, String errorMessage) {
+		CommonRpcResponse commonRpcResponse = new CommonRpcResponse(request.getId(), request.getCodecType(), request.getProtocolType());
+		commonRpcResponse.setException(new Exception(errorMessage));
+		ChannelFuture wf = ctx.channel().writeAndFlush(commonRpcResponse);
+		wf.addListener(new ChannelFutureListener() {
+			public void operationComplete(ChannelFuture future) throws Exception {
+				if (!future.isSuccess()) {
+					InetSocketAddress remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();
+					logger.error("server write response error, request id is:{}, client Ip is:{}", request.getId(), remoteAddress);
+					ctx.channel().close();
+				}
+			}
+		});
+	}
 }

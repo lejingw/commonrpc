@@ -10,9 +10,9 @@ public interface RpcClientFactory<T extends RpcClient> {
     /**
      * 创建客户端服务
      *
-     * @param connectiontimeout 连接超时时间
+     * @param timeout 连接超时时间
      */
-    void startClientFactory(int connectiontimeout);
+    void startClientFactory(int timeout);
 
     /**
      * 停止客户端服务
@@ -29,26 +29,16 @@ public interface RpcClientFactory<T extends RpcClient> {
      */
     T getClient(String host, int port) throws Exception;
 
-    String getKey(String host, int port);
-
-    T getClient(String key);
-
-    boolean containClient(String key);
-
     /**
-     * @param key
-     * @param rpcClient
+     * 销毁客户端
+     * @param host
+     * @param port
      */
-    void putRpcClient(String key, T rpcClient);
-
-    /**
-     * @param key
-     */
-    void removeRpcClient(String key);
+    void removeRpcClient(String host, int port) throws Exception;
 
 
     /**
-     * 接受消息
+     * 接收消息
      *
      * @param response
      * @throws Exception

@@ -1,46 +1,42 @@
-/**
- * 
- */
 package com.cross.plateform.common.rpc.tcp.netty4.spring.config;
 
+import com.cross.plateform.common.rpc.tcp.netty4.spring.config.support.CommonRpcReference;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
-import com.cross.plateform.common.rpc.tcp.netty4.spring.config.support.CommonRpcReference;
-/**
- * @author liubing1
- *
- */
 public class CommonRpcReferenceParser implements BeanDefinitionParser {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.xml.BeanDefinitionParser#parse(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)
-	 */
 	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		// TODO Auto-generated method stub
-		String interfacename = element.getAttribute("interfacename");
 		String id = element.getAttribute("id");
-		String group=element.getAttribute("group");
-		String procotolType=element.getAttribute("procotolType");
-		String codecType=element.getAttribute("codecType");
-		String timeout=element.getAttribute("timeout");
-		
+		String intfType = element.getAttribute("interface");
+		String group = element.getAttribute("group");
+		String procotolType = element.getAttribute("procotolType");
+		String codecType = element.getAttribute("codecType");
+		String timeout = element.getAttribute("timeout");
+
 		RootBeanDefinition beanDefinition = new RootBeanDefinition();
 		beanDefinition.setBeanClass(CommonRpcReference.class);
 		beanDefinition.setLazyInit(false);
-		
-		beanDefinition.getPropertyValues().addPropertyValue("interfacename", interfacename);
-        beanDefinition.getPropertyValues().addPropertyValue("group", group);
-        beanDefinition.getPropertyValues().addPropertyValue("protocolType", procotolType);
-        beanDefinition.getPropertyValues().addPropertyValue("codecType", codecType);
-        beanDefinition.getPropertyValues().addPropertyValue("timeout", timeout);
-        
-        parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
-		return beanDefinition;
+
+		beanDefinition.getPropertyValues().addPropertyValue("intfType", intfType);
+		beanDefinition.getPropertyValues().addPropertyValue("group", group);
+		beanDefinition.getPropertyValues().addPropertyValue("protocolType", procotolType);
+		beanDefinition.getPropertyValues().addPropertyValue("codecType", codecType);
+		beanDefinition.getPropertyValues().addPropertyValue("timeout", timeout);
+
+		if(!StringUtils.isEmpty(id)) {
+			parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
+		}else {
+			id = parserContext.getReaderContext().registerWithGeneratedName(beanDefinition);
+		}
+		parserContext.registerComponent(new BeanComponentDefinition(beanDefinition, id));
+		return null;
 	}
 
 }

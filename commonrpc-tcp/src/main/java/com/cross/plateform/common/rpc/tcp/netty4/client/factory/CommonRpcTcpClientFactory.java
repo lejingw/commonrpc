@@ -1,6 +1,7 @@
 package com.cross.plateform.common.rpc.tcp.netty4.client.factory;
 
 import com.cross.plateform.common.rpc.core.client.factory.AbstractRpcClientFactory;
+import com.cross.plateform.common.rpc.core.client.factory.RpcClientFactory;
 import com.cross.plateform.common.rpc.core.thread.NamedThreadFactory;
 import com.cross.plateform.common.rpc.tcp.netty4.client.CommonRpcTcpClient;
 import com.cross.plateform.common.rpc.tcp.netty4.client.handler.CommonRpcTcpClientHandler;
@@ -19,75 +20,80 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ThreadFactory;
 
 public class CommonRpcTcpClientFactory extends AbstractRpcClientFactory<CommonRpcTcpClient> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonRpcTcpClientFactory.class);
-    private static final int PROCESSORS = Runtime.getRuntime().availableProcessors();
-    private static final ThreadFactory workerThreadFactory = new NamedThreadFactory("NETTYCLIENT-WORKER-");
-    private static EventLoopGroup workerGroup = new NioEventLoopGroup(6 * PROCESSORS, workerThreadFactory);
-    private static AbstractRpcClientFactory _self = new CommonRpcTcpClientFactory();
-    private final Bootstrap bootstrap = new Bootstrap();
+	private static final Logger logger = LoggerFactory.getLogger(CommonRpcTcpClientFactory.class);
+	private static final int PROCESSORS_COUNT = Runtime.getRuntime().availableProcessors();
+	private static final RpcClientFactory instance = new CommonRpcTcpClientFactory();
 
-    private CommonRpcTcpClientFactory(){}
+	private static final ThreadFactory workerThreadFactory = new NamedThreadFactory("CommonRpc-WORKER-");
+	private static EventLoopGroup workerGroup = new NioEventLoopGroup(PROCESSORS_COUNT, workerThreadFactory);
+	private final Bootstrap bootstrap = new Bootstrap();
 
-    public static AbstractRpcClientFactory getInstance() {
-        return _self;
-    }
+	private CommonRpcTcpClientFactory() {
+	}
 
-    @Override
-    public void startClientFactory(int connectTimeout) {
-        LOGGER.info("----------------客户端开始启动-------------------------------");
-        bootstrap.group(workerGroup)
-                .channel(NioSocketChannel.class)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout)
-                .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.SO_REUSEADDR, true)
-                .option(ChannelOption.SO_KEEPALIVE, true)
-                .option(ChannelOption.SO_SNDBUF, 65535)
-                .option(ChannelOption.SO_RCVBUF, 65535);
-        bootstrap.handler(new ChannelInitializer<SocketChannel>() {
-            protected void initChannel(SocketChannel channel) throws Exception {
-                ChannelPipeline pipeline = channel.pipeline();
-                pipeline.addLast("decoder", new CommonRpcDecoderHandler());
-                pipeline.addLast("encoder", new CommonRpcEncoderHandler());
-                pipeline.addLast("timeout", new IdleStateHandler(0, 0, 120));
-                pipeline.addLast("handler", new CommonRpcTcpClientHandler());
-            }
-        });
-        LOGGER.info("----------------客户端启动结束-------------------------------");
-    }
+	public static RpcClientFactory getInstance() {
+		return instance;
+	}
 
-    @Override
-    public void stopClientFactory() throws Exception {
-        clearClients();
-        workerGroup.shutdownGracefully();
-    }
+	@Override
+	public void startClientFactory(int connectTimeout) {
+		bootstrap.group(workerGroup)
+				.channel(NioSocketChannel.class)
+				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout)
+				.option(ChannelOption.TCP_NODELAY, true)
+				.option(ChannelOption.SO_REUSEADDR, true)
+				.option(ChannelOption.SO_KEEPALIVE, true)
+				.option(ChannelOption.SO_SNDBUF, 65535)
+				.option(ChannelOption.SO_RCVBUF, 65535);
+		bootstrap.handler(new ChannelInitializer<SocketChannel>() {
+			protected void initChannel(SocketChannel channel) throws Exception {
+				ChannelPipeline pipeline = channel.pipeline();
+				pipeline.addLast("decoder", new CommonRpcDecoderHandler());
+				pipeline.addLast("encoder", new CommonRpcEncoderHandler());
+				pipeline.addLast("timeout", new IdleStateHandler(0, 0, 120));
+				pipeline.addLast("handler", new CommonRpcTcpClientHandler());
+			}
+		});
+		logger.info("CommonRpc client is started ...");
+		logger.info("====CommonRpc服务已启动====");
+	}
 
-    @Override
-    protected CommonRpcTcpClient createClient(String targetIP, int targetPort) throws Exception {
-        ChannelFuture future = null;
-        try {
-            future = bootstrap.connect(new InetSocketAddress(targetIP, targetPort)).sync();
-        }catch (Exception e){
-            AbstractRpcClientFactory instance = CommonRpcTcpClientFactory.getInstance();
-            String key = instance.getKey(targetIP, targetPort);
-            if(instance.containClient(key)){
-                instance.removeRpcClient(key);
-            }
-            throw e;
-        }
-        future.awaitUninterruptibly();
-        if (!future.isDone()) {
-            LOGGER.error("Create connection to " + targetIP + ":" + targetPort + " timeout!");
-            throw new Exception("Create connection to " + targetIP + ":" + targetPort + " timeout!");
-        }
-        if (future.isCancelled()) {
-            LOGGER.error("Create connection to " + targetIP + ":" + targetPort + " cancelled by user!");
-            throw new Exception("Create connection to " + targetIP + ":" + targetPort + " cancelled by user!");
-        }
-        if (!future.isSuccess()) {
-            LOGGER.error("Create connection to " + targetIP + ":" + targetPort + " error", future.cause());
-            throw new Exception("Create connection to " + targetIP + ":" + targetPort + " error", future.cause());
-        }
-        CommonRpcTcpClient client = new CommonRpcTcpClient(future);
-        return client;
-    }
+	@Override
+	public void stopClientFactory() throws Exception {
+		try {
+			clearClients();
+		}finally {
+			workerGroup.shutdownGracefully();
+		}
+		logger.info("CommonRpc client has been stoped !!!");
+		logger.info("====CommonRpc服务已停止====");
+	}
+
+	@Override
+	protected CommonRpcTcpClient createClient(String ip, int port) throws Exception {
+		ChannelFuture future = null;
+		try {
+			future = bootstrap.connect(new InetSocketAddress(ip, port)).sync();
+		} catch (Exception e) {
+			RpcClientFactory instance = CommonRpcTcpClientFactory.getInstance();
+			instance.removeRpcClient(ip, port);
+			throw e;
+		}
+		future.awaitUninterruptibly();
+		if (!future.isDone()) {
+			throw new Exception("Create connection to " + ip + ":" + port + " timeout!");
+		}
+		if (future.isCancelled()) {
+			throw new Exception("Create connection to " + ip + ":" + port + " cancelled by user!");
+		}
+		if (!future.isSuccess()) {
+			throw new Exception("Create connection to " + ip + ":" + port + " error", future.cause());
+		}
+		return new CommonRpcTcpClient(future);
+	}
+
+	@Override
+	protected void destroyClient(CommonRpcTcpClient client) throws Exception {
+		client.destroy();
+	}
 }

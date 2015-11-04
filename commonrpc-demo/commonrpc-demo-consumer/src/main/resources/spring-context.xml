@@ -12,15 +12,15 @@
         http://www.izhuan365.com/commonrpc/commonrpc.xsd">
 
     <!-- 加载配置属性文件 -->
-    <context:property-placeholder ignore-unresolvable="true" location="classpath:project.properties" />
+    <context:property-placeholder ignore-unresolvable="true" location="classpath:project.properties"/>
 
     <!--
         address：zookeeper 注册中心地址
-        flag：标记是提供者(1)，还是消费者(2)
+        providerFlag：标记是提供者还是消费者
         timeout：zookeeper连接超时时间
     -->
-    <commonrpc:application id="rpcRegistryApplicationClient" address="${zookeeper.addrs}" flag="2"
-                           timeout="${zookeeper.timeout}"></commonrpc:application>
+    <commonrpc:application address="${zookeeper.addrs}" providerFlag="false"
+                           timeout="${zookeeper.timeout}"/>
 
     <!--
         interfacename：接口名称
@@ -29,8 +29,8 @@
         timeout：调用远程服务时，服务调用超时时间
         group：服务所在的组（可以同时支持多组，以符合,隔开）
      -->
-    <commonrpc:reference id="demoService" interfacename="com.commonrpc.demo.sdk.DemoService" procotolType="1"
-                         codecType="${commonrpc.registry.codecType}" timeout="30000" group="demo"/>
+    <commonrpc:reference id="demoService" interface="com.commonrpc.demo.sdk.DemoService" group="demo"/>
+    <commonrpc:reference id="demoService2" interface="com.commonrpc.demo.sdk.DemoService2" group="demo"/>
 
 
 </beans>

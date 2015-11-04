@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.rpc</groupId>
         <artifactId>common-rpc</artifactId>
-        <version>1.0.5-SNAPSHOT</version>
+        <version>1.1-SNAPSHOT</version>
     </parent>
     <artifactId>commonrpc-core</artifactId>
     <name>commonrpc-core</name>
@@ -27,7 +27,6 @@
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <version>2.6.1</version>
-
         </dependency>
 
         <dependency>
@@ -37,33 +36,17 @@
         </dependency>
 
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.1.22</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.12.1.GA</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.rpc</groupId>
-            <artifactId>commonrpc-proxy</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.rpc</groupId>
-            <artifactId>commonrpc-filter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.rpc</groupId>
             <artifactId>commonrpc-service</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

@@ -13,9 +13,8 @@
             <xsd:complexContent>
                 <xsd:extension base="beans:identifiedType">
                     <xsd:attribute name="address" type="xsd:string" use="required"/>
-                    <xsd:attribute name="clientid" type="xsd:string" use="optional"/>
                     <xsd:attribute name="timeout" type="xsd:string" use="required"/>
-                    <xsd:attribute name="flag" type="xsd:string" use="required"/>
+                    <xsd:attribute name="providerFlag" type="xsd:boolean" use="required"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -25,9 +24,16 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="beans:identifiedType">
-                    <xsd:attribute name="interfacename" type="xsd:string" use="required"/>
-                    <xsd:attribute name="ref" type="xsd:string" use="required"/>
-                    <xsd:attribute name="filterRef" type="xsd:string" use="optional"/>
+                    <xsd:attribute name="ref" type="xsd:string"/>
+                    <xsd:attribute name="class" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation source="java:java.lang.Class"><![CDATA[
+	The fully qualified name of the bean's class, except if it serves only
+	as a parent definition for child bean definitions.
+				]]></xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="filterRef" type="xsd:string"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -40,7 +46,7 @@
                     <xsd:attribute name="ip" type="xsd:string" use="optional"/>
                     <xsd:attribute name="port" type="xsd:string" use="required"/>
                     <xsd:attribute name="timeout" type="xsd:string" use="required"/>
-                    <xsd:attribute name="procotolType" type="xsd:string" use="required"/>
+                    <xsd:attribute name="procotolType" type="xsd:string" default="1"/>
                     <xsd:attribute name="codecType" type="xsd:string" use="required"/>
                     <xsd:attribute name="threadCount" type="xsd:string" use="required"/>
                     <xsd:attribute name="group" type="xsd:string" use="required"/>
@@ -53,11 +59,11 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="beans:identifiedType">
-                    <xsd:attribute name="interfacename" type="xsd:string" use="required"/>
+                    <xsd:attribute name="interface" type="xsd:string" use="required"/>
                     <xsd:attribute name="group" type="xsd:string" use="required"/>
-                    <xsd:attribute name="procotolType" type="xsd:string" use="required"/>
-                    <xsd:attribute name="codecType" type="xsd:string" use="required"/>
-                    <xsd:attribute name="timeout" type="xsd:string" use="required"/>
+                    <xsd:attribute name="procotolType" type="xsd:string" default="1"/>
+                    <xsd:attribute name="codecType" type="xsd:string" default="4"/>
+                    <xsd:attribute name="timeout" type="xsd:string" default="10000"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

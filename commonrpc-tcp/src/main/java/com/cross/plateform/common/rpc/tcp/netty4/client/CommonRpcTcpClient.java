@@ -15,7 +15,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 public class CommonRpcTcpClient extends AbstractRpcClient {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonRpcTcpClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(CommonRpcTcpClient.class);
 
     private ChannelFuture cf;
 
@@ -51,23 +51,17 @@ public class CommonRpcTcpClient extends AbstractRpcClient {
                     }
                     String errorMsg = null;
                     if (future.isCancelled()) {
-                        errorMsg = "Send request to " + cf.channel().toString()
-                                + " cancelled by user,request id is:"
-                                + commonRpcRequest.getId();
-                    } else if (!future.isSuccess()) {
+                        errorMsg = "Send request to " + cf.channel().toString() + " cancelled by user,request id is:" + commonRpcRequest.getId();
+                    } else {
                         SocketAddress socketAddress = cf.channel().remoteAddress();
                         if (socketAddress instanceof InetSocketAddress) {
                             InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
-                            String key = getClientFactory().getKey(inetSocketAddress.getAddress().getHostAddress(), inetSocketAddress.getPort());
-                            getClientFactory().removeRpcClient(key);
+                            getClientFactory().removeRpcClient(inetSocketAddress.getAddress().getHostAddress(), inetSocketAddress.getPort());
                         }
-                        errorMsg = "Send request to " + cf.channel().toString() + " error" + future.cause();
-                    } else{
-                        errorMsg = "";
+                        errorMsg = "Send request to " + cf.channel().toString() + " error:" + future.cause();
                     }
-                    LOGGER.error(errorMsg);
-                    CommonRpcResponse response =
-                            new CommonRpcResponse(commonRpcRequest.getId(), commonRpcRequest.getCodecType(), commonRpcRequest.getProtocolType());
+                    logger.error(errorMsg);
+                    CommonRpcResponse response = new CommonRpcResponse(commonRpcRequest.getId(), commonRpcRequest.getCodecType(), commonRpcRequest.getProtocolType());
                     response.setException(new Exception(errorMsg));
                     getClientFactory().receiveResponse(response);
                 }
@@ -78,6 +72,7 @@ public class CommonRpcTcpClient extends AbstractRpcClient {
     @Override
     public void destroy() throws Exception {
         if (cf.channel().isOpen()) {
+//            cf.channel().closeFuture().sync();
             cf.channel().close();
         }
     }

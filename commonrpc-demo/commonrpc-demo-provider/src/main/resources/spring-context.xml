@@ -12,15 +12,15 @@
 		http://www.izhuan365.com/commonrpc/commonrpc.xsd">
 
     <!-- 加载配置属性文件 -->
-    <context:property-placeholder ignore-unresolvable="true" location="classpath:project.properties" />
+    <context:property-placeholder ignore-unresolvable="true" location="classpath:project.properties"/>
 
     <!--
         address：zookeeper 注册中心地址
-        flag：标记是提供者(1)，还是消费者(2)
+        providerFlag：标记是提供者还是消费者
         timeout：zookeeper连接超时时间
     -->
-    <commonrpc:application id="rpcRegistryApplication" address="${zookeeper.addrs}" flag="1"
-                           timeout="${zookeeper.timeout}"></commonrpc:application>
+    <commonrpc:application id="rpcRegistryApplication" address="${zookeeper.addrs}"
+                           timeout="${zookeeper.timeout}" providerFlag="true"/>
 
     <!--
         port：对外提供服务访问的端口
@@ -30,17 +30,18 @@
         group：服务所在的组
         threadCount：用于处理rpc请求的线程数
      -->
-    <commonrpc:registry id="rpcRegistry" port="${commonrpc.registry.port}" timeout="200" procotolType="${commonrpc.registry.procotolType}"
+    <commonrpc:registry id="rpcRegistry"
+                        port="${commonrpc.registry.port}" timeout="2000"
+                        procotolType="${commonrpc.registry.procotolType}"
                         codecType="${commonrpc.registry.codecType}"
                         group="${commonrpc.registry.group}"
-                        threadCount="${commonrpc.registry.threadCount}"></commonrpc:registry>
+                        threadCount="${commonrpc.registry.threadCount}"/>
 
-    <commonrpc:service id="IDemoService" interfacename="com.commonrpc.demo.sdk.DemoService" ref="demoService"
-                       filterRef="demoRpcFilter"></commonrpc:service>
+    <bean id="demoService" class="com.commonrpc.demo.provider.DemoServiceImpl"/>
+    <bean id="demoRpcFilter" class="com.commonrpc.demo.rpcfilter.DemoRpcFilter"/>
+    <commonrpc:service ref="demoService" filterRef="demoRpcFilter"/>
 
-
-    <bean id="demoService" class="com.commonrpc.demo.provider.DemoServiceImpl"></bean>
-    <bean id="demoRpcFilter" class="com.commonrpc.demo.rpcfilter.DemoRpcFilter"></bean>
+    <commonrpc:service class="com.commonrpc.demo.provider.DemoService2Impl"/>
 
 
 </beans>

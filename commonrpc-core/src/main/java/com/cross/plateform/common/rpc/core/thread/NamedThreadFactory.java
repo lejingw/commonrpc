@@ -11,7 +11,7 @@ public class NamedThreadFactory implements ThreadFactory {
     final boolean isDaemon;
 
     public NamedThreadFactory() {
-        this("commonrpc");
+        this("CommonRpc");
     }
 
     public NamedThreadFactory(String name) {

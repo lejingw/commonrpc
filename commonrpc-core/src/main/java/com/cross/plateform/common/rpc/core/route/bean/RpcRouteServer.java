@@ -5,18 +5,11 @@ import java.net.InetSocketAddress;
 
 /**
  * 权重轮询server
- * 
- * @author liubing1
- * 
  */
 public class RpcRouteServer implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5830467756387170272L;
 
-	public InetSocketAddress server ;
+	public InetSocketAddress server;
 	public int weight;
 	public int effectiveWeight;
 	public int currentWeight;
@@ -27,29 +20,16 @@ public class RpcRouteServer implements Serializable {
 		this.weight = weight;
 		this.effectiveWeight = this.weight;
 		this.currentWeight = 0;
-		if (this.weight < 0) {
-			this.down = true;
-		} else {
-			this.down = false;
-		}
+		this.down = this.weight < 0;
 	}
 
-	
-	/**
-	 * @return the server
-	 */
 	public InetSocketAddress getServer() {
 		return server;
 	}
 
-
-	/**
-	 * @param server the server to set
-	 */
 	public void setServer(InetSocketAddress server) {
 		this.server = server;
 	}
-
 
 	public int getWeight() {
 		return weight;
@@ -82,5 +62,4 @@ public class RpcRouteServer implements Serializable {
 	public void setDown(boolean down) {
 		this.down = down;
 	}
-
 }

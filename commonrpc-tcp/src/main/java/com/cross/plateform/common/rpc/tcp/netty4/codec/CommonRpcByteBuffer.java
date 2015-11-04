@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.cross.plateform.common.rpc.tcp.netty4.codec;
 
 import com.cross.plateform.common.rpc.core.bytebuffer.RpcByteBuffer;
@@ -8,10 +5,6 @@ import com.cross.plateform.common.rpc.core.bytebuffer.RpcByteBuffer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 
-/**
- * @author liubing1
- * 
- */
 public class CommonRpcByteBuffer implements RpcByteBuffer {
 
 	private ByteBuf buffer;
@@ -25,7 +18,6 @@ public class CommonRpcByteBuffer implements RpcByteBuffer {
 	public CommonRpcByteBuffer(ChannelHandlerContext ctx) {
 		this.ctx = ctx;
 	}
-
 	public CommonRpcByteBuffer get(int capacity) {
 		if (buffer != null)
 			return this;
