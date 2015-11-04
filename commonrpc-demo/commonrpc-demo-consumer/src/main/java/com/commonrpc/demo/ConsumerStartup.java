@@ -19,13 +19,15 @@ public class ConsumerStartup {
 
 		DemoService demoService = (DemoService) context.getBean("demoService");
 		DemoService2 demoService2 = (DemoService2) context.getBean("demoService2");
-
-		System.out.println("------------------call------" + demoService.sayHello("world"));
-		RequestVo req = new RequestVo();
-		req.setStr("hello world !");
-		ResponseVo res = demoService2.sayHello(req);
-		System.out.println("------------------call------" + res.getStr1());
-		Thread.sleep(10 * 1000);
-		context.close();
+		try {
+			System.out.println("------------------call----1--" + demoService.sayHello("world"));
+			RequestVo req = new RequestVo();
+			req.setStr("hello world !");
+			ResponseVo res = demoService2.sayHello(req);
+			System.out.println("------------------call----2--" + res.getStr1());
+			Thread.sleep(5 * 1000);
+		} finally {
+			context.close();
+		}
 	}
 }

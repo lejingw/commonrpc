@@ -12,6 +12,11 @@
 	<dependencies>
 		<!-- service sdk -->
 		<dependency>
+			<groupId>com.caucho</groupId>
+			<artifactId>hessian</artifactId>
+			<version>4.0.38</version>
+		</dependency>
+		<dependency>
 			<groupId>com.rpc</groupId>
 			<artifactId>commonrpc-demo-sdk</artifactId>
 			<version>${project.version}</version>
