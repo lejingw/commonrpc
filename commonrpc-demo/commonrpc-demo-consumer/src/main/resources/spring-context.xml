@@ -29,8 +29,8 @@
         timeout：调用远程服务时，服务调用超时时间
         group：服务所在的组（可以同时支持多组，以符合,隔开）
      -->
-    <commonrpc:reference id="demoService" interface="com.commonrpc.demo.sdk.DemoService" codecType="${commonrpc.registry.codecType}" group="demo"/>
-    <commonrpc:reference id="demoService2" interface="com.commonrpc.demo.sdk.DemoService2" codecType="${commonrpc.registry.codecType}" group="demo"/>
+    <commonrpc:reference id="demoService" interface="com.commonrpc.demo.sdk.DemoService" codecType="${commonrpc.registry.codecType}" group="${commonrpc.registry.group}"/>
+    <commonrpc:reference id="demoService2" interface="com.commonrpc.demo.sdk.DemoService2" codecType="${commonrpc.registry.codecType}" group="${commonrpc.registry.group}"/>
 
 
 </beans>

@@ -24,6 +24,19 @@
     </properties>
 
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>jingcai_snapshots</id>
+            <url>http://192.168.0.20:8081/nexus/content/repositories/jingcai_snapshots/</url>
+            <layout>default</layout>
+        </snapshotRepository>
+        <repository>
+            <id>jingcai_release</id>
+            <url>http://192.168.0.20:8081/nexus/content/repositories/jingcai_release/</url>
+            <layout>default</layout>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
         <!-- spring -->
         <dependency>

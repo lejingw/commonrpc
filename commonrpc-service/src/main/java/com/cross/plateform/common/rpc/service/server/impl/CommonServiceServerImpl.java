@@ -45,6 +45,7 @@ public class CommonServiceServerImpl implements CommonServiceServer {
 
 	@Override
 	public void registerServer(final String group, final String server) throws Exception {
+		//createNode("/" + group, group, CreateMode.PERSISTENT);
 		createNode("/" + group + "/server", group, CreateMode.PERSISTENT);
 
 		String path = "/" + group + "/server/" + server;
@@ -82,6 +83,7 @@ public class CommonServiceServerImpl implements CommonServiceServer {
 
 	@Override
 	public void registerClient(final String group, final String server, final String client) throws Exception {
+		//createNode("/" + group, group, CreateMode.PERSISTENT);
 		createNode("/" + group + "/client", group, CreateMode.PERSISTENT);
 
 		String path = "/" + group + "/client/" + client;
