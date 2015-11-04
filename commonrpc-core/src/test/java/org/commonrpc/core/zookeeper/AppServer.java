@@ -1,7 +1,4 @@
-/**
- * 
- */
-package test.cross.plateform.common.rpc.service.zookeeper;
+package org.commonrpc.core.zookeeper;
 
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
@@ -9,10 +6,6 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.ZooKeeper;
 
-/**
- * @author liubing
- *
- */
 public class AppServer {
 	private String groupNode = "sgroup";
 	private String subNode = "sub";
@@ -45,12 +38,6 @@ public class AppServer {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		// 在参数中指定server的地址
-//		if (args.length == 0) {
-//			System.err.println("The first argument must be server address");
-//			System.exit(1);
-//		}
-		
 		AppServer as = new AppServer();
 		as.connectZookeeper("127.0.0.1:10009");
 		

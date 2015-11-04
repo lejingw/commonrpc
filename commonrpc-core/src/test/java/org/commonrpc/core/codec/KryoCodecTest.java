@@ -1,7 +1,5 @@
-package org.commonrpc.core;
+package org.commonrpc.core.codec;
 
-import com.cross.plateform.common.rpc.core.codec.impl.KryoDecoder;
-import com.cross.plateform.common.rpc.core.codec.impl.KryoEncoder;
 import com.cross.plateform.common.rpc.core.util.KryoUtils;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Registration;
@@ -12,8 +10,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
 
 /**
  * Created by lejing on 15/11/4.

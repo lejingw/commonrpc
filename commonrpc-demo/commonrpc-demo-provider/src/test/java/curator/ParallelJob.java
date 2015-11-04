@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 并行任务
- * 
+ *
  * @author shencl
  */
 public class ParallelJob implements Runnable {
@@ -37,11 +37,12 @@ public class ParallelJob implements Runnable {
 		try {
 			if (!lock.acquire(wait_time, TimeUnit.SECONDS)) {
 				System.err.println(name + "等待" + wait_time + "秒，仍未能获取到lock,准备放弃。");
+			} else {
+				// 模拟job执行时间0-4000毫秒
+				int exeTime = new Random().nextInt(4000);
+				System.out.println(name + "开始执行,预计执行时间= " + exeTime + "毫秒----------");
+				Thread.sleep(exeTime);
 			}
-			// 模拟job执行时间0-4000毫秒
-			int exeTime = new Random().nextInt(4000);
-			System.out.println(name + "开始执行,预计执行时间= " + exeTime + "毫秒----------");
-			Thread.sleep(exeTime);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

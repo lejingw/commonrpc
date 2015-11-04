@@ -18,21 +18,21 @@ public class DistributedLockExample {
 	private static final String PATH = "/locks";
 
 	// 进程内部（可重入）读写锁
-	private static final InterProcessReadWriteLock lock;
+	private static InterProcessReadWriteLock lock;
 	// 读锁
-	private static final InterProcessLock readLock;
+	private static InterProcessLock readLock;
 	// 写锁
-	private static final InterProcessLock writeLock;
+	private static InterProcessLock writeLock;
 
-	static {
-		client.start();
-		lock = new InterProcessReadWriteLock(client, PATH);
-		readLock = lock.readLock();
-		writeLock = lock.writeLock();
-	}
 
 	public static void main(String[] args) {
 		try {
+			client.start();
+			lock = new InterProcessReadWriteLock(client, PATH);
+			readLock = lock.readLock();
+			writeLock = lock.writeLock();
+			Thread.sleep(1000);
+
 			List<Thread> jobs = Lists.newArrayList();
 			for (int i = 0; i < 10; i++) {
 				Thread t = new Thread(new ParallelJob("Parallel任务" + i, readLock));

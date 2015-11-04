@@ -1,4 +1,4 @@
-package org.commonrpc.core;
+package org.commonrpc.core.codec;
 
 import org.commonrpc.core.vo.Student2;
 import org.junit.Assert;

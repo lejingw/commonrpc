@@ -24,8 +24,7 @@ public class TransactionExamples {
 			Stat stat = client.checkExists().forPath("/a");
 			if(null != stat){
 				System.out.println(stat);
-				client.delete().forPath("/a/path");
-				client.delete().forPath("/a");
+				client.delete().deletingChildrenIfNeeded().forPath("/a");
 				System.out.println("delete successfully!");
 			}
 
@@ -33,8 +32,8 @@ public class TransactionExamples {
 					.create().forPath("/a")
 					.and().create().forPath("/a/path", "some data".getBytes())
 					.and().setData().forPath("/a/path", "other data".getBytes())
-					.and().delete().forPath("/a/path")
-					.and().delete().forPath("/a")
+//					.and().delete().forPath("/a/path")
+//					.and().delete().forPath("/a")
 					.and().commit();
 
 			for (CuratorTransactionResult result : results) {

@@ -27,6 +27,10 @@
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>jline</artifactId>
                     <groupId>jline</groupId>
                 </exclusion>
