@@ -1,6 +1,21 @@
 package com.cross.plateform.common.rpc.service.server;
 
 public interface CommonServiceServer {
+
+	/**
+	 * 连接zk
+	 *
+	 * @param server
+	 * @param timeout
+	 * @throws Exception
+	 */
+	void connectZookeeper(String server, int timeout) throws Exception;
+
+	/**
+	 * 关闭服务
+	 */
+	void close() throws Exception;
+
 	/**
 	 * 注册服务
 	 *
@@ -20,16 +35,12 @@ public interface CommonServiceServer {
 	void registerClient(String group, String server, String client) throws Exception;
 
 	/**
-	 * 关闭服务
-	 */
-	void close() throws Exception;
-
-	/**
-	 * 连接zk
+	 * 释放客户端
 	 *
+	 * @param group
 	 * @param server
-	 * @param timeout
-	 * @throws Exception
+	 * @param client
+	 * @return
 	 */
-	void connectZookeeper(String server, int timeout) throws Exception;
+	void unregisterClient(String group, String server, String client) throws Exception;
 }

@@ -16,19 +16,24 @@ public class CommonRpcServerService {
         return SingletonHolder.instance;
     }
 
-    public void registerService(String group, String server) throws Exception {
-        CommonRpcServiceFactory.getCommonServiceServer().registerServer(group, server);
+
+    public void connectZookeeper(String server, int timeout) throws Exception {
+        CommonRpcServiceFactory.getCommonServiceServer().connectZookeeper(server, timeout);
     }
 
     public void close() throws Exception {
         CommonRpcServiceFactory.getCommonServiceServer().close();
     }
 
-    public void connectZookeeper(String server, int timeout) throws Exception {
-        CommonRpcServiceFactory.getCommonServiceServer().connectZookeeper(server, timeout);
+    public void registerService(String group, String server) throws Exception {
+        CommonRpcServiceFactory.getCommonServiceServer().registerServer(group, server);
     }
 
     public void registerClient(String group, String server, String client) throws Exception {
         CommonRpcServiceFactory.getCommonServiceServer().registerClient(group, server, client);
+    }
+
+    public void unregisterClient(String group, String server, String client) throws Exception {
+        CommonRpcServiceFactory.getCommonServiceServer().unregisterClient(group, server, client);
     }
 }

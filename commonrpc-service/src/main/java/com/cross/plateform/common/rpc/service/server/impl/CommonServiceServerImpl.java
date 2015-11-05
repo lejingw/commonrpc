@@ -18,11 +18,12 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static org.apache.curator.framework.state.ConnectionState.*;
+
 public class CommonServiceServerImpl implements CommonServiceServer {
 	private static final Logger logger = LoggerFactory.getLogger(CommonServiceServerImpl.class);
 	private CuratorFramework zookeeperClient;
 	private List<String> serverRegistMap = new CopyOnWriteArrayList<>();
-	private List<String> clientRegistMap = new CopyOnWriteArrayList<>();
 
 	@Override
 	public void close() throws Exception {
@@ -45,25 +46,27 @@ public class CommonServiceServerImpl implements CommonServiceServer {
 
 	@Override
 	public void registerServer(final String group, final String server) throws Exception {
-		//createNode("/" + group, group, CreateMode.PERSISTENT);
 		createNode("/" + group + "/server", group, CreateMode.PERSISTENT);
 
 		String path = "/" + group + "/server/" + server;
 		createNode(path, server, CreateMode.EPHEMERAL_SEQUENTIAL);
 		if (!serverRegistMap.contains(path)) {
 			zookeeperClient.getConnectionStateListenable().addListener(new ConnectionStateListener() {
-				@Override
-				public void stateChanged(CuratorFramework client, ConnectionState newState) {
-					if (newState == ConnectionState.RECONNECTED) {
-						try {
-							logger.debug("[stateChanged]register server when state change to RECONNECTED");
-							registerServer(group, server);
-						} catch (Exception e) {
-							logger.error("registerServer fail when reconnect");
-						}
-					}
-				}
-			});
+					   @Override
+					   public void stateChanged(CuratorFramework client, ConnectionState newState) {
+						   switch (newState) {
+							   case RECONNECTED: {
+								   try {
+									   logger.debug("[stateChanged]register server when state change to RECONNECTED");
+									   registerServer(group, server);
+								   } catch (Exception e) {
+									   logger.error("registerServer fail when reconnect");
+								   }
+								   break;
+							   }
+						   }
+					   }
+				   });
 //            zookeeperClient.getCuratorListenable().addListener(new CuratorListener() {
 //                @Override
 //                public void eventReceived(CuratorFramework client, CuratorEvent event) throws Exception {
@@ -77,61 +80,52 @@ public class CommonServiceServerImpl implements CommonServiceServer {
 //                    }
 //                }
 //            });
-			serverRegistMap.add(path);
+				serverRegistMap.add(path);
+			}
 		}
-	}
 
-	@Override
-	public void registerClient(final String group, final String server, final String client) throws Exception {
-		//createNode("/" + group, group, CreateMode.PERSISTENT);
-		createNode("/" + group + "/client", group, CreateMode.PERSISTENT);
-
-		String path = "/" + group + "/client/" + client;
-		createNode(path, client + "->" + server, CreateMode.EPHEMERAL_SEQUENTIAL);
-		if (!clientRegistMap.contains(path)) {
-			zookeeperClient.getConnectionStateListenable().addListener(new ConnectionStateListener() {
-				@Override
-				public void stateChanged(CuratorFramework curatorFramework, ConnectionState newState) {
-					switch (newState) {
-						case RECONNECTED: {
-							try {
-								logger.debug("[stateChanged]register client when state change to RECONNECTED");
-								registerClient(group, server, client);
-							} catch (Exception e) {
-								logger.error("registerClient fail when reconnect");
-							}
-						}
-					}
-				}
-			});
-			clientRegistMap.add(path);
+		@Override
+		public void registerClient ( final String group, final String server, final String client)throws Exception {
+			createNode("/" + group + "/client", group, CreateMode.PERSISTENT);
+			createNode("/" + group + "/client/" + client + "->" + server, client, CreateMode.EPHEMERAL);
 		}
-	}
 
+		@Override
+		public void unregisterClient ( final String group, final String server, final String client)throws Exception {
+			deleteNode("/" + group + "/client/" + client + "->" + server);
+		}
 
-	/**
-	 * 创建node
-	 *
-	 * @param nodeName
-	 * @param value
-	 * @return
-	 */
-	public boolean createNode(String nodeName, String value, CreateMode createMode) {
-		boolean suc = false;
+		/**
+		 * 创建node
+		 *
+		 * @param nodeName
+		 * @param value
+		 * @return
+		 */
+
+	private void createNode(String nodeName, String value, CreateMode createMode) {
 		try {
 			Stat stat = zookeeperClient.checkExists().forPath(nodeName);
 			if (stat == null) {
-				String opResult = null;
 				if (Strings.isNullOrEmpty(value)) {
-					opResult = zookeeperClient.create().creatingParentsIfNeeded().withMode(createMode).forPath(nodeName);
+					zookeeperClient.create().creatingParentsIfNeeded().withMode(createMode).forPath(nodeName);
 				} else {
-					opResult = zookeeperClient.create().creatingParentsIfNeeded().withMode(createMode).forPath(nodeName, value.getBytes(Charsets.UTF_8));
+					zookeeperClient.create().creatingParentsIfNeeded().withMode(createMode).forPath(nodeName, value.getBytes(Charsets.UTF_8));
 				}
-				suc = Objects.equal(nodeName, opResult);
 			}
 		} catch (Exception e) {
-			logger.error("createNode fail,path:" + nodeName, e);
+			logger.error("createNode fail, path:" + nodeName, e);
 		}
-		return suc;
+	}
+
+	private void deleteNode(String nodeName) {
+		try {
+			Stat stat = zookeeperClient.checkExists().forPath(nodeName);
+			if (null != stat) {
+				zookeeperClient.delete().inBackground().forPath(nodeName);
+			}
+		} catch (Exception e) {
+			logger.error("deleteNode fail, path:" + nodeName, e);
+		}
 	}
 }

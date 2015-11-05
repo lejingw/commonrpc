@@ -2,11 +2,8 @@ package com.cross.plateform.common.rpc.tcp.netty4.server.handler;
 
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
-import com.cross.plateform.common.rpc.core.client.factory.RpcClientFactory;
 import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
 import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
-import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
-import com.cross.plateform.common.rpc.tcp.netty4.util.NetworkKit;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,12 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(CommonRpcTcpServerHandler.class);
@@ -57,7 +51,16 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+		logger.info("client:{} disconnected", ctx.channel().remoteAddress().toString());
 		ctx.channel().close();
+
+		SocketAddress socketAddress = ctx.channel().remoteAddress();
+		if (socketAddress instanceof InetSocketAddress) {
+			InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
+			String remoteAddr = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
+			CommonRpcServerService instance = CommonRpcServerService.getInstance();
+			instance.unregisterClient(group, ip + ":" + port, remoteAddr);
+		}
 	}
 
 	@Override
