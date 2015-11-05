@@ -27,6 +27,7 @@
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <version>2.6.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <!--<dependency>
@@ -38,6 +39,7 @@
             <groupId>com.esotericsoftware</groupId>
             <artifactId>kryo</artifactId>
             <version>3.0.3</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -45,7 +47,6 @@
             <artifactId>commonrpc-service</artifactId>
             <version>${project.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>junit</groupId>
