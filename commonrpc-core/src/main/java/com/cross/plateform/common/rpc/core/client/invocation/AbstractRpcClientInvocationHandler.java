@@ -47,8 +47,10 @@ public abstract class AbstractRpcClientInvocationHandler implements InvocationHa
         int j = random.nextInt(servers.size());
         InetSocketAddress server = servers.get(j).getServer();
 //        InetSocketAddress server = new ArrayList<InetSocketAddress>(addresses).get(random.nextInt(addresses.size()));
-
-        RpcClient client = getClientFactory().getClient(server.getAddress().getHostAddress(), server.getPort());
+        String ip = server.getAddress().getHostAddress();
+        int port = server.getPort();
+        logger.debug("call [{}-{}:{}] method {}", groups[i], ip, port, method);
+        RpcClient client = getClientFactory().getClient(ip, port);
         String methodName = method.getName();
         String[] argTypes = createParamSignature(method.getParameterTypes());
         Object result = client.invokeImpl(targetInstanceName, methodName, argTypes, args, timeout, codecType, protocolType);
