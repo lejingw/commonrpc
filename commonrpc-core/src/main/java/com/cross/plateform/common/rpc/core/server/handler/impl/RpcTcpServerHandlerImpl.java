@@ -8,6 +8,7 @@ import com.cross.plateform.common.rpc.server.filter.RpcFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -96,9 +97,12 @@ public class RpcTcpServerHandlerImpl extends AbstractRpcTcpServerHandler {
             } else {
                 responseWrapper.setResponse(method.invoke(rpcFilterServerBean.getObject(), requestObjects));
             }
-        } catch (Exception e) {
-            logger.error("server handle request error", e);
-            responseWrapper.setException(e);
+        } catch (InvocationTargetException e) {
+            logger.error("server handle request error", e.getTargetException());
+            responseWrapper.setException(e.getTargetException());
+        } catch (Exception e){
+            logger.error("server handle request error", e.getCause());
+            responseWrapper.setException(e.getCause());
         }
         return responseWrapper;
     }

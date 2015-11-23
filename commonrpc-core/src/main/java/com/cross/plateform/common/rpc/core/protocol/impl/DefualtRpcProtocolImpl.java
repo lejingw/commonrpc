@@ -15,15 +15,15 @@ import java.util.List;
 public class DefualtRpcProtocolImpl implements RpcProtocol {
 	private static final Logger logger = LoggerFactory.getLogger(DefualtRpcProtocolImpl.class);
 	public static final int TYPE = 1;
-	private static final int REQUEST_HEADER_LEN = 1 * 6 + 5 * 4 ;
-	private static final int RESPONSE_HEADER_LEN = 1 * 6 + 3 * 4 ;
+	private static final int REQUEST_HEADER_LEN = 1 * 6 + 5 * 4;
+	private static final int RESPONSE_HEADER_LEN = 1 * 6 + 3 * 4;
 	private static final byte VERSION = (byte) 1;
 	private static final byte REQUEST = (byte) 0;
 	private static final byte RESPONSE = (byte) 1;
 
 	@Override
 	public RpcByteBuffer encode(Object message, RpcByteBuffer bytebufferWrapper) throws Exception {
-		if (!(message instanceof CommonRpcRequest)&& !(message instanceof CommonRpcResponse)) {
+		if (!(message instanceof CommonRpcRequest) && !(message instanceof CommonRpcResponse)) {
 			throw new Exception("only support send RequestWrapper && ResponseWrapper");
 		}
 		int id = 0;
@@ -52,7 +52,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				byte[] targetInstanceNameByte = wrapper.getTargetInstanceName();
 				byte[] methodNameByte = wrapper.getMethodName();
 
-				
+
 				id = wrapper.getId();
 				int timeout = wrapper.getTimeout();
 				int capacity = CommonRpcProtocol.HEADER_LEN + REQUEST_HEADER_LEN
@@ -135,7 +135,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 			byteBuffer.writeByte((byte) 0);//1B
 
 			byteBuffer.writeInt(id);
-			byteBuffer.writeInt(wrapper.getCodecType() == CommonRpcCodecs.PB_CODEC?className.length:0);
+			byteBuffer.writeInt(wrapper.getCodecType() == CommonRpcCodecs.PB_CODEC ? className.length : 0);
 			byteBuffer.writeInt(body.length);
 			//---------------REQUEST_HEADER_LEN----------
 			if (wrapper.getCodecType() == CommonRpcCodecs.PB_CODEC) {
@@ -146,7 +146,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 		}
 	}
 
-	
+
 	@Override
 	public Object decode(RpcByteBuffer wrapper, Object errorObject, int... originPosArray) throws Exception {
 		final int originPos;
@@ -172,7 +172,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				wrapper.readByte();
 				wrapper.readByte();
 				wrapper.readByte();
-				
+
 				int requestId = wrapper.readInt();
 				int timeout = wrapper.readInt();
 				int targetInstanceLen = wrapper.readInt();
@@ -198,10 +198,10 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				}
 				byte[] targetInstanceByte = new byte[targetInstanceLen];
 				wrapper.readBytes(targetInstanceByte);
-				
+
 				byte[] methodNameByte = new byte[methodNameLen];
 				wrapper.readBytes(methodNameByte);
-				
+
 				if (wrapper.readableBytes() < expectedLen) {
 					wrapper.setReaderIndex(originPos);
 					return errorObject;
@@ -234,7 +234,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				wrapper.readByte();
 				wrapper.readByte();
 				wrapper.readByte();
-				
+
 				int requestId = wrapper.readInt();
 				int classNameLen = wrapper.readInt();
 				int bodyLen = wrapper.readInt();
@@ -250,7 +250,7 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				}
 				byte[] bodyBytes = new byte[bodyLen];
 				wrapper.readBytes(bodyBytes);
-				
+
 				CommonRpcResponse responseWrapper = new CommonRpcResponse(requestId, codecType, TYPE);
 				responseWrapper.setResponse(bodyBytes);
 				responseWrapper.setResponseClassName(classNameBytes);

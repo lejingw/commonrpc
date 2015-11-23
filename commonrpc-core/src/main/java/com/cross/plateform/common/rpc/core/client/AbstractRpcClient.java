@@ -16,7 +16,7 @@ public abstract class AbstractRpcClient implements RpcClient {
 	@Override
 	public Object invokeImpl(String targetInstanceName, String methodName,
 							 String[] argTypes, Object[] args, int timeout, int codecType,
-							 int protocolType) throws Exception {
+							 int protocolType) throws Throwable {
 		byte[][] argTypeBytes = new byte[argTypes.length][];
 		for (int i = 0; i < argTypes.length; i++) {
 			argTypeBytes[i] = argTypes[i].getBytes();
@@ -27,7 +27,7 @@ public abstract class AbstractRpcClient implements RpcClient {
 		return invokeImplIntern(wrapperRequest);
 	}
 
-	private Object invokeImplIntern(CommonRpcRequest request) throws Exception {
+	private Object invokeImplIntern(CommonRpcRequest request) throws Throwable {
 		long beginTime = System.currentTimeMillis();
 		LinkedBlockingQueue<Object> responseQueue = new LinkedBlockingQueue<Object>(1);
 		getClientFactory().putResponse(request.getId(), responseQueue);
@@ -77,12 +77,12 @@ public abstract class AbstractRpcClient implements RpcClient {
 		} catch (Exception e) {
 			throw new Exception("Deserialize response object error", e);
 		}
-		if (!StringUtils.isNullOrEmpty(response.getException())) {
+		if (null != response.getException()) {
 //			Throwable t = response.getException();
 //			String errorMsg = "server error,server is: " + getServerIP() + ":" + getServerPort() + " request id is:" + request.getId();
 //			logger.error(errorMsg, t);
 //			return null;
-			throw new RuntimeException(response.getException());
+			throw response.getException();
 		}
 		return response.getResponse();
 	}

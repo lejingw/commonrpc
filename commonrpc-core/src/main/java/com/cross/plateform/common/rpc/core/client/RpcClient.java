@@ -18,7 +18,7 @@ public interface RpcClient {
      */
     Object invokeImpl(String targetInstanceName, String methodName,
                       String[] argTypes, Object[] args, int timeout, int codecType, int protocolType)
-            throws Exception;
+            throws Throwable;
 
     /**
      * server address

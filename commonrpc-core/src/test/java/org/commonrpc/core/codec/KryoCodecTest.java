@@ -107,6 +107,29 @@ public class KryoCodecTest {
 	}
 
 	@Test
+	public void test_cycle() throws Exception {
+		Kryo kryo = new Kryo();
+		kryo.setReferences(true);//default
+
+		Student student = new Student("zhangsan", "man", 0);
+		student.setStudent1(student);
+		{
+			Output output = new Output(256);
+			kryo.writeClassAndObject(output, student);
+			byte[] bytes = output.toBytes();
+
+			Input input = new Input(bytes);
+			Object stu = kryo.readClassAndObject(input);
+
+			System.out.println(stu);
+			Student s = (Student) stu;
+			System.out.println(s.getName() + "," + s.getSex());
+			System.out.println(s.getStudent1() == s);
+			Assert.assertEquals(s.getStudent1(), s);
+		}
+	}
+
+	@Test
 	public void test_references() throws Exception {
 		Kryo kryo = new Kryo();
 		kryo.setReferences(true);//default
