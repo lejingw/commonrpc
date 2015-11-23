@@ -1,7 +1,7 @@
 package com.cross.plateform.common.rpc.tcp.netty4.server;
 
 import com.cross.plateform.common.rpc.core.server.RpcServer;
-import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
+import com.cross.plateform.common.rpc.core.server.handler.impl.RpcTcpServerHandler;
 import com.cross.plateform.common.rpc.core.thread.NamedThreadFactory;
 import com.cross.plateform.common.rpc.server.filter.RpcFilter;
 import com.cross.plateform.common.rpc.tcp.netty4.codec.CommonRpcDecoderHandler;
@@ -9,8 +9,6 @@ import com.cross.plateform.common.rpc.tcp.netty4.codec.CommonRpcEncoderHandler;
 import com.cross.plateform.common.rpc.tcp.netty4.server.handler.CommonRpcTcpServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -46,7 +44,7 @@ public class CommonRpcTcpServer implements RpcServer {
 
 	@Override
 	public void registerProcessor(String serviceName, Object serviceInstance, RpcFilter rpcFilter) {
-		CommonRpcServerHandlerFactory.getServerHandler().registerProcessor(serviceName, serviceInstance, rpcFilter);
+		RpcTcpServerHandler.getInstance().registerProcessor(serviceName, serviceInstance, rpcFilter);
 	}
 
 	@Override
@@ -84,7 +82,7 @@ public class CommonRpcTcpServer implements RpcServer {
 		try {
 			channelFuture.channel().close().awaitUninterruptibly();
 			executorService.shutdownNow();
-			CommonRpcServerHandlerFactory.getServerHandler().clear();
+			RpcTcpServerHandler.getInstance().clear();
 		} finally {
 			bossGroup.shutdownGracefully();
 			workerGroup.shutdownGracefully();

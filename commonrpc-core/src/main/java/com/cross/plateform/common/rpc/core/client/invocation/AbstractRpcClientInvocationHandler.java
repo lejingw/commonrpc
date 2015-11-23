@@ -4,7 +4,7 @@ import com.cross.plateform.common.rpc.core.client.RpcClient;
 import com.cross.plateform.common.rpc.core.client.factory.RpcClientFactory;
 import com.cross.plateform.common.rpc.core.route.bean.RpcRouteServer;
 import com.cross.plateform.common.rpc.core.util.SocketAddressUtil;
-import com.cross.plateform.common.rpc.service.factory.CommonRpcServiceFactory;
+import com.cross.plateform.common.rpc.zk.factory.CommonRpcZkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +17,12 @@ import java.util.Set;
 
 public abstract class AbstractRpcClientInvocationHandler implements InvocationHandler {
 	private static final Logger logger = LoggerFactory.getLogger(AbstractRpcClientInvocationHandler.class);
-	private String group;
-	private int timeout;
-	private String targetInstanceName;
-	private int codecType;
-	private int protocolType;
-	private Random random;
+	private final String group;
+	private final int timeout;
+	private final String targetInstanceName;
+	private final int codecType;
+	private final int protocolType;
+	private final Random random;
 
 	public AbstractRpcClientInvocationHandler(String group, int timeout, String targetInstanceName, int codecType, int protocolType) {
 		this.group = group;
@@ -35,19 +35,17 @@ public abstract class AbstractRpcClientInvocationHandler implements InvocationHa
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		String[] groups = group.split(",");
-		int i = random.nextInt(groups.length);
-		Set<InetSocketAddress> addresses = CommonRpcServiceFactory.getCommonServiceClient().getServersByGroup(group);
+		Set<InetSocketAddress> addresses = CommonRpcZkFactory.getClient().getServersByGroup(group);
 		if (null == addresses || addresses.size() < 1) {
 			throw new RuntimeException("count not find remote server, please check the server side");
 		}
 		List<RpcRouteServer> servers = SocketAddressUtil.getInetSocketAddress(addresses);
 		int j = random.nextInt(servers.size());
 		InetSocketAddress server = servers.get(j).getServer();
-//        InetSocketAddress server = new ArrayList<InetSocketAddress>(addresses).get(random.nextInt(addresses.size()));
 		String ip = server.getAddress().getHostAddress();
 		int port = server.getPort();
-		logger.debug("call [{}-{}:{}] method {}", groups[i], ip, port, method);
+		logger.debug("call [{}-{}:{}] method {}", group, ip, port, method);
+
 		RpcClient client = getClientFactory().getClient(ip, port);
 		String methodName = method.getName();
 		String[] argTypes = createParamSignature(method.getParameterTypes());
@@ -60,8 +58,8 @@ public abstract class AbstractRpcClientInvocationHandler implements InvocationHa
 			return new String[]{};
 		}
 		String[] paramSig = new String[argTypes.length];
-		for (int x = 0; x < argTypes.length; x++) {
-			paramSig[x] = argTypes[x].getName();
+		for (int i = 0; i < argTypes.length; i++) {
+			paramSig[i] = argTypes[i].getName();
 		}
 		return paramSig;
 	}

@@ -13,8 +13,7 @@ public class DemoRpcFilter implements RpcFilter {
 	}
 
 	@Override
-	public boolean doAfterRequest(Object processor) {
+	public void doAfterRequest(Object processor) {
 		System.out.println("----------------拦截结束----------------");
-		return false;
 	}
 }

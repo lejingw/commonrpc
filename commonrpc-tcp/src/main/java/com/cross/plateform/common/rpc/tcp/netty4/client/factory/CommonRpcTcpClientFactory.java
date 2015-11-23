@@ -26,7 +26,7 @@ public class CommonRpcTcpClientFactory extends AbstractRpcClientFactory<CommonRp
 
 	private static final ThreadFactory workerThreadFactory = new NamedThreadFactory("CommonRpc-WORKER-");
 	private static EventLoopGroup workerGroup = new NioEventLoopGroup(PROCESSORS_COUNT, workerThreadFactory);
-	private final Bootstrap bootstrap = new Bootstrap();
+	private Bootstrap bootstrap = null;
 
 	private CommonRpcTcpClientFactory() {
 	}
@@ -37,6 +37,11 @@ public class CommonRpcTcpClientFactory extends AbstractRpcClientFactory<CommonRp
 
 	@Override
 	public void startClientFactory(int connectTimeout) {
+		if(null != bootstrap){
+			logger.error("CommonRpc client is already started !!!");
+			return;
+		}
+		bootstrap = new Bootstrap();
 		bootstrap.group(workerGroup)
 				.channel(NioSocketChannel.class)
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout)
@@ -75,8 +80,7 @@ public class CommonRpcTcpClientFactory extends AbstractRpcClientFactory<CommonRp
 		try {
 			future = bootstrap.connect(new InetSocketAddress(ip, port)).sync();
 		} catch (Exception e) {
-			RpcClientFactory instance = CommonRpcTcpClientFactory.getInstance();
-			instance.removeRpcClient(ip, port);
+			removeRpcClient(ip, port);
 			throw e;
 		}
 		future.awaitUninterruptibly();

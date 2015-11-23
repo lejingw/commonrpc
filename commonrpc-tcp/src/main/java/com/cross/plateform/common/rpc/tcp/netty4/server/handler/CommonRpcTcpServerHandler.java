@@ -2,8 +2,8 @@ package com.cross.plateform.common.rpc.tcp.netty4.server.handler;
 
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
-import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
-import com.cross.plateform.common.rpc.service.factory.CommonRpcServiceFactory;
+import com.cross.plateform.common.rpc.core.server.handler.impl.RpcTcpServerHandler;
+import com.cross.plateform.common.rpc.zk.factory.CommonRpcZkFactory;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -43,9 +43,8 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 		if (socketAddress instanceof InetSocketAddress) {
 			InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
 			String remoteAddr = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
-			CommonRpcServiceFactory.getCommonServiceServer().registerClient(group, ip + ":" + port, remoteAddr);
+			CommonRpcZkFactory.getServer().registerClient(group, ip + ":" + port, remoteAddr);
 		}
-
 	}
 
 	@Override
@@ -57,7 +56,7 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 		if (socketAddress instanceof InetSocketAddress) {
 			InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
 			String remoteAddr = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
-			CommonRpcServiceFactory.getCommonServiceServer().unregisterClient(group, ip + ":" + port, remoteAddr);
+			CommonRpcZkFactory.getServer().unregisterClient(group, ip + ":" + port, remoteAddr);
 		}
 	}
 
@@ -67,7 +66,7 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 		if (!(e.getCause() instanceof IOException)) {
 			logger.error("catch some exception not IOException", e);
 		}
-		ctx.channel().close();
+		closeChannel(ctx);
 	}
 
 	@Override
@@ -105,15 +104,13 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 	 */
 	private void handleRequestWithSingleThread(final ChannelHandlerContext ctx, CommonRpcRequest request) {
 		try {
-			CommonRpcResponse rocketRPCResponse = CommonRpcServerHandlerFactory.getServerHandler().handleRequest(request, codecType, procotolType);
+			CommonRpcResponse rocketRPCResponse = RpcTcpServerHandler.getInstance().handleRequest(request, codecType, procotolType);
 			if (ctx.channel().isOpen()) {
 				ChannelFuture wf = ctx.channel().writeAndFlush(rocketRPCResponse);
 				wf.addListener(new ChannelFutureListener() {
 					public void operationComplete(ChannelFuture future) throws Exception {
 						if (!future.isSuccess()) {
-							InetSocketAddress remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();
-							logger.error("server write response error, client host is:{}:{}", remoteAddress.getHostName(), remoteAddress.getPort());
-							ctx.channel().close();
+							closeChannel(ctx);
 						}
 					}
 				});
@@ -132,11 +129,15 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 		wf.addListener(new ChannelFutureListener() {
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (!future.isSuccess()) {
-					InetSocketAddress remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();
-					logger.error("server write response error, request id is:{}, client Ip is:{}", request.getId(), remoteAddress);
-					ctx.channel().close();
+					closeChannel(ctx);
 				}
 			}
 		});
+	}
+
+	private void closeChannel(ChannelHandlerContext ctx){
+		InetSocketAddress remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();
+		logger.error("server write response error, client Ip is:{}", remoteAddress);
+		ctx.channel().close();
 	}
 }

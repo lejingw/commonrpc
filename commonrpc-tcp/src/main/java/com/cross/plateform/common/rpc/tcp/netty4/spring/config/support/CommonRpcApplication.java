@@ -1,7 +1,7 @@
 package com.cross.plateform.common.rpc.tcp.netty4.spring.config.support;
 
 import com.cross.plateform.common.rpc.core.util.StringUtils;
-import com.cross.plateform.common.rpc.service.factory.CommonRpcServiceFactory;
+import com.cross.plateform.common.rpc.zk.factory.CommonRpcZkFactory;
 import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.InitializingBean;
 
 public class CommonRpcApplication implements InitializingBean, DisposableBean {
 	private static final Logger logger = LoggerFactory.getLogger(CommonRpcApplication.class);
-	private String address = null;
+	private String address;
 	private boolean providerFlag;
 	private int timeout;
 
@@ -23,9 +23,9 @@ public class CommonRpcApplication implements InitializingBean, DisposableBean {
 			throw new RuntimeException("parameter 'timeout' should be positive");
 		}
 		if (providerFlag) {//服务端
-			CommonRpcServiceFactory.getCommonServiceServer().connectZookeeper(address, timeout);
+			CommonRpcZkFactory.getServer().connectZookeeper(address, timeout);
 		} else {//客户端
-			CommonRpcServiceFactory.getCommonServiceClient().connectZookeeper(address, timeout);
+			CommonRpcZkFactory.getClient().connectZookeeper(address, timeout);
 			CommonRpcTcpClientFactory.getInstance().startClientFactory(timeout);//客户端启动
 		}
 	}
@@ -33,9 +33,9 @@ public class CommonRpcApplication implements InitializingBean, DisposableBean {
 	@Override
 	public void destroy() throws Exception {
 		if (providerFlag) {
-			CommonRpcServiceFactory.getCommonServiceServer().close();
+			CommonRpcZkFactory.getServer().close();
 		} else {
-			CommonRpcServiceFactory.getCommonServiceClient().close();
+			CommonRpcZkFactory.getClient().close();
 			CommonRpcTcpClientFactory.getInstance().stopClientFactory();
 		}
 		logger.info("CommonRpcApplication has been closed !!!");

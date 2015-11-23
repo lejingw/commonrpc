@@ -20,7 +20,8 @@ public class ConsumerStartup {
 		DemoService demoService = (DemoService) context.getBean("demoService");
 		DemoService2 demoService2 = (DemoService2) context.getBean("demoService2");
 
-		System.out.println(demoService.sayHello("world!!!!aaa"));
+		demoService.testNone();
+		System.out.println(demoService.sayHello("world"));
 		try {
 			RequestVo req = new RequestVo();
 			req.setStr("hello world !");
@@ -51,8 +52,8 @@ public class ConsumerStartup {
 		public void run() {
 			try {
 				//System.out.println("------------------call----1--" + demoService.sayHello("world"));
-				ResponseVo res = demoService2.testException(req);
-				System.out.println("------------------call----2--" + res.getStr1());
+				ResponseVo res = demoService2.testObj(req);
+				System.out.println(res);
 			} catch (Exception e) {
 				logger.error("consumer error:", e);
 			}

@@ -1,10 +1,11 @@
 package com.cross.plateform.common.rpc.tcp.netty4.spring.config.support;
 
-import com.cross.plateform.common.rpc.core.util.StringUtils;
-import com.cross.plateform.common.rpc.tcp.netty4.client.proxy.CommonRpcTcpClientProxy;
+import com.cross.plateform.common.rpc.tcp.netty4.client.invocation.CommonRpcTcpClientInvocationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
+
+import java.lang.reflect.Proxy;
 
 public class CommonRpcReference implements FactoryBean {
 	private static final Logger logger = LoggerFactory.getLogger(CommonRpcReference.class);
@@ -17,7 +18,10 @@ public class CommonRpcReference implements FactoryBean {
 
 	@Override
 	public Object getObject() throws Exception {
-		return CommonRpcTcpClientProxy.getInstance().getProxyService(intfType, timeout, codecType, protocolType, getObjectType().getName(), group);
+		return Proxy.newProxyInstance(
+				Thread.currentThread().getContextClassLoader(),
+				new Class[]{intfType},
+				new CommonRpcTcpClientInvocationHandler(group, timeout, getObjectType().getName(), codecType, protocolType));
 	}
 
 	@Override

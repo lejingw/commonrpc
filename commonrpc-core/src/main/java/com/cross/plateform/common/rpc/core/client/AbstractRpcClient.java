@@ -7,6 +7,7 @@ import com.cross.plateform.common.rpc.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -29,7 +30,7 @@ public abstract class AbstractRpcClient implements RpcClient {
 
 	private Object invokeImplIntern(CommonRpcRequest request) throws Throwable {
 		long beginTime = System.currentTimeMillis();
-		LinkedBlockingQueue<Object> responseQueue = new LinkedBlockingQueue<Object>(1);
+		BlockingQueue<Object> responseQueue = new LinkedBlockingQueue<>(1);
 		getClientFactory().putResponse(request.getId(), responseQueue);
 		try {
 			sendRequest(request);
@@ -47,18 +48,17 @@ public abstract class AbstractRpcClient implements RpcClient {
 
 		CommonRpcResponse response = null;
 		if (result == null) {
-			if ((System.currentTimeMillis() - beginTime) <= request.getTimeout()) {//返回null
-				response = new CommonRpcResponse(request.getId(), request.getCodecType(), request.getProtocolType());
-			} else {//超时
+			response = new CommonRpcResponse(request.getId(), request.getCodecType(), request.getProtocolType());
+			if ((System.currentTimeMillis() - beginTime) > request.getTimeout()) {//超时
 				String errorMsg = "receive response timeout(" + request.getTimeout() + " ms), server is: " + getServerIP() + ":" + getServerPort() + " request id is:" + request.getId();
 				response = new CommonRpcResponse(request.getId(), request.getCodecType(), request.getProtocolType());
 				response.setException(new RuntimeException(errorMsg));
-			}
-		} else if (result != null) {
+			}//else 返回null
+		} else {
 			response = (CommonRpcResponse) result;
 		}
 		try {
-			if (response.getResponse() instanceof byte[]) {
+			if (null != response.getResponse() && response.getResponse() instanceof byte[]) {
 				String responseClassName = null;
 				if (response.getResponseClassName() != null) {
 					responseClassName = new String(response.getResponseClassName());
@@ -78,10 +78,6 @@ public abstract class AbstractRpcClient implements RpcClient {
 			throw new Exception("Deserialize response object error", e);
 		}
 		if (null != response.getException()) {
-//			Throwable t = response.getException();
-//			String errorMsg = "server error,server is: " + getServerIP() + ":" + getServerPort() + " request id is:" + request.getId();
-//			logger.error(errorMsg, t);
-//			return null;
 			throw response.getException();
 		}
 		return response.getResponse();

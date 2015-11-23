@@ -17,10 +17,10 @@ public interface RpcFilter {
     /**
      * 拦截器服务端后处理
      *
-     * @param processor
+     * @param response
      * @return
      */
-    boolean doAfterRequest(Object processor);
+    void doAfterRequest(Object response);
 
 
 }

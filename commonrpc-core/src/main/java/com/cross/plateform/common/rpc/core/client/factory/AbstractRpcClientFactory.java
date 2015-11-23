@@ -6,13 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class AbstractRpcClientFactory<T extends AbstractRpcClient> implements RpcClientFactory<T> {
 	private static final Logger logger = LoggerFactory.getLogger(AbstractRpcClientFactory.class);
-	private Map<Integer, LinkedBlockingQueue<Object>> responses = new ConcurrentHashMap<>();
+	private Map<Integer, BlockingQueue<Object>> responses = new ConcurrentHashMap<>();
 	private Map<String, T> rpcClients = new ConcurrentHashMap<>();
 	private ReentrantLock lock = new ReentrantLock();
 
@@ -65,7 +66,7 @@ public abstract class AbstractRpcClientFactory<T extends AbstractRpcClient> impl
 			return;
 		} else {
 			try {
-				LinkedBlockingQueue<Object> queue = responses.get(response.getRequestId());
+				BlockingQueue<Object> queue = responses.get(response.getRequestId());
 				if (queue != null) {
 					queue.put(response);
 				} else {
@@ -78,7 +79,7 @@ public abstract class AbstractRpcClientFactory<T extends AbstractRpcClient> impl
 	}
 
 	@Override
-	public void putResponse(int key, LinkedBlockingQueue<Object> queue)
+	public void putResponse(int key, BlockingQueue<Object> queue)
 			throws Exception {
 		responses.put(key, queue);
 	}

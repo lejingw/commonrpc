@@ -12,7 +12,7 @@ public class DemoService2Impl implements DemoService2 {
 	public ResponseVo testObj(RequestVo req) {
 		System.out.println(req.getStr());
 		ResponseVo res = new ResponseVo();
-		String str = "---------------2----";
+		String str = "--testObj--";
 		res.setStr1(str);
 		return res;
 	}
