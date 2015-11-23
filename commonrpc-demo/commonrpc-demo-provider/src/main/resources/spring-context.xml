@@ -14,6 +14,7 @@
     <!-- 加载配置属性文件 -->
     <context:property-placeholder ignore-unresolvable="true" location="classpath:project.properties"/>
 
+    <bean class="com.commonrpc.demo.util.KryoInit"/>
     <!--
         address：zookeeper 注册中心地址
         providerFlag：标记是提供者还是消费者

@@ -13,4 +13,9 @@ public class ResponseVo {
 	public void setStr1(String str1) {
 		this.str1 = str1;
 	}
+
+	@Override
+	public String toString() {
+		return "toString:" + str1;
+	}
 }

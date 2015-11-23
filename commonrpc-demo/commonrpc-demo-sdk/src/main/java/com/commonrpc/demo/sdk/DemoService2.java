@@ -1,5 +1,6 @@
 package com.commonrpc.demo.sdk;
 
 public interface DemoService2 {
-	ResponseVo sayHello(RequestVo req);
+	ResponseVo testObj(RequestVo req);
+	ResponseVo testException(RequestVo req);
 }

@@ -1,4 +1,4 @@
-package com.commonrpc.demo;
+package com.commonrpc.demo.exception;
 
 /**
  * Created by lejing on 15/11/19.
