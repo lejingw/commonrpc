@@ -14,7 +14,7 @@ import org.springframework.beans.factory.InitializingBean;
 public class KryoInit implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		int nextId = 1;
+		int nextId = 100;
 		KryoUtils.registerClass(MyException.class, new Serializer<MyException>() {
 					@Override
 					public void write(Kryo kryo, Output output, MyException object) {

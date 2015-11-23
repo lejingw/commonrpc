@@ -1,5 +1,6 @@
 package com.commonrpc.demo;
 
+import com.commonrpc.demo.sdk.DemoService;
 import com.commonrpc.demo.sdk.DemoService2;
 import com.commonrpc.demo.sdk.RequestVo;
 import com.commonrpc.demo.sdk.ResponseVo;
@@ -16,8 +17,10 @@ public class ConsumerStartup {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"spring-context.xml"});
 		context.registerShutdownHook();
 
-//		DemoService demoService = (DemoService) context.getBean("demoService");
+		DemoService demoService = (DemoService) context.getBean("demoService");
 		DemoService2 demoService2 = (DemoService2) context.getBean("demoService2");
+
+		System.out.println(demoService.sayHello("world!!!!aaa"));
 		try {
 			RequestVo req = new RequestVo();
 			req.setStr("hello world !");
