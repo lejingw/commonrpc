@@ -77,9 +77,9 @@
         </dependency>
     </dependencies>
     <modules>
+        <module>commonrpc-zk</module>
         <module>commonrpc-core</module>
         <module>commonrpc-tcp</module>
-        <module>commonrpc-zk</module>
     </modules>
 
     <build>
