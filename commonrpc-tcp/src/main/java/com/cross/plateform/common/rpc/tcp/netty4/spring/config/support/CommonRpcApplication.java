@@ -1,8 +1,7 @@
 package com.cross.plateform.common.rpc.tcp.netty4.spring.config.support;
 
 import com.cross.plateform.common.rpc.core.util.StringUtils;
-import com.cross.plateform.common.rpc.service.client.service.CommonRpcClientService;
-import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
+import com.cross.plateform.common.rpc.service.factory.CommonRpcServiceFactory;
 import com.cross.plateform.common.rpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +23,9 @@ public class CommonRpcApplication implements InitializingBean, DisposableBean {
 			throw new RuntimeException("parameter 'timeout' should be positive");
 		}
 		if (providerFlag) {//服务端
-			CommonRpcServerService.getInstance().connectZookeeper(address, timeout);
+			CommonRpcServiceFactory.getCommonServiceServer().connectZookeeper(address, timeout);
 		} else {//客户端
-			CommonRpcClientService.getInstance().connectZookeeper(address, timeout);
+			CommonRpcServiceFactory.getCommonServiceClient().connectZookeeper(address, timeout);
 			CommonRpcTcpClientFactory.getInstance().startClientFactory(timeout);//客户端启动
 		}
 	}
@@ -34,9 +33,9 @@ public class CommonRpcApplication implements InitializingBean, DisposableBean {
 	@Override
 	public void destroy() throws Exception {
 		if (providerFlag) {
-			CommonRpcServerService.getInstance().close();
+			CommonRpcServiceFactory.getCommonServiceServer().close();
 		} else {
-			CommonRpcClientService.getInstance().close();
+			CommonRpcServiceFactory.getCommonServiceClient().close();
 			CommonRpcTcpClientFactory.getInstance().stopClientFactory();
 		}
 		logger.info("CommonRpcApplication has been closed !!!");

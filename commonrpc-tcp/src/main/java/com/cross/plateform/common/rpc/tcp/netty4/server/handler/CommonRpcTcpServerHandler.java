@@ -3,7 +3,7 @@ package com.cross.plateform.common.rpc.tcp.netty4.server.handler;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcRequest;
 import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
 import com.cross.plateform.common.rpc.core.server.handler.factory.CommonRpcServerHandlerFactory;
-import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
+import com.cross.plateform.common.rpc.service.factory.CommonRpcServiceFactory;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -43,8 +43,7 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 		if (socketAddress instanceof InetSocketAddress) {
 			InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
 			String remoteAddr = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
-			CommonRpcServerService instance = CommonRpcServerService.getInstance();
-			instance.registerClient(group, ip + ":" + port, remoteAddr);
+			CommonRpcServiceFactory.getCommonServiceServer().registerClient(group, ip + ":" + port, remoteAddr);
 		}
 
 	}
@@ -58,8 +57,7 @@ public class CommonRpcTcpServerHandler extends ChannelInboundHandlerAdapter {
 		if (socketAddress instanceof InetSocketAddress) {
 			InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
 			String remoteAddr = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
-			CommonRpcServerService instance = CommonRpcServerService.getInstance();
-			instance.unregisterClient(group, ip + ":" + port, remoteAddr);
+			CommonRpcServiceFactory.getCommonServiceServer().unregisterClient(group, ip + ":" + port, remoteAddr);
 		}
 	}
 

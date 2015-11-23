@@ -1,7 +1,7 @@
 package com.cross.plateform.common.rpc.tcp.netty4.spring.config.support;
 
 import com.cross.plateform.common.rpc.core.util.StringUtils;
-import com.cross.plateform.common.rpc.service.server.service.CommonRpcServerService;
+import com.cross.plateform.common.rpc.service.factory.CommonRpcServiceFactory;
 import com.cross.plateform.common.rpc.tcp.netty4.server.CommonRpcTcpServer;
 import com.cross.plateform.common.rpc.tcp.netty4.util.NetworkKit;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class CommonRpcRegistery implements InitializingBean, DisposableBean {
 		if (port == 0) {
 			throw new Exception("parameter port can not be null");
 		}
-		CommonRpcServerService.getInstance().registerService(group, getLocalhost() + ":" + port);
+		CommonRpcServiceFactory.getCommonServiceServer().registerServer(group, getLocalhost() + ":" + port);
 		CommonRpcTcpServer.getInstance().setCodecType(codecType);
 		CommonRpcTcpServer.getInstance().setProcotolType(procotolType);
 		CommonRpcTcpServer.getInstance().setThreadCount(threadCount);

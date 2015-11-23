@@ -14,7 +14,8 @@ import java.util.List;
 
 public class DefualtRpcProtocolImpl implements RpcProtocol {
 	private static final Logger logger = LoggerFactory.getLogger(DefualtRpcProtocolImpl.class);
-	public static final int TYPE = 1;
+	public static final int PROTOCOL_TYPE = 1;
+
 	private static final int REQUEST_HEADER_LEN = 1 * 6 + 5 * 4;
 	private static final int RESPONSE_HEADER_LEN = 1 * 6 + 3 * 4;
 	private static final byte VERSION = (byte) 1;
@@ -26,7 +27,6 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 		if (!(message instanceof CommonRpcRequest) && !(message instanceof CommonRpcResponse)) {
 			throw new Exception("only support send RequestWrapper && ResponseWrapper");
 		}
-		int id = 0;
 		if (message instanceof CommonRpcRequest) {
 			try {
 				CommonRpcRequest wrapper = (CommonRpcRequest) message;
@@ -52,18 +52,19 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				byte[] targetInstanceNameByte = wrapper.getTargetInstanceName();
 				byte[] methodNameByte = wrapper.getMethodName();
 
-
-				id = wrapper.getId();
 				int timeout = wrapper.getTimeout();
 				int capacity = CommonRpcProtocol.HEADER_LEN + REQUEST_HEADER_LEN
 						+ requestArgs.size() * 4 * 2
 						+ targetInstanceNameByte.length + methodNameByte.length
 						+ requestArgTypesLen + requestArgsLen;
 
+				//--------------HEADER start----------------
 				RpcByteBuffer byteBuffer = bytebufferWrapper.get(capacity);
 				byteBuffer.writeByte(CommonRpcProtocol.CURRENT_VERSION);
-				byteBuffer.writeByte((byte) TYPE);
-				//--------------HEADER_LEN----------------
+				byteBuffer.writeByte((byte) PROTOCOL_TYPE);
+				//--------------HEADER end----------------
+
+				//---------------REQUEST_HEADER start----------
 				byteBuffer.writeByte(VERSION);//1B
 				byteBuffer.writeByte(REQUEST);//1B
 				byteBuffer.writeByte((byte) wrapper.getCodecType());//1B
@@ -71,12 +72,13 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				byteBuffer.writeByte((byte) 0);//1B
 				byteBuffer.writeByte((byte) 0);//1B
 
-				byteBuffer.writeInt(id);//4B
+				byteBuffer.writeInt(wrapper.getId());//4B
 				byteBuffer.writeInt(timeout);//4B
 				byteBuffer.writeInt(targetInstanceNameByte.length);//4B
 				byteBuffer.writeInt(methodNameByte.length);//4B
 				byteBuffer.writeInt(requestArgs.size());//4B
-				//---------------REQUEST_HEADER_LEN----------
+				//---------------REQUEST_HEADER end----------
+
 				for (byte[] requestArgType : requestArgTypes) {
 					byteBuffer.writeInt(requestArgType.length);
 				}
@@ -98,8 +100,8 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 			}
 		} else {
 			CommonRpcResponse wrapper = (CommonRpcResponse) message;
-			byte[] body = new byte[0];
 			byte[] className = new byte[0];
+			byte[] body = new byte[0];
 			try {
 				// no return object
 				if (wrapper.getResponse() != null) {
@@ -110,7 +112,6 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 					className = wrapper.getException().getClass().getName().getBytes();
 					body = CommonRpcCodecs.getEncoder(wrapper.getCodecType()).encode(wrapper.getException());
 				}
-				id = wrapper.getRequestId();
 			} catch (Exception e) {
 				logger.error("encode response object error", e);
 				// still create responsewrapper,so client can get exception
@@ -124,9 +125,12 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 				capacity += className.length;
 			}
 			RpcByteBuffer byteBuffer = bytebufferWrapper.get(capacity);
+			//--------------HEADER start----------------
 			byteBuffer.writeByte(CommonRpcProtocol.CURRENT_VERSION);
-			byteBuffer.writeByte((byte) TYPE);
-			//--------------HEADER_LEN----------------
+			byteBuffer.writeByte((byte) PROTOCOL_TYPE);
+			//--------------HEADER end----------------
+
+			//---------------REQUEST_HEADER start----------
 			byteBuffer.writeByte(VERSION);//1B
 			byteBuffer.writeByte(RESPONSE);//1B
 			byteBuffer.writeByte((byte) wrapper.getCodecType());//1B
@@ -134,10 +138,10 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 			byteBuffer.writeByte((byte) 0);//1B
 			byteBuffer.writeByte((byte) 0);//1B
 
-			byteBuffer.writeInt(id);
+			byteBuffer.writeInt(wrapper.getRequestId());
 			byteBuffer.writeInt(wrapper.getCodecType() == CommonRpcCodecs.PB_CODEC ? className.length : 0);
 			byteBuffer.writeInt(body.length);
-			//---------------REQUEST_HEADER_LEN----------
+			//---------------REQUEST_HEADER end----------
 			if (wrapper.getCodecType() == CommonRpcCodecs.PB_CODEC) {
 				byteBuffer.writeBytes(className);
 			}
@@ -160,108 +164,107 @@ public class DefualtRpcProtocolImpl implements RpcProtocol {
 			return errorObject;
 		}
 		byte version = wrapper.readByte();
-		if (version == (byte) 1) {
-			byte type = wrapper.readByte();
-			if (type == REQUEST) {
-				if (wrapper.readableBytes() < REQUEST_HEADER_LEN - 2) {
-					wrapper.setReaderIndex(originPos);
-					return errorObject;
-				}
-				int codecType = wrapper.readByte();
-
-				wrapper.readByte();
-				wrapper.readByte();
-				wrapper.readByte();
-
-				int requestId = wrapper.readInt();
-				int timeout = wrapper.readInt();
-				int targetInstanceLen = wrapper.readInt();
-				int methodNameLen = wrapper.readInt();
-				int argsCount = wrapper.readInt();
-
-				int argInfosLen = argsCount * 4 * 2;
-				int expectedLenInfoLen = argInfosLen + targetInstanceLen + methodNameLen;
-				if (wrapper.readableBytes() < expectedLenInfoLen) {
-					wrapper.setReaderIndex(originPos);
-					return errorObject;
-				}
-				int expectedLen = 0;
-				int[] argsTypeLen = new int[argsCount];
-				for (int i = 0; i < argsCount; i++) {
-					argsTypeLen[i] = wrapper.readInt();
-					expectedLen += argsTypeLen[i];
-				}
-				int[] argsLen = new int[argsCount];
-				for (int i = 0; i < argsCount; i++) {
-					argsLen[i] = wrapper.readInt();
-					expectedLen += argsLen[i];
-				}
-				byte[] targetInstanceByte = new byte[targetInstanceLen];
-				wrapper.readBytes(targetInstanceByte);
-
-				byte[] methodNameByte = new byte[methodNameLen];
-				wrapper.readBytes(methodNameByte);
-
-				if (wrapper.readableBytes() < expectedLen) {
-					wrapper.setReaderIndex(originPos);
-					return errorObject;
-				}
-				byte[][] argTypes = new byte[argsCount][];
-				for (int i = 0; i < argsCount; i++) {
-					byte[] argTypeByte = new byte[argsTypeLen[i]];
-					wrapper.readBytes(argTypeByte);
-					argTypes[i] = argTypeByte;
-				}
-				Object[] args = new Object[argsCount];
-				for (int i = 0; i < argsCount; i++) {
-					byte[] argByte = new byte[argsLen[i]];
-					wrapper.readBytes(argByte);
-					args[i] = argByte;
-				}
-
-				CommonRpcRequest rpcRequest = new CommonRpcRequest(
-						targetInstanceByte, methodNameByte, argTypes, args,
-						timeout, requestId, codecType, TYPE);
-				int messageLen = CommonRpcProtocol.HEADER_LEN + REQUEST_HEADER_LEN + expectedLenInfoLen + expectedLen;
-				rpcRequest.setMessageLen(messageLen);
-				return rpcRequest;
-			} else if (type == RESPONSE) {
-				if (wrapper.readableBytes() < RESPONSE_HEADER_LEN - 2) {
-					wrapper.setReaderIndex(originPos);
-					return errorObject;
-				}
-				int codecType = wrapper.readByte();
-				wrapper.readByte();
-				wrapper.readByte();
-				wrapper.readByte();
-
-				int requestId = wrapper.readInt();
-				int classNameLen = wrapper.readInt();
-				int bodyLen = wrapper.readInt();
-				if (wrapper.readableBytes() < classNameLen + bodyLen) {
-					wrapper.setReaderIndex(originPos);
-					return errorObject;
-				}
-
-				byte[] classNameBytes = null;
-				if (codecType == CommonRpcCodecs.PB_CODEC) {
-					classNameBytes = new byte[classNameLen];
-					wrapper.readBytes(classNameBytes);
-				}
-				byte[] bodyBytes = new byte[bodyLen];
-				wrapper.readBytes(bodyBytes);
-
-				CommonRpcResponse responseWrapper = new CommonRpcResponse(requestId, codecType, TYPE);
-				responseWrapper.setResponse(bodyBytes);
-				responseWrapper.setResponseClassName(classNameBytes);
-				int messageLen = CommonRpcProtocol.HEADER_LEN + RESPONSE_HEADER_LEN + classNameLen + bodyLen;
-				responseWrapper.setMessageLen(messageLen);
-				return responseWrapper;
-			} else {
-				throw new UnsupportedOperationException("protocol type : " + type + " is not supported!");
-			}
-		} else {
+		if (version != (byte) 1) {
 			throw new UnsupportedOperationException("protocol version :" + version + " is not supported!");
+		}
+		byte type = wrapper.readByte();
+		if (type == REQUEST) {
+			if (wrapper.readableBytes() < REQUEST_HEADER_LEN - 2) {
+				wrapper.setReaderIndex(originPos);
+				return errorObject;
+			}
+			int codecType = wrapper.readByte();
+
+			wrapper.readByte();
+			wrapper.readByte();
+			wrapper.readByte();
+
+			int requestId = wrapper.readInt();
+			int timeout = wrapper.readInt();
+			int targetInstanceLen = wrapper.readInt();
+			int methodNameLen = wrapper.readInt();
+			int argsCount = wrapper.readInt();
+
+			int argInfosLen = argsCount * 4 * 2;
+			int expectedLenInfoLen = argInfosLen + targetInstanceLen + methodNameLen;
+			if (wrapper.readableBytes() < expectedLenInfoLen) {
+				wrapper.setReaderIndex(originPos);
+				return errorObject;
+			}
+			int expectedLen = 0;
+			int[] argsTypeLen = new int[argsCount];
+			for (int i = 0; i < argsCount; i++) {
+				argsTypeLen[i] = wrapper.readInt();
+				expectedLen += argsTypeLen[i];
+			}
+			int[] argsLen = new int[argsCount];
+			for (int i = 0; i < argsCount; i++) {
+				argsLen[i] = wrapper.readInt();
+				expectedLen += argsLen[i];
+			}
+			byte[] targetInstanceByte = new byte[targetInstanceLen];
+			wrapper.readBytes(targetInstanceByte);
+
+			byte[] methodNameByte = new byte[methodNameLen];
+			wrapper.readBytes(methodNameByte);
+
+			if (wrapper.readableBytes() < expectedLen) {
+				wrapper.setReaderIndex(originPos);
+				return errorObject;
+			}
+			byte[][] argTypes = new byte[argsCount][];
+			for (int i = 0; i < argsCount; i++) {
+				byte[] argTypeByte = new byte[argsTypeLen[i]];
+				wrapper.readBytes(argTypeByte);
+				argTypes[i] = argTypeByte;
+			}
+			Object[] args = new Object[argsCount];
+			for (int i = 0; i < argsCount; i++) {
+				byte[] argByte = new byte[argsLen[i]];
+				wrapper.readBytes(argByte);
+				args[i] = argByte;
+			}
+
+			CommonRpcRequest rpcRequest = new CommonRpcRequest(
+					targetInstanceByte, methodNameByte, argTypes, args,
+					timeout, requestId, codecType, PROTOCOL_TYPE);
+			int messageLen = CommonRpcProtocol.HEADER_LEN + REQUEST_HEADER_LEN + expectedLenInfoLen + expectedLen;
+			rpcRequest.setMessageLen(messageLen);
+			return rpcRequest;
+		} else if (type == RESPONSE) {
+			if (wrapper.readableBytes() < RESPONSE_HEADER_LEN - 2) {
+				wrapper.setReaderIndex(originPos);
+				return errorObject;
+			}
+			int codecType = wrapper.readByte();
+			wrapper.readByte();
+			wrapper.readByte();
+			wrapper.readByte();
+
+			int requestId = wrapper.readInt();
+			int classNameLen = wrapper.readInt();
+			int bodyLen = wrapper.readInt();
+			if (wrapper.readableBytes() < classNameLen + bodyLen) {
+				wrapper.setReaderIndex(originPos);
+				return errorObject;
+			}
+
+			byte[] classNameBytes = null;
+			if (codecType == CommonRpcCodecs.PB_CODEC) {
+				classNameBytes = new byte[classNameLen];
+				wrapper.readBytes(classNameBytes);
+			}
+			byte[] bodyBytes = new byte[bodyLen];
+			wrapper.readBytes(bodyBytes);
+
+			CommonRpcResponse responseWrapper = new CommonRpcResponse(requestId, codecType, PROTOCOL_TYPE);
+			responseWrapper.setResponse(bodyBytes);
+			responseWrapper.setResponseClassName(classNameBytes);
+			int messageLen = CommonRpcProtocol.HEADER_LEN + RESPONSE_HEADER_LEN + classNameLen + bodyLen;
+			responseWrapper.setMessageLen(messageLen);
+			return responseWrapper;
+		} else {
+			throw new UnsupportedOperationException("protocol type : " + type + " is not supported!");
 		}
 	}
 

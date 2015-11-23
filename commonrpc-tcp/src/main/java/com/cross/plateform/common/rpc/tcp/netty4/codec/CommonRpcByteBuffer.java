@@ -18,6 +18,7 @@ public class CommonRpcByteBuffer implements RpcByteBuffer {
 	public CommonRpcByteBuffer(ChannelHandlerContext ctx) {
 		this.ctx = ctx;
 	}
+
 	public CommonRpcByteBuffer get(int capacity) {
 		if (buffer != null)
 			return this;

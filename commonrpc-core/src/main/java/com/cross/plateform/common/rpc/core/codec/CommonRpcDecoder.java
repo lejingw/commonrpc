@@ -5,5 +5,5 @@ package com.cross.plateform.common.rpc.core.codec;
  */
 public interface CommonRpcDecoder {
 
-	Object decode(String className,byte[] bytes) throws Exception;
+	Object decode(String className, byte[] bytes) throws Exception;
 }

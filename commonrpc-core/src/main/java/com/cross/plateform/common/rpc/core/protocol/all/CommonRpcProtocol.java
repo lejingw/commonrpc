@@ -7,10 +7,8 @@ import com.cross.plateform.common.rpc.core.protocol.RpcProtocol;
 import com.cross.plateform.common.rpc.core.protocol.factory.CommonRpcProtocolFactory;
 
 public class CommonRpcProtocol {
-
 	public static final int HEADER_LEN = 2;
-
-	public static final byte CURRENT_VERSION = (byte) 1;
+	public static final byte CURRENT_VERSION = 1;
 
 	public static RpcByteBuffer encode(Object message, RpcByteBuffer bytebufferWrapper) throws Exception {
 		Integer type = 0;
