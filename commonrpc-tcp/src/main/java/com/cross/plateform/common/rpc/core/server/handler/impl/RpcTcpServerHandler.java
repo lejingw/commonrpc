@@ -7,6 +7,7 @@ import com.cross.plateform.common.rpc.core.server.handler.AbstractRpcTcpServerHa
 import com.cross.plateform.common.rpc.server.filter.RpcFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -43,7 +44,7 @@ public class RpcTcpServerHandler extends AbstractRpcTcpServerHandler {
 			for (Class<?> argClass : argTypes) {
 				methodKeyBuilder.append(argClass.getName()).append("_");
 			}
-			method.setAccessible(true);
+			ReflectionUtils.makeAccessible(method);
 			cacheMethods.put(methodKeyBuilder.toString(), method);
 		}
 	}
