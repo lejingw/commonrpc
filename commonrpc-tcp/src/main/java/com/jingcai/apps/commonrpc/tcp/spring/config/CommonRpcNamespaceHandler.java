@@ -1,4 +1,4 @@
-package com.jingcai.apps.commonrpc.tcp.netty4.spring.config;
+package com.jingcai.apps.commonrpc.tcp.spring.config;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 

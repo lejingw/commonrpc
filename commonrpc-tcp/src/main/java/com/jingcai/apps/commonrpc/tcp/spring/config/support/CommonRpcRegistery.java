@@ -1,8 +1,8 @@
-package com.jingcai.apps.commonrpc.tcp.netty4.spring.config.support;
+package com.jingcai.apps.commonrpc.tcp.spring.config.support;
 
 import com.jingcai.apps.commonrpc.core.util.StringUtils;
 import com.jingcai.apps.commonrpc.tcp.netty4.server.CommonRpcTcpServer;
-import com.jingcai.apps.commonrpc.tcp.netty4.util.NetworkKit;
+import com.jingcai.apps.commonrpc.tcp.util.NetworkKit;
 import com.jingcai.apps.commonrpc.zk.zk.factory.CommonRpcZkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -10,7 +10,7 @@ public interface RpcServerHandler {
      * @param instanceName
      * @param instance
      */
-    void registerProcessor(String instanceName, Object instance, RpcFilter rpcFilter);
+    void registerProcessor(String instanceName, Object instance, RpcFilter rpcFilter, int codecType);
 
     /**
      * 清除

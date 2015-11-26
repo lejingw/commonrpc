@@ -1,4 +1,4 @@
-package com.jingcai.apps.commonrpc.tcp.netty4.spring.config.support;
+package com.jingcai.apps.commonrpc.tcp.spring.config.support;
 
 import com.jingcai.apps.commonrpc.core.util.StringUtils;
 import com.jingcai.apps.commonrpc.tcp.netty4.client.factory.CommonRpcTcpClientFactory;

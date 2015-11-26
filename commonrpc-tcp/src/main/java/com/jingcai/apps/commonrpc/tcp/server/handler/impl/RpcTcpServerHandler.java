@@ -30,8 +30,8 @@ public class RpcTcpServerHandler extends AbstractRpcTcpServerHandler {
 	}
 
 	@Override
-	public void registerProcessor(String instanceName, Object instance, RpcFilter rpcFilter) {
-		RpcFilterServerBean filterServerBean = new RpcFilterServerBean(instance, rpcFilter);
+	public void registerProcessor(String instanceName, Object instance, RpcFilter rpcFilter, int codecType) {
+		RpcFilterServerBean filterServerBean = new RpcFilterServerBean(instance, rpcFilter, codecType);
 		processors.put(instanceName, filterServerBean);
 
 		Class<?> instanceClass = instance.getClass();
@@ -109,6 +109,10 @@ public class RpcTcpServerHandler extends AbstractRpcTcpServerHandler {
 			logger.error("server handle request error", e.getCause());
 			respWrapper.setException(e.getCause());
 		}
+		//服务自身的编码类型,覆盖registry上的设置
+		if(rpcFilterServerBean.getCodecType()>0){
+			respWrapper.setCodecType(rpcFilterServerBean.getCodecType());
+		}
 		return respWrapper;
 	}
 
@@ -123,6 +127,7 @@ public class RpcTcpServerHandler extends AbstractRpcTcpServerHandler {
 	private class RpcFilterServerBean {
 		private Object object;
 		private RpcFilter rpcFilter;
+		private int codecType;
 
 		public Object getObject() {
 			return object;
@@ -132,9 +137,14 @@ public class RpcTcpServerHandler extends AbstractRpcTcpServerHandler {
 			return rpcFilter;
 		}
 
-		public RpcFilterServerBean(Object object, RpcFilter rpcFilter) {
+		public int getCodecType() {
+			return codecType;
+		}
+
+		public RpcFilterServerBean(Object object, RpcFilter rpcFilter, int codecType) {
 			this.object = object;
 			this.rpcFilter = rpcFilter;
+			this.codecType = codecType;
 		}
 	}
 }

@@ -21,6 +21,10 @@ public class CommonRpcResponse implements Serializable {
 		this.protocolType = protocolType;
 	}
 
+	public void setCodecType(int codecType) {
+		this.codecType = codecType;
+	}
+
 	public int getMessageLen() {
 		return messageLen;
 	}

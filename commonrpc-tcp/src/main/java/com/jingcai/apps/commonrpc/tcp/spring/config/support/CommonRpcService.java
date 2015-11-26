@@ -1,4 +1,4 @@
-package com.jingcai.apps.commonrpc.tcp.netty4.spring.config.support;
+package com.jingcai.apps.commonrpc.tcp.spring.config.support;
 
 import com.jingcai.apps.commonrpc.core.filter.RpcFilter;
 import com.jingcai.apps.commonrpc.tcp.netty4.server.CommonRpcTcpServer;
@@ -11,6 +11,7 @@ public class CommonRpcService implements InitializingBean {
 
 	private Object ref;//服务类bean value
 	private RpcFilter filterRef;//拦截器类
+	private int codecType;//编码类型
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -24,7 +25,7 @@ public class CommonRpcService implements InitializingBean {
 			return;
 		}
 		String interfacename = interfaces[0].getName();
-		CommonRpcTcpServer.getInstance().registerProcessor(interfacename, ref, filterRef);//filterRef 允许为null
+		CommonRpcTcpServer.getInstance().registerProcessor(interfacename, ref, filterRef, codecType);//filterRef 允许为null
 	}
 
 	public void setRef(Object ref) {
@@ -33,5 +34,9 @@ public class CommonRpcService implements InitializingBean {
 
 	public void setFilterRef(RpcFilter filterRef) {
 		this.filterRef = filterRef;
+	}
+
+	public void setCodecType(int codecType) {
+		this.codecType = codecType;
 	}
 }

@@ -1,9 +1,9 @@
 /**
  *
  */
-package com.jingcai.apps.commonrpc.tcp.netty4.spring.config;
+package com.jingcai.apps.commonrpc.tcp.spring.config;
 
-import com.jingcai.apps.commonrpc.tcp.netty4.spring.config.support.CommonRpcRegistery;
+import com.jingcai.apps.commonrpc.tcp.spring.config.support.CommonRpcRegistery;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;

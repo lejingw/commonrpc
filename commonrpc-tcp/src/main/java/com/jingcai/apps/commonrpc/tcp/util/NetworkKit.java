@@ -1,4 +1,4 @@
-package com.jingcai.apps.commonrpc.tcp.netty4.util;
+package com.jingcai.apps.commonrpc.tcp.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

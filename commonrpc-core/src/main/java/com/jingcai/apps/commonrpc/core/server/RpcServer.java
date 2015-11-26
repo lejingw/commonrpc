@@ -10,7 +10,7 @@ public interface RpcServer {
 	 * @param serviceName     服务名称
 	 * @param serviceInstance 服务实例
 	 */
-	void registerProcessor(String serviceName, Object serviceInstance, RpcFilter rpcFilter);
+	void registerProcessor(String serviceName, Object serviceInstance, RpcFilter rpcFilter, int codecType);
 
 	/**
 	 * @param port

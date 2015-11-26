@@ -1,8 +1,6 @@
-package com.jingcai.apps.commonrpc.tcp.netty4.spring.config;
+package com.jingcai.apps.commonrpc.tcp.spring.config;
 
-import com.jingcai.apps.commonrpc.tcp.netty4.spring.config.support.CommonRpcApplication;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.jingcai.apps.commonrpc.tcp.spring.config.support.CommonRpcReference;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -11,22 +9,26 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
-public class CommonRpcApplicationParser implements BeanDefinitionParser {
-	private static final Logger logger = LoggerFactory.getLogger(CommonRpcApplicationParser.class);
+public class CommonRpcReferenceParser implements BeanDefinitionParser {
 
 	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		String id = element.getAttribute("id");
-		String address=element.getAttribute("address");
-		String providerFlag=element.getAttribute("providerFlag");
-		String timeout=element.getAttribute("timeout");
-		
+		String intfType = element.getAttribute("interface");
+		String group = element.getAttribute("group");
+		String procotolType = element.getAttribute("procotolType");
+		String codecType = element.getAttribute("codecType");
+		String timeout = element.getAttribute("timeout");
+
 		RootBeanDefinition beanDefinition = new RootBeanDefinition();
-		beanDefinition.setBeanClass(CommonRpcApplication.class);
+		beanDefinition.setBeanClass(CommonRpcReference.class);
 		beanDefinition.setLazyInit(false);
-        beanDefinition.getPropertyValues().addPropertyValue("address", address);
-        beanDefinition.getPropertyValues().addPropertyValue("providerFlag", "true".equals(providerFlag));
-        beanDefinition.getPropertyValues().addPropertyValue("timeout", timeout);
+
+		beanDefinition.getPropertyValues().addPropertyValue("intfType", intfType);
+		beanDefinition.getPropertyValues().addPropertyValue("group", group);
+		beanDefinition.getPropertyValues().addPropertyValue("protocolType", procotolType);
+		beanDefinition.getPropertyValues().addPropertyValue("codecType", codecType);
+		beanDefinition.getPropertyValues().addPropertyValue("timeout", timeout);
 
 		if(!StringUtils.isEmpty(id)) {
 			parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);

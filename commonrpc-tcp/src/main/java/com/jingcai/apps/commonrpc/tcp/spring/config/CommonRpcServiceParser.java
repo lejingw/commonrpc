@@ -1,4 +1,4 @@
-package com.jingcai.apps.commonrpc.tcp.netty4.spring.config;
+package com.jingcai.apps.commonrpc.tcp.spring.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
-import com.jingcai.apps.commonrpc.tcp.netty4.spring.config.support.CommonRpcService;
+import com.jingcai.apps.commonrpc.tcp.spring.config.support.CommonRpcService;
 
 public class CommonRpcServiceParser implements BeanDefinitionParser {
 	private static final Logger logger = LoggerFactory.getLogger(CommonRpcServiceParser.class);
@@ -24,6 +24,7 @@ public class CommonRpcServiceParser implements BeanDefinitionParser {
 		String ref = element.getAttribute("ref");
 		String clsname = element.getAttribute("class");
 		String filterRef = element.getAttribute("filterRef");
+		String codecType = element.getAttribute("codecType");
 
 		if (StringUtils.isEmpty(ref) && StringUtils.isEmpty(clsname)) {
 			logger.error("ref or class must be setting when define service !!!");
@@ -51,6 +52,9 @@ public class CommonRpcServiceParser implements BeanDefinitionParser {
 
 		if(!StringUtils.isEmpty(filterRef)) {
 			beanDefinition.getPropertyValues().addPropertyValue("filterRef", new RuntimeBeanReference(filterRef));
+		}
+		if(!StringUtils.isEmpty(codecType)) {
+			beanDefinition.getPropertyValues().addPropertyValue("codecType", codecType);
 		}
 //		parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
 		String id = parserContext.getReaderContext().registerWithGeneratedName(beanDefinition);

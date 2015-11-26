@@ -43,8 +43,8 @@ public class CommonRpcTcpServer implements RpcServer {
 	}
 
 	@Override
-	public void registerProcessor(String serviceName, Object serviceInstance, RpcFilter rpcFilter) {
-		RpcTcpServerHandler.getInstance().registerProcessor(serviceName, serviceInstance, rpcFilter);
+	public void registerProcessor(String serviceName, Object serviceInstance, RpcFilter rpcFilter, int codecType) {
+		RpcTcpServerHandler.getInstance().registerProcessor(serviceName, serviceInstance, rpcFilter, codecType);
 	}
 
 	@Override
