@@ -2,7 +2,7 @@ package com.commonrpc.demo.rpcfilter;
 
 import java.lang.reflect.Method;
 
-import com.cross.plateform.common.rpc.server.filter.RpcFilter;
+import com.cross.plateform.common.rpc.core.filter.RpcFilter;
 
 public class DemoRpcFilter implements RpcFilter {
 	@Override

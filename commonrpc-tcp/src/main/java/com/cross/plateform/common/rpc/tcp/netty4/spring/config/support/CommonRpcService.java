@@ -1,6 +1,6 @@
 package com.cross.plateform.common.rpc.tcp.netty4.spring.config.support;
 
-import com.cross.plateform.common.rpc.server.filter.RpcFilter;
+import com.cross.plateform.common.rpc.core.filter.RpcFilter;
 import com.cross.plateform.common.rpc.tcp.netty4.server.CommonRpcTcpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

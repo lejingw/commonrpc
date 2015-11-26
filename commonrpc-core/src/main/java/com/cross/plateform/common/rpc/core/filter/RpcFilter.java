@@ -1,4 +1,4 @@
-package com.cross.plateform.common.rpc.server.filter;
+package com.cross.plateform.common.rpc.core.filter;
 
 import java.lang.reflect.Method;
 

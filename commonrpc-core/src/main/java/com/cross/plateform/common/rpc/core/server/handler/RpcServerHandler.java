@@ -1,6 +1,6 @@
 package com.cross.plateform.common.rpc.core.server.handler;
 
-import com.cross.plateform.common.rpc.server.filter.RpcFilter;
+import com.cross.plateform.common.rpc.core.filter.RpcFilter;
 
 public interface RpcServerHandler {
 
