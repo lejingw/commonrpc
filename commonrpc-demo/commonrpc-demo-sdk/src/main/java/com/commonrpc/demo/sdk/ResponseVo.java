@@ -1,9 +1,11 @@
 package com.commonrpc.demo.sdk;
 
+import java.io.Serializable;
+
 /**
  * Created by lejing on 15/11/4.
  */
-public class ResponseVo {
+public class ResponseVo implements Serializable {
 	private String str1;
 
 	public String getStr1() {
