@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.rpc</groupId>
+    <groupId>com.jingcai.apps</groupId>
     <artifactId>commonrpc-demo</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -17,7 +17,7 @@
     </modules>
 
     <properties>
-        <commonrpc.version>1.3-SNAPSHOT</commonrpc.version>
+        <commonrpc.version>2.0-SNAPSHOT</commonrpc.version>
         <springframework.version>3.2.8.RELEASE</springframework.version>
         <slf4j.version>1.7.7</slf4j.version>
         <logback.version>1.1.3</logback.version>
@@ -85,7 +85,7 @@
         <!-- logger End -->
 
         <dependency>
-            <groupId>com.rpc</groupId>
+            <groupId>com.jingcai.apps</groupId>
             <artifactId>commonrpc-tcp</artifactId>
             <version>${commonrpc.version}</version>
         </dependency>

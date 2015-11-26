@@ -3,9 +3,9 @@
          xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.rpc</groupId>
-        <artifactId>common-rpc</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <groupId>com.jingcai.apps</groupId>
+        <artifactId>commonrpc</artifactId>
+        <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>commonrpc-tcp</artifactId>
     <name>commonrpc-tcp</name>
@@ -23,9 +23,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.rpc</groupId>
+            <groupId>com.jingcai.apps</groupId>
             <artifactId>commonrpc-core</artifactId>
-            <version>1.3-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

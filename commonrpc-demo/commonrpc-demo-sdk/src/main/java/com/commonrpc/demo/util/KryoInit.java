@@ -1,7 +1,7 @@
 package com.commonrpc.demo.util;
 
 import com.commonrpc.demo.exception.MyException;
-import com.cross.plateform.common.rpc.core.util.KryoUtils;
+import com.jingcai.apps.commonrpc.core.util.KryoUtils;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;

@@ -1,6 +1,6 @@
 package org.commonrpc.core.codec;
 
-import com.cross.plateform.common.rpc.core.util.KryoUtils;
+import com.jingcai.apps.commonrpc.core.util.KryoUtils;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Registration;
 import com.esotericsoftware.kryo.io.Input;

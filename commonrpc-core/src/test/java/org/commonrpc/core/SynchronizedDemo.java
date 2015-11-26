@@ -1,10 +1,5 @@
 package org.commonrpc.core;
 
-import com.cross.plateform.common.rpc.core.all.message.CommonRpcResponse;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 public class SynchronizedDemo {
 	public static void main(String[] args) throws Exception {
 		SynchronizedDemo synchronizedDemo = new SynchronizedDemo();

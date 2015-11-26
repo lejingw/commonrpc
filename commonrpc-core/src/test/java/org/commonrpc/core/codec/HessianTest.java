@@ -1,7 +1,7 @@
 package org.commonrpc.core.codec;
 
-import com.cross.plateform.common.rpc.core.codec.impl.HessianDecoder;
-import com.cross.plateform.common.rpc.core.codec.impl.HessianEncoder;
+import com.jingcai.apps.commonrpc.core.codec.impl.HessianDecoder;
+import com.jingcai.apps.commonrpc.core.codec.impl.HessianEncoder;
 import org.commonrpc.core.vo.Student2;
 import org.junit.Assert;
 import org.junit.Test;
