@@ -22,7 +22,7 @@ public class KryoUtils {
 				kryo.register(classList.get(i), serializerList.get(i), idList.get(i));
 			}
 //			kryo.setRegistrationRequired(true);
-			kryo.setReferences(true);
+			kryo.setReferences(false);//default is true
 			return kryo;
 		}
 	};

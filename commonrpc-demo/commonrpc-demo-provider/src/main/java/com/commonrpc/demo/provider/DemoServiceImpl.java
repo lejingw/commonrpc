@@ -1,5 +1,6 @@
 package com.commonrpc.demo.provider;
 
+import com.commonrpc.demo.myenum.UserType;
 import com.commonrpc.demo.sdk.DemoService;
 
 public class DemoServiceImpl implements DemoService {
@@ -21,6 +22,12 @@ public class DemoServiceImpl implements DemoService {
 		String str = "--sayHello--";
 		System.out.println(str);
 		return "Hello " + name;
+	}
+
+	@Override
+	public UserType testEnum(UserType userType) {
+		System.out.println("receive:" + userType.name() + "\t val:" + userType.val());
+		return UserType.game_merchant;
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.commonrpc.demo;
 
+import com.commonrpc.demo.myenum.UserType;
 import com.commonrpc.demo.sdk.DemoService;
 import com.commonrpc.demo.sdk.DemoService2;
 import com.commonrpc.demo.sdk.RequestVo;
@@ -21,22 +22,24 @@ public class ConsumerStartup {
 		DemoService2 demoService2 = (DemoService2) context.getBean("demoService2");
 
 		demoService.testNone();
-		System.out.println(demoService.sayHello("world"));
-		try {
-			RequestVo req = new RequestVo();
-			req.setStr("hello world !");
-
-			for (int i = 0; i < 10; i++) {
-				if (i % 2 == 0) {
-					new Thread(new Task1(demoService2, req)).start();
-				} else {
-					System.out.println(demoService2.testObj(req));
-				}
-				Thread.sleep(5 * 1000);
-			}
-		} finally {
+		UserType userType = demoService.testEnum(UserType.game_user);
+		logger.debug("receive:" + userType.name() + "\t val:" + userType.val());
+//		System.out.println(demoService.sayHello("world"));
+//		try {
+//			RequestVo req = new RequestVo();
+//			req.setStr("hello world !");
+//
+//			for (int i = 0; i < 10; i++) {
+//				if (i % 2 == 0) {
+//					new Thread(new Task1(demoService2, req)).start();
+//				} else {
+//					System.out.println(demoService2.testObj(req));
+//				}
+//				Thread.sleep(5 * 1000);
+//			}
+//		} finally {
 			context.close();
-		}
+//		}
 	}
 
 	static class Task1 implements Runnable {
