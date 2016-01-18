@@ -31,6 +31,12 @@
         </repository>
     </distributionManagement>
 
+    <modules>
+        <module>commonrpc-zk</module>
+        <module>commonrpc-core</module>
+        <module>commonrpc-tcp</module>
+    </modules>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -66,6 +72,7 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+            <optional>true</optional>
         </dependency>
         <!-- logger End -->
 
@@ -76,11 +83,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <modules>
-        <module>commonrpc-zk</module>
-        <module>commonrpc-core</module>
-        <module>commonrpc-tcp</module>
-    </modules>
 
     <build>
         <plugins>

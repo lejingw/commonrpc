@@ -1,18 +1,13 @@
 package org.commonrpc.core.codec;
 
-import com.esotericsoftware.kryo.Serializer;
-import com.jingcai.apps.commonrpc.core.util.KryoUtils;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Registration;
+import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.jingcai.apps.common.lang.serialize.KryoUtils;
 import org.commonrpc.core.vo.Student;
 import org.commonrpc.core.vo.Student2;
-import org.junit.Assert;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +15,9 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by lejing on 15/11/4.
@@ -173,12 +171,8 @@ public class KryoCodecTest {
 
 		long time = System.currentTimeMillis();
 		for (int i = 0; i < 10000; i++) {
-			Output output = new Output(256);
-			KryoUtils.getKryo().writeClassAndObject(output, student);
-			byte[] bytes = output.toBytes();
-
-			Input input = new Input(bytes);
-			Object stu = KryoUtils.getKryo().readClassAndObject(input);
+			byte[] bytes = KryoUtils.getKryo().writeClassAndObject(student);
+			Object stu = KryoUtils.getKryo().readClassAndObject(bytes);
 		}
 		time = System.currentTimeMillis() - time;
 		System.out.println("time:" + time);
