@@ -25,6 +25,7 @@ public class CommonRpcServiceParser implements BeanDefinitionParser {
 		String clsname = element.getAttribute("class");
 		String filterRef = element.getAttribute("filterRef");
 		String codecType = element.getAttribute("codecType");
+		String intfname = element.getAttribute("interface");
 
 		if (StringUtils.isEmpty(ref) && StringUtils.isEmpty(clsname)) {
 			logger.error("ref or class must be setting when define service !!!");
@@ -55,6 +56,9 @@ public class CommonRpcServiceParser implements BeanDefinitionParser {
 		}
 		if(!StringUtils.isEmpty(codecType)) {
 			beanDefinition.getPropertyValues().addPropertyValue("codecType", codecType);
+		}
+		if(!StringUtils.isEmpty(intfname)) {
+			beanDefinition.getPropertyValues().addPropertyValue("interfaceName", intfname);
 		}
 //		parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
 		String id = parserContext.getReaderContext().registerWithGeneratedName(beanDefinition);

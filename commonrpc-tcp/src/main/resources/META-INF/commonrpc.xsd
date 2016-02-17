@@ -34,6 +34,7 @@
                     </xsd:attribute>
                     <xsd:attribute name="filterRef" type="xsd:string"/>
                     <xsd:attribute name="codecType" type="xsd:string"/>
+                    <xsd:attribute name="interface" type="xsd:string"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

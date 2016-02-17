@@ -41,7 +41,8 @@
     <bean id="demoRpcFilter" class="com.commonrpc.demo.rpcfilter.DemoRpcFilter"/>
     <commonrpc:service ref="demoService" filterRef="demoRpcFilter"/>
 
-    <commonrpc:service class="com.commonrpc.demo.provider.DemoService2Impl" codecType="2"/>
+    <!--<commonrpc:service class="com.commonrpc.demo.provider.DemoService2Impl" codecType="2"/>-->
+    <commonrpc:service class="com.commonrpc.demo.provider.DemoService2Impl" interface="com.commonrpc.demo.sdk.DemoService2" codecType="2"/>
 
 
 </beans>

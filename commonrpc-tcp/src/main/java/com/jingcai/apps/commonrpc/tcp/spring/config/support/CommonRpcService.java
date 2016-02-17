@@ -1,5 +1,6 @@
 package com.jingcai.apps.commonrpc.tcp.spring.config.support;
 
+import com.jingcai.apps.common.lang.string.StringUtils;
 import com.jingcai.apps.commonrpc.core.filter.RpcFilter;
 import com.jingcai.apps.commonrpc.tcp.netty4.server.CommonRpcTcpServer;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ public class CommonRpcService implements InitializingBean {
 	private Object ref;//服务类bean value
 	private RpcFilter filterRef;//拦截器类
 	private int codecType;//编码类型
+	private String interfaceName;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -19,13 +21,15 @@ public class CommonRpcService implements InitializingBean {
 			logger.error("could not found the ref class");
 			return;
 		}
-		Class<?>[] interfaces = ref.getClass().getInterfaces();
-		if (null == interfaces || 1 != interfaces.length) {
-			logger.error("could not found the only one interface from class:" + ref.getClass());
-			return;
+		if(StringUtils.isEmpty(interfaceName)) {
+			Class<?>[] interfaces = ref.getClass().getInterfaces();
+			if (null == interfaces || 1 != interfaces.length) {
+				logger.error("could not found the only one interface from class:" + ref.getClass());
+				return;
+			}
+			interfaceName = interfaces[0].getName();
 		}
-		String interfacename = interfaces[0].getName();
-		CommonRpcTcpServer.getInstance().registerProcessor(interfacename, ref, filterRef, codecType);//filterRef 允许为null
+		CommonRpcTcpServer.getInstance().registerProcessor(interfaceName, ref, filterRef, codecType);//filterRef 允许为null
 	}
 
 	public void setRef(Object ref) {
@@ -38,5 +42,9 @@ public class CommonRpcService implements InitializingBean {
 
 	public void setCodecType(int codecType) {
 		this.codecType = codecType;
+	}
+
+	public void setInterfaceName(String interfaceName) {
+		this.interfaceName = interfaceName;
 	}
 }
