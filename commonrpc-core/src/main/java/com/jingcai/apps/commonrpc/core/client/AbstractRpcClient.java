@@ -56,9 +56,9 @@ public abstract class AbstractRpcClient implements RpcClient {
 		} else {
 			response = (CommonRpcResponse) result;
 		}
+		String responseClassName = null;
 		try {
 			if (null != response.getResponse() && response.getResponse() instanceof byte[]) {
-				String responseClassName = null;
 				if (response.getResponseClassName() != null) {
 					responseClassName = new String(response.getResponseClassName());
 				}
@@ -74,7 +74,7 @@ public abstract class AbstractRpcClient implements RpcClient {
 				}
 			}
 		} catch (Exception e) {
-			throw new Exception("Deserialize response object error", e);
+			throw new Exception("Deserialize response object of class[" + responseClassName + "] error", e);
 		}
 		if (null != response.getException()) {
 			throw response.getException();
